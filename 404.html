@@ -4714,46 +4714,12 @@ else:
       </div>
     </div>
 
-    <!-- === Phase 2: 多数据集输入 === -->
-    <div style="border:1px solid var(--line);border-radius:6px;padding:20px 24px;background:#fff">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <div style="display:flex;align-items:center;gap:10px">
-          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">2</span>
-          <b style="font-size:15px">数据集列表</b>
-          <span style="font-size:12px;color:var(--muted)">支持多个数据集，填信息后平台会自动匹配现有资源</span>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn sm" onclick="studyDownloadTemplate()" style="padding:5px 12px;font-size:12.5px">下载规范化模板</button>
-          <button class="btn sm teal" onclick="studyAddDataset()" style="padding:5px 12px;font-size:12.5px">+ 手动添加</button>
-        </div>
-      </div>
-
-      <!-- 文件上传区 -->
-      <div style="border:2px dashed var(--line);border-radius:6px;padding:18px;text-align:center;margin-bottom:14px;transition:border-color .2s" id="st-upload-zone" ondragover="this.style.borderColor='var(--accent)';event.preventDefault()" ondragleave="this.style.borderColor='var(--line)'" ondrop="studyHandleDrop(event)">
-        <div style="font-size:13px;color:var(--ink2);margin-bottom:8px">上传规范化数据集描述文档（.xlsx）</div>
-        <div style="font-size:11.5px;color:var(--muted);margin-bottom:10px">下载模板 → 填写数据集基本信息 + 变量字典 → 上传后自动解析并映射到推荐方案</div>
-        <input type="file" id="st-file-input" accept=".xlsx,.xls" style="display:none" onchange="studyHandleFile(this.files[0])">
-        <button class="btn sm primary" onclick="document.getElementById('st-file-input').click()" style="padding:6px 16px;font-size:12.5px">选择文件上传</button>
-        <span style="margin-left:8px;font-size:11.5px;color:var(--muted)">或拖拽 .xlsx 到此区域</span>
-      </div>
-
-      <!-- 已上传数据集的变量字典展示区 -->
-      <div id="st-uploaded-datasets" style="display:none;margin-bottom:14px">
-        <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--ink2)">已上传的数据集描述：</div>
-        <div id="st-uploaded-list" style="display:flex;flex-direction:column;gap:14px"></div>
-      </div>
-
-      <!-- 手动输入区 -->
-      <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px;border-top:1px dashed var(--line);padding-top:10px">或手动填写数据集信息：</div>
-      <div id="st-datasets" style="display:flex;flex-direction:column;gap:12px"></div>
-    </div>
-
-    <!-- === Phase 3: 开始分析按钮 === -->
+    <!-- === Phase 2: 开始自动检索 === -->
     <div style="display:flex;justify-content:center">
       <button class="btn primary" onclick="studyRun()" style="padding:12px 40px;font-size:15px;font-weight:600">开始自动检索 →</button>
     </div>
 
-    <!-- === Phase 4: 结果展示区 === -->
+    <!-- === Phase 3: 结果展示区 === -->
     <div id="st-results" style="display:none">
       <div id="st-matches-wrap" style="margin-top:24px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
@@ -4764,9 +4730,48 @@ else:
         <div id="st-matches-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px"></div>
       </div>
 
+      <!-- === Phase 4: 数据集上传（P2） === -->
+      <div style="margin-top:28px;border:1px solid var(--line);border-radius:6px;padding:20px 24px;background:#fff">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">4</span>
+            <b style="font-size:15px">上传已下载数据集的描述文档</b>
+            <span style="font-size:12px;color:var(--muted)">下载匹配的数据集 → 填写模板 → 上传变量字典</span>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn sm" onclick="studyDownloadTemplate()" style="padding:5px 12px;font-size:12.5px">下载规范化模板</button>
+            <button class="btn sm teal" onclick="studyAddDataset()" style="padding:5px 12px;font-size:12.5px">+ 手动添加</button>
+          </div>
+        </div>
+
+        <!-- 文件上传区 -->
+        <div style="border:2px dashed var(--line);border-radius:6px;padding:18px;text-align:center;margin-bottom:14px;transition:border-color .2s" id="st-upload-zone" ondragover="this.style.borderColor='var(--accent)';event.preventDefault()" ondragleave="this.style.borderColor='var(--line)'" ondrop="studyHandleDrop(event)">
+          <div style="font-size:13px;color:var(--ink2);margin-bottom:8px">上传规范化数据集描述文档（.xlsx）</div>
+          <div style="font-size:11.5px;color:var(--muted);margin-bottom:10px">下载模板 → 填写数据集基本信息 + 变量字典 → 上传后自动解析并映射到推荐方案</div>
+          <input type="file" id="st-file-input" accept=".xlsx,.xls" style="display:none" onchange="studyHandleFile(this.files[0])">
+          <button class="btn sm primary" onclick="document.getElementById('st-file-input').click()" style="padding:6px 16px;font-size:12.5px">选择文件上传</button>
+          <span style="margin-left:8px;font-size:11.5px;color:var(--muted)">或拖拽 .xlsx 到此区域</span>
+        </div>
+
+        <!-- 已上传数据集的变量字典展示区 -->
+        <div id="st-uploaded-datasets" style="display:none;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--ink2)">已上传的数据集描述：</div>
+          <div id="st-uploaded-list" style="display:flex;flex-direction:column;gap:14px"></div>
+        </div>
+
+        <!-- 手动输入区 -->
+        <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px;border-top:1px dashed var(--line);padding-top:10px">或手动填写数据集信息：</div>
+        <div id="st-datasets" style="display:flex;flex-direction:column;gap:12px"></div>
+
+        <!-- 上传后重新分析按钮 -->
+        <div style="margin-top:14px;display:flex;justify-content:center">
+          <button class="btn primary" onclick="studyReanalyze()" style="padding:8px 28px;font-size:13px;font-weight:600">上传完成，重新生成综述与方案 →</button>
+        </div>
+      </div>
+
       <div id="st-lit-wrap" style="margin-top:28px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">4</span>
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">5</span>
           <b style="font-size:15px">相关文献（Crossref + PubMed）</b>
           <span id="st-lit-count" style="font-size:12px;color:var(--muted)"></span>
         </div>
@@ -4776,7 +4781,7 @@ else:
       <!-- === Phase 5: 文献综述（P1） === -->
       <div id="st-review-wrap" style="margin-top:32px;display:none">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">5</span>
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">6</span>
           <b style="font-size:15px">自动生成文献综述</b>
           <span style="font-size:11.5px;color:var(--muted)">基于检索文献元数据，纯前端自动生成结构化综述</span>
           <div style="flex:1"></div>
@@ -4790,7 +4795,7 @@ else:
       <!-- === Phase 6: 研究方案推荐（P1） === -->
       <div id="st-plans-wrap" style="margin-top:32px;display:none">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">6</span>
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">7</span>
           <b style="font-size:15px">推荐研究设计方案</b>
           <span style="font-size:11.5px;color:var(--muted)">点击方案可编辑改进，支持复制/下载</span>
         </div>
@@ -4800,7 +4805,7 @@ else:
       <!-- === Phase 7: 变量-方案映射（P2） === -->
       <div id="st-varmap-wrap" style="margin-top:32px;display:none">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">7</span>
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">8</span>
           <b style="font-size:15px">变量-方案映射</b>
           <span style="font-size:11.5px;color:var(--muted)">将上传数据集的变量自动映射到推荐方案的变量建议，为后续生成分析脚本做准备</span>
         </div>
@@ -8186,6 +8191,11 @@ async function studyRun() {
   uniq.sort(function (a, b) { return (b.year || 0) - (a.year || 0) });
   studyRenderLit(uniq);
 
+  // 缓存文献和匹配结果到 state，供重新分析使用
+  STUDY_STATE._lastLit = uniq;
+  STUDY_STATE._lastMatches = matches;
+  studySave();
+
   // === 触发 P1：自动生成文献综述 + 推荐研究方案 ===
   studyRunP1(title, purpose, uniq, matches);
 }
@@ -8624,6 +8634,40 @@ function studyRunP1(title, purpose, literature, matches) {
   if (STUDY_STATE.uploadedDatasets && STUDY_STATE.uploadedDatasets.length > 0) {
     studyRunP2(STUDY_STATE._lastPlans || []);
   }
+}
+
+/* --- 重新分析：用户上传数据集后重新生成综述/方案/映射 --- */
+function studyReanalyze() {
+  var title = STUDY_STATE.title || '';
+  var purpose = STUDY_STATE.purpose || '';
+  if (!title) { alert('请先填写研究题目并执行自动检索'); return; }
+
+  /* 从 DOM 读取已渲染的文献列表 */
+  var lit = [];
+  var litItems = document.querySelectorAll('#st-lit-list > div');
+  litItems.forEach(function (el) {
+    var titleEl = el.querySelector('b');
+    if (titleEl) lit.push({ title: titleEl.textContent, year: '', authors: '', journal: '', doi: '', abstract: '', url: '' });
+  });
+  /* 如果 DOM 没有，用 state 中缓存的 */
+  if (lit.length === 0 && STUDY_STATE._lastLit) lit = STUDY_STATE._lastLit;
+  if (lit.length === 0) { alert('请先执行自动检索获取文献，再上传数据集后重新分析'); return; }
+
+  /* 缓存文献到 state */
+  STUDY_STATE._lastLit = lit;
+
+  /* 重新匹配数据集 */
+  var fullQuery = title + (purpose ? ' ' + purpose.substring(0, 80) : '');
+  var matches = studyMatchDatasets(fullQuery);
+  studyRenderMatches(matches);
+  STUDY_STATE._lastMatches = matches;
+
+  /* 重新生成综述 + 方案 + 映射 */
+  studyRunP1(title, purpose, lit, matches);
+
+  /* 滚动到综述区域 */
+  var reviewWrap = document.getElementById('st-review-wrap');
+  if (reviewWrap) reviewWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /* ============ STUDY ASSISTANT P2: 规范化数据集模板 ============ */
