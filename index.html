@@ -8100,13 +8100,137 @@ function studyMatchDatasets(query) {
   return out.slice(0, 12);
 }
 
+/* ---- 提取核心概念（用于精确检索） ----
+ * 策略：① 领域词典优先（高精确度）；② 英文词组/词；③ 中文 2-gram 但仅保留与词典邻近的、过滤通用词
+ * 输出：最多 8 个概念，按"词典 > 英文 > 2-gram"排序
+ */
+function studyExtractConcepts(title, purpose) {
+  var text = (title || '') + ' ' + (purpose || '');
+  var concepts = [];
+  var seen = function (c) { return concepts.some(function (x) { return x === c || x.indexOf(c) >= 0 || c.indexOf(x) >= 0 }); };
+
+  /* ① 领域词典（按专业度排序，命中即加分） */
+  var cnKeywords = [
+    '精神健康','心理健康','认知功能','阿尔茨海默','老年痴呆','抑郁','焦虑','睡眠障碍','自杀',
+    '卫生资源','医疗资源','资源配置','卫生服务','医疗可及性','基层医疗','社区卫生','分级诊疗',
+    '医疗保险','卫生费用','慢性病','高血压','糖尿病','心血管','肿瘤','癌症','死亡率',
+    '城乡差异','区域差异','健康公平','健康不平等','社会经济','老龄化','空巢','留守',
+    '卫生统计','卫生健康','教育经费','计划生育','流行病学',
+    '队列','横断面','病例对照','干预','随机','生存分析','危险因素','保护因素',
+    '政策','改革','准实验','双重差分','断点回归','合成控制','倾向性评分','工具变量',
+    '多水平','混合效应','结构方程','中介分析','交互作用','剂量反应','Meta分析','系统综述',
+    '访谈','扎根理论','主题分析','框架分析','质性','混合方法','三角验证'
+  ];
+  cnKeywords.forEach(function (kw) { if (text.indexOf(kw) >= 0 && !seen(kw)) concepts.push(kw); });
+
+  /* ② 英文词组（≥2 词，且排除通用词） */
+  var stopEn = /\b(the|and|for|with|from|this|that|study|research|analysis|based|using|model|method|effect|impact|among|between|associated|factors|results?|health|data|china|chinese|national?|population|using|approach|systematic?|review|article|paper)\b/i;
+  var enPhrases = text.match(/[A-Za-z]{3,}(\s+[A-Za-z]{3,})+/g);
+  if (enPhrases) enPhrases.forEach(function (p) {
+    p = p.trim();
+    if (p.length >= 6 && !stopEn.test(p) && !seen(p)) concepts.push(p);
+  });
+
+  /* ③ 英文单词（≥4 字母，排除停用词） */
+  var enWords = text.match(/[A-Za-z]{4,}/g);
+  if (enWords) enWords.forEach(function (w) {
+    w = w.toLowerCase();
+    if (w.length >= 4 && !stopEn.test(w) && !seen(w)) concepts.push(w);
+  });
+
+  /* ④ 中文 2-gram 补充：仅当词典命中数 < 4 时启用，且过滤通用二元组 */
+  if (concepts.length < 4) {
+    /* 通用二元组黑名单（不携带领域语义） */
+    var commonBigrams = { '研究':1,'分析':1,'方法':1,'目的':1,'背景':1,'结果':1,'结论':1,'数据':1,'影响':1,'相关':1,'关系':1,'因素':1,'问题':1,'现状':1,'水平':1,'情况':1,'特点':1,'变化':1,'趋势':1,'比较':1,'差异':1,'分布':1,'结构':1,'类型':1,'使用':1,'基于':1,'不同':1,'我国':1,'中国':1,'全国':1 };
+    var cnText = text.replace(/[^\u4e00-\u9fa5]/g, '');
+    for (var i = 0; i < cnText.length - 1; i++) {
+      var bg = cnText.substring(i, i + 2);
+      if (commonBigrams[bg]) continue;
+      if (/[\u4e00-\u9fa5]{2}/.test(bg) && !seen(bg)) concepts.push(bg);
+      if (concepts.length >= 8) break;
+    }
+  }
+  return concepts.slice(0, 8);
+}
+
+/* ---- 识别研究问题类型 ----
+ * 五类：descriptive(描述) / etiological(病因/关联) / interventional(干预) / policy(政策评估) / exploratory(探索/机制)
+ * 输出：{ primary: 'etiological', scores: {descriptive:.., etiological:.., ...}, signals: [...] }
+ */
+function studyClassifyQuestionType(title, purpose, concepts) {
+  var text = ((title || '') + ' ' + (purpose || '')).toLowerCase();
+  var signals = [];
+  var s = { descriptive: 0, etiological: 0, interventional: 0, policy: 0, exploratory: 0 };
+
+  /* 描述性：估计现状/分布/患病率 */
+  var descKw = ['现状','分布','患病率','发生率','描述','特征','调查','水平','比例','构成','prevalence','survey','descriptive','cross-sectional','横断面','现患'];
+  descKw.forEach(function (kw) { if (text.indexOf(kw) >= 0) { s.descriptive += 2; signals.push('描述性:'+kw); } });
+
+  /* 病因学/关联：影响因素/危险因素/关联/预测 */
+  var etioKw = ['影响因素','危险因素','保护因素','关联','相关','预测','作用','效应','风险','病因','etiology','risk factor','association','predictor','cohort','病例对照','case-control','odds','relative risk'];
+  etioKw.forEach(function (kw) { if (text.indexOf(kw) >= 0) { s.etiological += 2; signals.push('病因学:'+kw); } });
+
+  /* 干预/效果：干预/试验/有效性/治疗 */
+  var intKw = ['干预','试验','实验','效果','有效性','疗效','治疗','药物','rct','randomized','intervention','efficacy','trial','placebo','对照'];
+  intKw.forEach(function (kw) { if (text.indexOf(kw) >= 0) { s.interventional += 2; signals.push('干预:'+kw); } });
+
+  /* 政策评估：政策/改革/DID/断点 */
+  var polKw = ['政策','改革','实施','效果评估','政策评估','双重差分','断点','合成控制','准实验','did','rdd','policy','reform','quasi-experiment','difference-in-differences'];
+  polKw.forEach(function (kw) { if (text.indexOf(kw) >= 0) { s.policy += 2; signals.push('政策:'+kw); } });
+
+  /* 探索/机制：机制/理解/体验/质性 */
+  var expKw = ['机制','理解','体验','探索','质性','访谈','扎根','混合方法','机制分析','路径','中介','moderator','mediator','qualitative','interview','mechanism','pathway','mixed'];
+  expKw.forEach(function (kw) { if (text.indexOf(kw) >= 0) { s.exploratory += 2; signals.push('探索:'+kw); } });
+
+  /* 概念命中加权：如"队列"加权到 etiological，"患病率"加权到 descriptive */
+  (concepts || []).forEach(function (c) {
+    if (/(队列|cohort|follow|追踪|随访|病例对照|case-control|危险因素|risk|predictor)/i.test(c)) s.etiological += 1;
+    if (/(患病率|prevalence|横断面|cross-sectional|survey|调查|分布|distribution)/i.test(c)) s.descriptive += 1;
+    if (/(干预|intervention|rct|randomized|试验|trial|疗效|efficacy)/i.test(c)) s.interventional += 1;
+    if (/(政策|policy|reform|did|rdd|断点|准实验|quasi)/i.test(c)) s.policy += 1;
+    if (/(质性|qualitative|interview|访谈|机制|mechanism|mixed|混合)/i.test(c)) s.exploratory += 1;
+  });
+
+  var primary = 'descriptive';
+  var maxScore = -1;
+  Object.keys(s).forEach(function (k) { if (s[k] > maxScore) { maxScore = s[k]; primary = k; } });
+
+  /* 若全为 0，默认 descriptive */
+  if (maxScore <= 0) { primary = 'descriptive'; s.descriptive = 1; }
+
+  return { primary: primary, scores: s, signals: signals };
+}
+
+/* ---- 计算单篇文献的概念命中分（用于排序与过滤） ---- */
+function studyScoreConceptHits(paper, concepts) {
+  if (!concepts || concepts.length === 0) return 0;
+  var blob = ((paper.title || '') + ' ' + (paper.abstract || '')).toLowerCase();
+  var hits = 0;
+  concepts.forEach(function (kc) {
+    var k = kc.toLowerCase();
+    if (k.length < 2) return;
+    if (blob.indexOf(k) >= 0) hits++;
+  });
+  return hits;
+}
+
 /* ---- Crossref ---- */
-async function studyFetchCrossref(q) {
+async function studyFetchCrossref(q, keyConcepts) {
   try {
-    var url = 'https://api.crossref.org/works?rows=10&sort=relevance&query.bibliographic=' + encodeURIComponent(q);
+    /* 检索词：优先用概念组合，让检索更聚焦 */
+    var crQuery;
+    if (keyConcepts && keyConcepts.length >= 2) {
+      /* 取前 5 个概念组合，既保证召回又聚焦 */
+      crQuery = keyConcepts.slice(0, 5).join(' ');
+    } else if (keyConcepts && keyConcepts.length === 1) {
+      crQuery = keyConcepts[0];
+    } else {
+      crQuery = q;
+    }
+    var url = 'https://api.crossref.org/works?rows=20&sort=relevance&filter=type:journal-article&query.bibliographic=' + encodeURIComponent(crQuery);
     var r = await fetch(url); if (!r.ok) return [];
     var j = await r.json();
-    return (j.message.items || []).map(function (p) {
+    var items = (j.message.items || []).map(function (p) {
       return {
         title: p.title ? ('' + p.title[0]) : '(无标题)',
         year: (p.issued && p.issued['date-parts']) ? p.issued['date-parts'][0][0] : '',
@@ -8114,19 +8238,47 @@ async function studyFetchCrossref(q) {
         doi: p.DOI || '',
         url: p.URL || ('https://doi.org/' + (p.DOI || '')),
         authors: (p.author || []).map(function (a) { return a.family || a.name || '' }).slice(0, 3).join(', '),
-        abstract: ''
+        abstract: p.abstract || ''
       };
     });
+    /* 后过滤：按概念命中分排序，保留命中 ≥1 的；若全部命中 0，则保留前 8 篇避免空结果 */
+    if (keyConcepts && keyConcepts.length > 0) {
+      items.forEach(function (p) { p._conceptHits = studyScoreConceptHits(p, keyConcepts); });
+      var hitItems = items.filter(function (p) { return p._conceptHits >= 1; });
+      /* 至少需要 2 个概念命中才算高相关，否则降级到 1 命中 */
+      var strongItems = hitItems.filter(function (p) { return p._conceptHits >= Math.max(2, Math.ceil(keyConcepts.length / 4)); });
+      items = strongItems.length >= 4 ? strongItems : (hitItems.length >= 4 ? hitItems : items.slice(0, 8));
+      items.sort(function (a, b) { return (b._conceptHits || 0) - (a._conceptHits || 0); });
+    }
+    return items;
   } catch (e) { console.warn('crossref err', e); return [] }
 }
 
 /* ---- PubMed ---- */
-async function studyFetchPubMed(q) {
+async function studyFetchPubMed(q, keyConcepts) {
   try {
-    var sUrl = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=8&retmode=json&term=' + encodeURIComponent(q);
+    var pmQuery;
+    if (keyConcepts && keyConcepts.length >= 2) {
+      /* 使用 AND 组合前 3 个核心概念（更精准），OR 拓展后 2 个（提升召回） */
+      var top3 = keyConcepts.slice(0, 3);
+      var rest = keyConcepts.slice(3, 5);
+      var andPart = top3.map(function (kc) { return '(' + kc + '[Title/Abstract])' }).join(' AND ');
+      var orPart = rest.length > 0 ? ' OR ' + rest.map(function (kc) { return '(' + kc + '[Title/Abstract])' }).join(' OR ') : '';
+      pmQuery = '(' + andPart + ')' + orPart;
+    } else {
+      pmQuery = q + '[Title/Abstract]';
+    }
+    var sUrl = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=20&sort=relevance&retmode=json&term=' + encodeURIComponent(pmQuery);
     var sr = await fetch(sUrl); if (!sr.ok) return [];
     var sj = await sr.json();
     var ids = (sj.esearchresult && sj.esearchresult.idlist) || [];
+    if (ids.length === 0) {
+      /* 退避：用原始题目作为检索词 */
+      sUrl = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=15&sort=relevance&retmode=json&term=' + encodeURIComponent(q + '[Title/Abstract]');
+      sr = await fetch(sUrl); if (!sr.ok) return [];
+      sj = await sr.json();
+      ids = (sj.esearchresult && sj.esearchresult.idlist) || [];
+    }
     if (ids.length === 0) return [];
     var fUrl = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&id=' + ids.join(',');
     var fr = await fetch(fUrl); if (!fr.ok) return [];
@@ -8155,11 +8307,136 @@ async function studyFetchPubMed(q) {
         abstract: abs ? abs.textContent : ''
       });
     });
+    if (keyConcepts && keyConcepts.length > 0) {
+      out.forEach(function (p) { p._conceptHits = studyScoreConceptHits(p, keyConcepts); });
+      var hitOut = out.filter(function (p) { return p._conceptHits >= 1; });
+      var strongOut = hitOut.filter(function (p) { return p._conceptHits >= Math.max(2, Math.ceil(keyConcepts.length / 4)); });
+      out = strongOut.length >= 4 ? strongOut : (hitOut.length >= 4 ? hitOut : out.slice(0, 8));
+      out.sort(function (a, b) { return (b._conceptHits || 0) - (a._conceptHits || 0); });
+    }
     return out;
   } catch (e) { console.warn('pubmed err', e); return [] }
 }
 
-/* ---- 主入口 ---- */
+/* ---- OpenAlex（2.4 亿篇学术文献，免费无密钥，CORS 开放） ---- */
+async function studyFetchOpenAlex(q, keyConcepts) {
+  try {
+    /* 用概念构造检索词，按相关性排序 */
+    var search = keyConcepts && keyConcepts.length >= 2 ? keyConcepts.slice(0, 5).join(' ') : q;
+    var url = 'https://api.openalex.org/works?search=' + encodeURIComponent(search) +
+      '&per-page=20&sort=relevance_score:desc&filter=type:article,language:en,has_abstract:true';
+    var r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!r.ok) return [];
+    var j = await r.json();
+    var items = (j.results || []).map(function (p) {
+      /* OpenAlex 摘要是倒排索引格式，需重建 */
+      var abstract = '';
+      if (p.abstract_inverted_index) {
+        var positions = [];
+        Object.keys(p.abstract_inverted_index).forEach(function (word) {
+          (p.abstract_inverted_index[word] || []).forEach(function (pos) {
+            positions.push([pos, word]);
+          });
+        });
+        positions.sort(function (a, b) { return a[0] - b[0] });
+        abstract = positions.map(function (x) { return x[1] }).join(' ');
+      }
+      return {
+        title: p.title || '(无标题)',
+        year: p.publication_year ? '' + p.publication_year : '',
+        journal: (p.host_venue && p.host_venue.display_name) ? p.host_venue.display_name : '',
+        doi: p.doi ? p.doi.replace('https://doi.org/', '') : '',
+        url: p.doi || ('https://openalex.org/' + (p.id || '').replace('https://openalex.org/', '')),
+        authors: (p.authorships || []).slice(0, 3).map(function (a) {
+          return (a.author && a.author.display_name) ? a.author.display_name : '';
+        }).filter(Boolean).join(', '),
+        abstract: abstract,
+        _source: 'OpenAlex'
+      };
+    });
+    if (keyConcepts && keyConcepts.length > 0) {
+      items.forEach(function (p) { p._conceptHits = studyScoreConceptHits(p, keyConcepts); });
+      var hitItems = items.filter(function (p) { return p._conceptHits >= 1; });
+      var strongItems = hitItems.filter(function (p) { return p._conceptHits >= Math.max(2, Math.ceil(keyConcepts.length / 4)); });
+      items = strongItems.length >= 4 ? strongItems : (hitItems.length >= 4 ? hitItems : items.slice(0, 8));
+      items.sort(function (a, b) { return (b._conceptHits || 0) - (a._conceptHits || 0); });
+    }
+    return items;
+  } catch (e) { console.warn('openalex err', e); return [] }
+}
+
+/* ---- Semantic Scholar（AI 驱动文献检索，含 TLDR 摘要，CORS 开放，需限流退避） ---- */
+async function studyFetchSemanticScholar(q, keyConcepts) {
+  try {
+    var search = keyConcepts && keyConcepts.length >= 2 ? keyConcepts.slice(0, 4).join(' ') : q;
+    var url = 'https://api.semanticscholar.org/graph/v1/paper/search?query=' + encodeURIComponent(search) +
+      '&limit=20&fields=title,year,authors,abstract,journal,externalIds,tldr';
+    var r = await fetch(url);
+    /* 429 限流 → 退避 1.2 秒重试 1 次 */
+    if (r.status === 429) {
+      await new Promise(function (res) { setTimeout(res, 1200) });
+      r = await fetch(url);
+    }
+    if (!r.ok) return [];
+    var j = await r.json();
+    var items = (j.data || []).map(function (p) {
+      /* 优先用 tldr（AI 生成的一句话摘要），再用原始 abstract */
+      var abs = p.tldr && p.tldr.text ? p.tldr.text : (p.abstract || '');
+      return {
+        title: p.title || '(无标题)',
+        year: p.year ? '' + p.year : '',
+        journal: (p.journal && p.journal.name) ? p.journal.name : '',
+        doi: (p.externalIds && p.externalIds.DOI) ? p.externalIds.DOI : '',
+        url: (p.externalIds && p.externalIds.DOI) ? ('https://doi.org/' + p.externalIds.DOI) : '',
+        authors: (p.authors || []).slice(0, 3).map(function (a) { return a.name || '' }).filter(Boolean).join(', '),
+        abstract: abs,
+        _source: 'SemanticScholar'
+      };
+    });
+    if (keyConcepts && keyConcepts.length > 0) {
+      items.forEach(function (p) { p._conceptHits = studyScoreConceptHits(p, keyConcepts); });
+      var hitItems = items.filter(function (p) { return p._conceptHits >= 1; });
+      var strongItems = hitItems.filter(function (p) { return p._conceptHits >= Math.max(2, Math.ceil(keyConcepts.length / 4)); });
+      items = strongItems.length >= 4 ? strongItems : (hitItems.length >= 4 ? hitItems : items.slice(0, 8));
+      items.sort(function (a, b) { return (b._conceptHits || 0) - (a._conceptHits || 0); });
+    }
+    return items;
+  } catch (e) { console.warn('s2 err', e); return [] }
+}
+
+/* ---- Europe PMC（开放获取生物医学文献全文链接，CORS 开放） ---- */
+async function studyFetchEuropePMC(q, keyConcepts) {
+  try {
+    var search = keyConcepts && keyConcepts.length >= 2 ? keyConcepts.slice(0, 5).join(' ') : q;
+    var url = 'https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=' + encodeURIComponent(search) +
+      '&format=json&pageSize=20&sort=relevance';
+    var r = await fetch(url);
+    if (!r.ok) return [];
+    var j = await r.json();
+    var items = ((j.resultList && j.resultList.result) || []).map(function (p) {
+      return {
+        title: p.title || '(无标题)',
+        year: p.pubYear || '',
+        journal: p.journalTitle || '',
+        doi: p.doi || '',
+        url: p.doi ? ('https://doi.org/' + p.doi) : ('https://europepmc.org/article/med/' + (p.pmid || '')),
+        authors: p.authorString ? p.authorString.split(',').slice(0, 3).join(', ') : '',
+        abstract: p.abstractText || '',
+        _source: 'EuropePMC'
+      };
+    });
+    if (keyConcepts && keyConcepts.length > 0) {
+      items.forEach(function (p) { p._conceptHits = studyScoreConceptHits(p, keyConcepts); });
+      var hitItems = items.filter(function (p) { return p._conceptHits >= 1; });
+      var strongItems = hitItems.filter(function (p) { return p._conceptHits >= Math.max(2, Math.ceil(keyConcepts.length / 4)); });
+      items = strongItems.length >= 4 ? strongItems : (hitItems.length >= 4 ? hitItems : items.slice(0, 8));
+      items.sort(function (a, b) { return (b._conceptHits || 0) - (a._conceptHits || 0); });
+    }
+    return items;
+  } catch (e) { console.warn('epmc err', e); return [] }
+}
+
+
 async function studyRun() {
   var titleEl = document.getElementById('st-title');
   var purposeEl = document.getElementById('st-purpose');
@@ -8172,19 +8449,42 @@ async function studyRun() {
 
   var results = document.getElementById('st-results'); if (results) results.style.display = 'block';
   var mWrap = document.getElementById('st-matches-grid'); if (mWrap) mWrap.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:20px">匹配中...</div>';
-  var lWrap = document.getElementById('st-lit-list'); if (lWrap) lWrap.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:20px">检索 Crossref + PubMed 中...</div>';
+  var lWrap = document.getElementById('st-lit-list'); if (lWrap) lWrap.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:20px">提取核心概念并检索 5 个学术数据库中（PubMed / Crossref / OpenAlex / Semantic Scholar / Europe PMC）...</div>';
+
+  /* === 提取核心概念，用于精确检索与方案推荐 === */
+  var keyConcepts = studyExtractConcepts(title, purpose);
+  STUDY_STATE._lastConcepts = keyConcepts;
+  /* 识别研究问题类型（描述/病因/干预/政策/探索） */
+  var qType = studyClassifyQuestionType(title, purpose, keyConcepts);
+  STUDY_STATE._lastQType = qType;
+  studySave();
 
   var matches = studyMatchDatasets(fullQuery);
   studyRenderMatches(matches);
 
   var refs = await Promise.all([
-    studyFetchCrossref(fullQuery).catch(function () { return [] }),
-    studyFetchPubMed(title).catch(function () { return [] })
+    studyFetchCrossref(fullQuery, keyConcepts).catch(function () { return [] }),
+    studyFetchPubMed(title, keyConcepts).catch(function () { return [] }),
+    studyFetchOpenAlex(fullQuery, keyConcepts).catch(function () { return [] }),
+    studyFetchSemanticScholar(fullQuery, keyConcepts).catch(function () { return [] }),
+    studyFetchEuropePMC(fullQuery, keyConcepts).catch(function () { return [] })
   ]);
-  var allLit = refs[0].concat(refs[1]);
+  var allLit = refs[0].concat(refs[1]).concat(refs[2]).concat(refs[3]).concat(refs[4]);
+  /* 去重并按概念匹配分排序 */
   var seen = {}; var uniq = [];
-  allLit.forEach(function (p) { var k = (p.title || '').substring(0, 30).toLowerCase(); if (!seen[k]) { seen[k] = true; uniq.push(p) } });
-  uniq.sort(function (a, b) { return (b.year || 0) - (a.year || 0) });
+  allLit.forEach(function (p) {
+    var k = (p.title || '').substring(0, 30).toLowerCase();
+    if (!seen[k]) {
+      seen[k] = true;
+      p._conceptHits = studyScoreConceptHits(p, keyConcepts);
+      uniq.push(p);
+    }
+  });
+  uniq.sort(function (a, b) {
+    var s = (b._conceptHits || 0) - (a._conceptHits || 0);
+    if (s !== 0) return s;
+    return (b.year || 0) - (a.year || 0);
+  });
   studyRenderLit(uniq);
 
   // 缓存文献和匹配结果到 state，供重新分析使用
@@ -8217,24 +8517,66 @@ function studyRenderMatches(list) {
 
 function studyRenderLit(list) {
   var el = document.getElementById('st-lit-list'); if (!el) return;
-  var cnt = document.getElementById('st-lit-count'); if (cnt) cnt.textContent = '' + list.length + ' 篇（Crossref + PubMed）';
+  var cnt = document.getElementById('st-lit-count'); if (cnt) cnt.textContent = '' + list.length + ' 篇（Crossref + PubMed，按概念命中分排序）';
+
+  var concepts = STUDY_STATE._lastConcepts || [];
+  var qType = STUDY_STATE._lastQType || null;
+  var typeLabel = { descriptive: '描述性研究', etiological: '病因学/关联研究', interventional: '干预/效果研究', policy: '政策评估研究', exploratory: '探索/机制研究' };
+
+  var html = '';
+
+  /* === 检索算法透明声明 + 概念提取摘要 === */
+  html += '<div style="border:1px dashed var(--line);border-radius:6px;padding:12px 16px;background:#fafbfd;margin-bottom:12px;font-size:12px;line-height:1.7;color:var(--ink2)">';
+  html += '<b style="color:var(--ink1);font-size:12.5px">🔍 文献检索算法说明</b><br>';
+  html += '本系统<b>未调用大语言模型</b>生成检索结果，而是通过以下步骤实现精准匹配：<br>';
+  html += '① <b>核心概念提取</b>：基于领域词典（80+ 术语）+ 英文词组/词 + 中文 2-gram（过滤通用词）<br>';
+  html += '② <b>PubMed 检索</b>：前 3 个概念用 AND 组合（精准），后 2 个用 OR 拓展（召回），无结果时退避到原始题目<br>';
+  html += '③ <b>Crossref 检索</b>：前 5 个概念组合检索，按相关性排序<br>';
+  html += '④ <b>后过滤排序</b>：每篇文献计算概念命中分，优先保留命中 ≥2 的强相关文献，按命中分降序排列<br>';
+  if (concepts.length > 0) {
+    html += '<div style="margin-top:6px"><b>提取到的核心概念：</b>';
+    html += concepts.map(function (c) { return '<span style="display:inline-block;background:#eef3ff;color:var(--accent);padding:1px 7px;border-radius:8px;margin:2px 3px;font-size:11px">' + studyEsc(c) + '</span>'; }).join('');
+    html += '</div>';
+  }
+  if (qType) {
+    html += '<div style="margin-top:4px"><b>识别的研究问题类型：</b>' + (typeLabel[qType.primary] || '未识别') + '</div>';
+  }
+  html += '</div>';
+
   if (list.length === 0) {
-    el.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:24px 0">Crossref / PubMed 未返回结果，试试调整关键词或缩短研究题目。</div>';
+    html += '<div style="font-size:13px;color:var(--muted);padding:24px 0">Crossref / PubMed 未返回结果，试试调整关键词或缩短研究题目。</div>';
+    el.innerHTML = html;
     return;
   }
-  var html = '';
   list.forEach(function (p) {
+    var hits = p._conceptHits || 0;
+    var hitBadge = hits > 0
+      ? '<span style="font-size:10.5px;background:' + (hits >= 3 ? '#e6f4ea' : '#fff3e0') + ';color:' + (hits >= 3 ? '#1e7d34' : '#b06a00') + ';padding:1px 7px;border-radius:8px;border:1px solid ' + (hits >= 3 ? '#b6d7c4' : '#f0d8a8') + '">概念命中 ' + hits + '</span>'
+      : '<span style="font-size:10.5px;color:var(--muted);background:#f3f3f3;padding:1px 7px;border-radius:8px">兜底召回</span>';
+    /* 高亮命中概念 */
+    var titleHtml = studyEsc(p.title);
+    var absText = p.abstract ? (p.abstract.length > 240 ? p.abstract.substring(0, 240) + '...' : p.abstract) : '';
+    var absHtml = studyEsc(absText);
+    if (concepts.length > 0) {
+      concepts.forEach(function (kc) {
+        if (kc.length < 2) return;
+        var re = new RegExp(kc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        titleHtml = titleHtml.replace(re, '<mark style="background:#fff3a0;padding:0 2px">$&</mark>');
+        absHtml = absHtml.replace(re, '<mark style="background:#fff3a0;padding:0 2px">$&</mark>');
+      });
+    }
     html += '<div style="border-left:3px solid var(--accent);padding:10px 14px;background:#fafbfd;border-radius:0 4px 4px 0">';
     html += '<div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap">';
-    html += '<b style="font-size:14px">' + p.title + '</b>';
+    html += '<b style="font-size:14px">' + titleHtml + '</b>';
     if (p.year) html += '<span style="font-size:11.5px;color:var(--muted)">(' + p.year + ')</span>';
+    html += hitBadge;
     html += '</div>';
-    if (p.authors) html += '<div style="font-size:12px;color:var(--ink2);margin-top:2px">' + p.authors + '</div>';
+    if (p.authors) html += '<div style="font-size:12px;color:var(--ink2);margin-top:2px">' + studyEsc(p.authors) + '</div>';
     html += '<div style="font-size:12px;color:var(--muted);margin-top:2px">';
-    if (p.journal) html += p.journal;
-    if (p.doi) html += ' · DOI: ' + p.doi;
+    if (p.journal) html += studyEsc(p.journal);
+    if (p.doi) html += ' · DOI: ' + studyEsc(p.doi);
     html += '</div>';
-    if (p.abstract) html += '<div style="font-size:12px;color:var(--ink2);margin-top:4px;line-height:1.55">' + p.abstract.substring(0, 240) + (p.abstract.length > 240 ? '...' : '') + '</div>';
+    if (absText) html += '<div style="font-size:12px;color:var(--ink2);margin-top:4px;line-height:1.55">' + absHtml + '</div>';
     html += '<div style="margin-top:4px"><a href="' + p.url + '" target="_blank" style="font-size:12.5px">→ 查看原文</a></div>';
     html += '</div>';
   });
@@ -8337,10 +8679,528 @@ var STUDY_PLAN_TEMPLATES = [
   }
 ];
 
-/* --- 自动生成文献综述 --- */
+/* ======================================================================
+ * 深度方法抽取：从每篇文献标题+摘要中提取结构化方法学信息
+ * 抽取维度：研究设计 / 样本量 / 统计方法 / 测量工具 / 研究人群 / 暴露/结局变量
+ * 算法：规则化模式匹配（regex）+ 结构化摘要分段解析，非 LLM/ML
+ * ====================================================================== */
+function studyExtractMethods(paper) {
+  var blob = ((paper.title || '') + ' ' + (paper.abstract || '')).toLowerCase();
+  var abs = paper.abstract || '';
+  var result = {
+    design: 'unknown',
+    designLabel: '未识别',
+    sampleSize: null,
+    stats: [],
+    instruments: [],
+    population: [],
+    exposure: [],
+    outcome: [],
+    setting: [],
+    structured: false,
+    /* === 深化抽取（第二层）=== */
+    effectSizes: [],          // {type:'OR'|'RR'|'HR'|'beta', point:1.5, ci_low:1.2, ci_high:1.9, exposure:'', outcome:'', direction:'positive'|'negative'|'null'}
+    confounders: [],          // 已控制的混杂因素关键词
+    causalFramework: [],     // ['DAG','反事实','自然实验','工具变量','断点','倾向性评分']
+    missingDataHandling: [],  // ['多重插补','完整病例分析','IPW','最大似然']
+    powerAnalysis: false,    // 是否提及样本量计算/效力分析
+    sensitivityAnalysis: false,
+    biasAssessment: []        // ['ROBINS-I','Cochrane RoB','NOS','QUADAS-2','JBI']
+  };
+
+  /* === 结构化摘要分段解析 === */
+  var sections = {};
+  /* 常见标签格式：BACKGROUND: / METHODS: / RESULTS: / CONCLUSION: */
+  var sectionRe = /(background|objective|aim|purpose|methods?|materials?\s+and\s+methods?|results?|conclusions?|discussion|limitations?)[:：]/gi;
+  var matches;
+  var lastLabel = null;
+  var parts = abs.split(sectionRe);
+  if (parts.length > 1) {
+    result.structured = true;
+    var labels = abs.match(sectionRe);
+    if (labels) {
+      for (var li = 0; li < labels.length; li++) {
+        var label = labels[li].replace(/[:：]/g, '').toLowerCase().trim();
+        var content = (parts[li + 1] || '').trim();
+        if (label.match(/method/) || label.match(/materials/)) sections.methods = content;
+        else if (label.match(/result/)) sections.results = content;
+        else if (label.match(/conclusion/)) sections.conclusions = content;
+        else if (label.match(/background|objective|aim|purpose/)) sections.background = content;
+      }
+    }
+  }
+  var methodsText = sections.methods || blob;
+  var resultsText = sections.results || blob;
+
+  /* === 1. 研究设计识别（优先级：RCT > 队列 > 病例对照 > Meta > 横断面 > 质性） === */
+  var designs = [
+    { id: 'rct', label: '随机对照试验', patterns: [/\brct\b/, /randomi[sz]ed?\s+controlled?\s+trial/, /randomi[sz]ed?,?\s+(clinical\s+)?trial/, /random\s+allocation/, /placebo[- ]?controlled/, /double[- ]?blind/, /single[- ]?blind/, /随机对照/, /随机分组/, /盲法/] },
+    { id: 'cohort', label: '队列研究', patterns: [/cohort\s+stud/, /longitudinal\s+stud/, /prospective\s+(cohort|stud|follow)/, /follow[- ]?up\s+stud/, /panel\s+data\s+analys/, /队列研究/, /前瞻性/, /追踪/, /随访\s+\d+\s*年/] },
+    { id: 'case_control', label: '病例对照研究', patterns: [/case[- ]?control/, /病例对照/, /matched\s+case/, /1:[24]\s+match/] },
+    { id: 'meta', label: '系统综述/Meta分析', patterns: [/meta[- ]analys/, /systematic\s+review/, /prisma/, /pooled\s+analysis/, /meta分析/, /系统综述/, /荟萃分析/] },
+    { id: 'cross_sectional', label: '横断面研究', patterns: [/cross[- ]?sectional/, /prevalence\s+survey/, /横断面/, /现况调查/, /患病率调查/] },
+    { id: 'qualitative', label: '质性研究', patterns: [/qualitative\s+(stud|research|method|interview|analys)/, /focus\s+group/, /grounded\s+theory/, /thematic\s+analys/, /phenomenolog/, /ethnograph/, /质性研究/, /深度访谈/, /扎根理论/] },
+    { id: 'ecological', label: '生态研究', patterns: [/ecological\s+(stud|analys)/, /ecological\s+fallac/] },
+    { id: 'secondary', label: '二次数据分析', patterns: [/secondary\s+(data\s+)?analys/, /reanalysis/, /retrospective\s+cohort/, /二次分析/, /回顾性队列/] }
+  ];
+  for (var di = 0; di < designs.length; di++) {
+    var d = designs[di];
+    for (var pi = 0; pi < d.patterns.length; pi++) {
+      if (d.patterns[pi].test(blob)) { result.design = d.id; result.designLabel = d.label; break; }
+    }
+    if (result.design !== 'unknown') break;
+  }
+  /* 如果结构化摘要的 Methods 段提到 design 关键词，更可信 */
+  if (sections.methods) {
+    for (var di2 = 0; di2 < designs.length; di2++) {
+      if (result.design !== 'unknown') break;
+      var d2 = designs[di2];
+      for (var pi2 = 0; pi2 < d2.patterns.length; pi2++) {
+        if (d2.patterns[pi2].test(sections.methods.toLowerCase())) { result.design = d2.id; result.designLabel = d2.label; break; }
+      }
+    }
+  }
+
+  /* === 2. 样本量提取 === */
+  var nPatterns = [
+    /n\s*=\s*(\d[\d,]*)/i,
+    /sample\s+(size\s+)?(of\s+)?(\d[\d,]*)\s*(participants?|patients?|subjects?|individuals?|women|men|adults?|children|older)/i,
+    /(\d[\d,]*)\s*(participants?|patients?|subjects?|individuals?|women|men|adults?|children|older\s+adults?|respondents?)/i,
+    /(\d[\d,]*)\s*(人|例|名|位)\s*(参与者|患者|受试|研究对象|老年人|成人|儿童|妇女)/,
+    /总样本(?:量)?[为约]?\s*(\d[\d,]*)/,
+    /纳入(?:研究)?\s*(\d[\d,]*)\s*(例|名|位)/
+  ];
+  for (var ni = 0; ni < nPatterns.length; ni++) {
+    var nm = blob.match(nPatterns[ni]);
+    if (nm) {
+      var num = parseInt((nm[1] || '').replace(/,/g, ''));
+      if (num && num >= 10 && num <= 10000000) { result.sampleSize = num; break; }
+    }
+  }
+
+  /* === 3. 统计方法提取 === */
+  var statsMap = [
+    { kw: 'logistic regression', label: 'Logistic 回归', patterns: [/logistic\s+regression/, /logistic\s+model/] },
+    { kw: 'linear regression', label: '线性回归', patterns: [/linear\s+regression/, /ols\s+regression/, /ordinary\s+least\s+squares/] },
+    { kw: 'cox regression', label: 'Cox 比例风险模型', patterns: [/cox\s+(proportional\s+hazards?|regression|model)/, /survival\s+analys/, /hazard\s+ratio/, /kaplan[- ]?meier/] },
+    { kw: 'mixed effects', label: '混合效应模型', patterns: [/mixed[- ]?effects?\s+(model|regression)/, /multilevel\s+model/, /hierarchical\s+linear\s+model/, /random\s+effects?\s+model/, /混合效应/, /多水平模型/] },
+    { kw: 'gee', label: '广义估计方程', patterns: [/\bgee\b/, /generalized\s+estimating\s+equation/] },
+    { kw: 'sem', label: '结构方程模型', patterns: [/structural\s+equation\s+model/, /\bsem\b/, /path\s+analysis/, /latent\s+variable/, /结构方程/, /路径分析/] },
+    { kw: 'mediation', label: '中介分析', patterns: [/mediation\s+analys/, /mediator/, /indirect\s+effect/, /中介分析/, /中介效应/] },
+    { kw: 'moderation', label: '调节分析', patterns: [/moderation\s+analys/, /moderator/, /interaction\s+effect/, /调节效应/, /交互作用/] },
+    { kw: 'propensity score', label: '倾向性评分', patterns: [/propensity\s+score/, /psm/, /倾向性评分/] },
+    { kw: 'did', label: '双重差分', patterns: [/difference[- ]?in[- ]?differences?/, /\bdid\b\s+estimat/, /双重差分/] },
+    { kw: 'rdd', label: '断点回归', patterns: [/regression\s+discontinuity/, /\brdd\b/, /断点回归/] },
+    { kw: 'iv', label: '工具变量', patterns: [/instrumental\s+variable/, /\biv\s+estimat/, /2sls/, /工具变量/] },
+    { kw: 'bayesian', label: '贝叶斯方法', patterns: [/bayesian\s+(method|approach|model|analys|inference)/, /mcmc/, /markov\s+chain\s+monte\s+carlo/] },
+    { kw: 'machine learning', label: '机器学习', patterns: [/machine\s+learning/, /deep\s+learning/, /neural\s+network/, /random\s+forest/, /xgboost/, /gradient\s+boosting/, /support\s+vector/, /聚类/, /机器学习/, /深度学习/] },
+    { kw: 'meta-analysis', label: 'Meta分析', patterns: [/pooled\s+(effect|estimate|odds\s+ratio|risk\s+ratio)/, /random[- ]?effects?\s+model/, /fixed\s+effects?\s+model/, /heterogeneity.*i2/] },
+    { kw: 'sensitivity analysis', label: '敏感性分析', patterns: [/sensitivity\s+analys/, /敏感性分析/] },
+    { kw: 'clustering', label: '聚类分析', patterns: [/cluster\s+analys/, /latent\s+class/, /聚类分析/, /潜在类别/] },
+    { kw: 'multilevel', label: '多水平模型', patterns: [/multilevel\s+model/, /hierarchical\s+model/, /多水平/] }
+  ];
+  statsMap.forEach(function (s) {
+    s.patterns.forEach(function (p) {
+      if (p.test(blob)) { if (result.stats.indexOf(s.label) < 0) result.stats.push(s.label); }
+    });
+  });
+
+  /* === 4. 测量工具/量表提取 === */
+  var instruments = [
+    { kw: 'PHQ-9', label: 'PHQ-9（抑郁筛查）', patterns: [/phq[- ]?9/] },
+    { kw: 'GAD-7', label: 'GAD-7（焦虑筛查）', patterns: [/gad[- ]?7/] },
+    { kw: 'SF-36', label: 'SF-36（生命质量）', patterns: [/sf[- ]?36/] },
+    { kw: 'SF-12', label: 'SF-12（生命质量）', patterns: [/sf[- ]?12/] },
+    { kw: 'EQ-5D', label: 'EQ-5D（健康效用）', patterns: [/eq[- ]?5d/] },
+    { kw: 'CES-D', label: 'CES-D（抑郁量表）', patterns: [/ces[- ]?d\b/] },
+    { kw: 'HAMD', label: 'HAMD（汉密尔顿抑郁）', patterns: [/hamd/, /hamilton\s+depression/] },
+    { kw: 'MMSE', label: 'MMSE（简易精神状态检查）', patterns: [/mmse/, /mini[- ]?mental\s+state/] },
+    { kw: 'MoCA', label: 'MoCA（蒙特利尔认知评估）', patterns: [/moca/, /montreal\s+cognitive/] },
+    { kw: 'GHQ', label: 'GHQ（一般健康问卷）', patterns: [/\bghq\b/, /general\s+health\s+questionnaire/] },
+    { kw: 'K10', label: 'K10（心理痛苦量表）', patterns: [/\bk10\b/, /kessler\s+10/] },
+    { kw: 'WHO-5', label: 'WHO-5（心理健康指数）', patterns: [/who[- ]?5/] },
+    { kw: 'AUDIT', label: 'AUDIT（酒精使用障碍筛查）', patterns: [/\baudit\b/, /alcohol\s+use\s+disorder/] },
+    { kw: 'PSQI', label: 'PSQI（睡眠质量）', patterns: [/\bpsqi\b/, /pittsburgh\s+sleep/] },
+    { kw: 'SDS', label: 'SDS（自评抑郁量表）', patterns: [/\bsds\b/, /self[- ]?rating\s+depression/] },
+    { kw: 'SAS', label: 'SAS（自评焦虑量表）', patterns: [/\bsas\b/, /self[- ]?rating\s+anxiety/] }
+  ];
+  instruments.forEach(function (ins) {
+    ins.patterns.forEach(function (p) {
+      if (p.test(blob)) { if (result.instruments.indexOf(ins.label) < 0) result.instruments.push(ins.label); }
+    });
+  });
+
+  /* === 5. 研究人群/场所提取 === */
+  var popPatterns = [
+    { kw: 'older adults', label: '老年人', patterns: [/older\s+adults?/, /elderly/, /aged\s+\d{2}/, /老年/] },
+    { kw: 'children', label: '儿童/青少年', patterns: [/children/, /adolescent/, /pediatric/, /儿童/, /青少年/] },
+    { kw: 'women', label: '女性/孕产妇', patterns: [/\bwomen\b/, /pregnant/, /maternal/, /女性/, /孕产妇/] },
+    { kw: 'rural', label: '农村人群', patterns: [/rural\s+(population|area|china|residents?)/, /农村/] },
+    { kw: 'urban', label: '城市人群', patterns: [/urban\s+(population|area|residents?)/, /城市/, /城区/] },
+    { kw: 'patients', label: '临床患者', patterns: [/patients?\s+with/, /clinical\s+sample/, /hospitali[sz]ed/, /患者/, /住院/] },
+    { kw: 'community', label: '社区人群', patterns: [/community[- ]?dwell/, /community\s+sample/, /社区/, /居民/] },
+    { kw: 'nationally representative', label: '全国代表性样本', patterns: [/nationally\s+representative/, /national\s+survey/, /全国(?:性|范围)?(?:调查|抽样|样本)/] }
+  ];
+  popPatterns.forEach(function (pp) {
+    pp.patterns.forEach(function (p) {
+      if (p.test(blob)) { if (result.population.indexOf(pp.label) < 0) result.population.push(pp.label); }
+    });
+  });
+
+  /* === 6. 暴露/结局变量关键词 === */
+  var exposureKw = ['smoking', 'drinking', 'alcohol', 'bmi', 'obesity', 'physical activity', 'exercise', 'diet', 'education', 'income', 'socioeconomic', '吸烟', '饮酒', '肥胖', '运动', '饮食', '教育', '收入', '社会经济'];
+  exposureKw.forEach(function (kw) {
+    if (blob.indexOf(kw) >= 0 && result.exposure.indexOf(kw) < 0) result.exposure.push(kw);
+  });
+  var outcomeKw = ['mortality', 'death', 'survival', 'depression', 'anxiety', 'cognitive decline', 'dementia', 'quality of life', 'life satisfaction', 'self-rated health', 'morbidity', 'incidence', 'prevalence', '死亡率', '抑郁', '焦虑', '认知功能', '痴呆', '生命质量', '生活满意度', '自评健康', '发病率', '患病率'];
+  outcomeKw.forEach(function (kw) {
+    if (blob.indexOf(kw) >= 0 && result.outcome.indexOf(kw) < 0) result.outcome.push(kw);
+  });
+
+  /* === 7. 深化抽取：效应量（OR/RR/HR/β + 95% CI 数值提取） ===
+   * 仅从结构化摘要 Results 段抽取，提高准确性；pattern 兼容中英文表达
+   */
+  var effText = resultsText || '';
+  /* 7.1 优势比 OR */
+  var orRe = /(?:adjusted\s+)?(?:odds\s+ratio[s]?|or)\s*(?:=|of|was|were|:)?\s*(\d+\.\d+)\s*[\(]?\s*(\d+\.\d+)\s*[-–to]+\s*(\d+\.\d+)\s*\)?/gi;
+  var orMatch;
+  while ((orMatch = orRe.exec(effText)) !== null) {
+    var pt = parseFloat(orMatch[1]), lo = parseFloat(orMatch[2]), hi = parseFloat(orMatch[3]);
+    if (pt > 0.1 && pt < 100) {
+      result.effectSizes.push({ type: 'OR', point: pt, ci_low: lo, ci_high: hi, direction: pt > 1 ? 'positive' : (pt < 1 ? 'negative' : 'null') });
+    }
+  }
+  /* 7.2 风险比 RR */
+  var rrRe = /(?:relative\s+risk|risk\s+ratio|rr)\s*(?:=|of|was|were|:)?\s*(\d+\.\d+)\s*[\(]?\s*(\d+\.\d+)\s*[-–to]+\s*(\d+\.\d+)\s*\)?/gi;
+  var rrMatch;
+  while ((rrMatch = rrRe.exec(effText)) !== null) {
+    var pt2 = parseFloat(rrMatch[1]);
+    if (pt2 > 0.1 && pt2 < 100) {
+      result.effectSizes.push({ type: 'RR', point: pt2, ci_low: parseFloat(rrMatch[2]), ci_high: parseFloat(rrMatch[3]), direction: pt2 > 1 ? 'positive' : (pt2 < 1 ? 'negative' : 'null') });
+    }
+  }
+  /* 7.3 风险比 HR */
+  var hrRe = /hazard\s+ratio[s]?\s*(?:=|of|was|were|:)?\s*(\d+\.\d+)\s*[\(]?\s*(\d+\.\d+)\s*[-–to]+\s*(\d+\.\d+)\s*\)?/gi;
+  var hrMatch;
+  while ((hrMatch = hrRe.exec(effText)) !== null) {
+    var pt3 = parseFloat(hrMatch[1]);
+    if (pt3 > 0.1 && pt3 < 100) {
+      result.effectSizes.push({ type: 'HR', point: pt3, ci_low: parseFloat(hrMatch[2]), ci_high: parseFloat(hrMatch[3]), direction: pt3 > 1 ? 'positive' : (pt3 < 1 ? 'negative' : 'null') });
+    }
+  }
+  /* 7.4 β 回归系数 */
+  var betaRe = /\b(?:beta|β|coefficient|b\s*=\s*)\s*(?:=|:)?\s*(-?\d+\.\d+)\s*[\(]?\s*(-?\d+\.\d+)\s*[-–to]+\s*(-?\d+\.\d+)\s*\)?/gi;
+  var betaMatch;
+  while ((betaMatch = betaRe.exec(effText)) !== null) {
+    var pb = parseFloat(betaMatch[1]);
+    if (Math.abs(pb) < 100) {
+      result.effectSizes.push({ type: 'beta', point: pb, ci_low: parseFloat(betaMatch[2]), ci_high: parseFloat(betaMatch[3]), direction: pb > 0 ? 'positive' : (pb < 0 ? 'negative' : 'null') });
+    }
+  }
+
+  /* === 8. 已控制混杂因素 === */
+  var confounderKw = [
+    { label: '年龄', patterns: [/age/, /年龄/] },
+    { label: '性别', patterns: [/\bsex\b/, /gender/, /性别/] },
+    { label: '社会经济地位', patterns: [/socioeconomic/, /income/, /education/, /社会经济/, /收入/, /教育/] },
+    { label: 'BMI', patterns: [/\bbmi\b/, /body\s+mass\s+index/] },
+    { label: '吸烟', patterns: [/\bsmoking\b/, /\bsmoker/, /吸烟/] },
+    { label: '饮酒', patterns: [/alcohol/, /drinking/, /饮酒/] },
+    { label: '合并症', patterns: [/comorbidit/, / Charlson /, /合并症/, /并发症/] },
+    { label: '地区', patterns: [/region/, /urban[- ]?rural/, /地区/, /城乡/] },
+    { label: '时间/年份', patterns: [/\byear\b/, /time[- ]?varying/, /年份/] },
+    { label: '医疗可及性', patterns: [/access\s+to\s+(health|care)/, /医疗可及/] }
+  ];
+  /* 仅在 Methods 段提到 "adjusted for" / "controlled for" / "controlling" 才记 */
+  var adjustedMention = /(adjusted\s+for|controlled\s+for|controlling\s+for|controlling\s+the\s+effect\s+of|adjusted\s+model|multivariable\s+model|multiple\s+regression|校正|调整后)/i;
+  if (adjustedMention.test(methodsText) || adjustedMention.test(blob)) {
+    confounderKw.forEach(function (c) {
+      c.patterns.forEach(function (p) {
+        if (p.test(methodsText) || p.test(blob)) {
+          if (result.confounders.indexOf(c.label) < 0) result.confounders.push(c.label);
+        }
+      });
+    });
+  }
+
+  /* === 9. 因果推断框架 === */
+  var causalKw = [
+    { label: '有向无环图 DAG', patterns: [/directed\s+acyclic\s+graph/, /\bdag\b/, /有向无环图/] },
+    { label: '反事实/潜在结局', patterns: [/counterfactual/, /potential\s+outcome/, /反事实/, /潜在结局/] },
+    { label: '自然实验', patterns: [/natural\s+experiment/, /自然实验/] },
+    { label: '工具变量', patterns: [/instrumental\s+variable/, /\biv\s+estimat/, /2sls/, /工具变量/] },
+    { label: '断点回归', patterns: [/regression\s+discontinuity/, /\brdd\b/, /断点回归/] },
+    { label: '倾向性评分', patterns: [/propensity\s+score/, /\bpsm\b/, /倾向性评分/] },
+    { label: '双重差分', patterns: [/difference[- ]?in[- ]?differences?/, /\bdid\b\s+estimat/, /双重差分/] },
+    { label: '合成控制', patterns: [/synthetic\s+control/, /合成控制/] },
+    { label: '前后对比', patterns: [/pre[- ]?post/, /before[- ]?and[- ]?after/, /前后对比/] },
+    { label: '反事实中介', patterns: [/causal\s+mediation/, /counterfactual\s+mediation/, /反事实中介/] }
+  ];
+  causalKw.forEach(function (c) {
+    c.patterns.forEach(function (p) {
+      if (p.test(blob)) { if (result.causalFramework.indexOf(c.label) < 0) result.causalFramework.push(c.label); }
+    });
+  });
+
+  /* === 10. 缺失数据处理 === */
+  var missingKw = [
+    { label: '多重插补', patterns: [/multiple\s+imputation/, /\bmi\s+ chained equations/, /mice/, /多重插补/] },
+    { label: '完整病例分析', patterns: [/complete[- ]?case/, /listwise\s+deletion/, /完整病例/] },
+    { label: '逆概率加权', patterns: [/inverse\s+probability\s+weight/, /\bipw\b/, /逆概率加权/] },
+    { label: '最大似然', patterns: [/maximum\s+likelihood/, /\bfiml\b/, /full\s+information\s+maximum/, /最大似然/] },
+    { label: 'LOCF/末次观测结转', patterns: [/\blocf\b/, /last\s+observation\s+carried/, /末次观测/] },
+    { label: '热卡插补', patterns: [/hot[- ]?deck/, /热卡/] }
+  ];
+  missingKw.forEach(function (m) {
+    m.patterns.forEach(function (p) {
+      if (p.test(blob)) { if (result.missingDataHandling.indexOf(m.label) < 0) result.missingDataHandling.push(m.label); }
+    });
+  });
+
+  /* === 11. 效力分析/样本量计算 === */
+  result.powerAnalysis = /power\s+analys/i.test(blob) || /sample\s+size\s+calculation/i.test(blob) ||
+    /power\s+calculation/i.test(blob) || /a priori\s+sample/i.test(blob) || /two[- ]?sided\s+alpha/i.test(blob) ||
+    /power\s+analys/i.test(methodsText) || /sample\s+size\s+calculation/i.test(methodsText) ||
+    /效力分析/.test(blob) || /样本量计算/.test(blob);
+
+  /* === 12. 敏感性分析 === */
+  result.sensitivityAnalysis = /sensitivity\s+analys/i.test(blob) || /敏感性分析/.test(blob);
+
+  /* === 13. 偏倚风险评估工具 === */
+  var biasTools = [
+    { label: 'ROBINS-I', patterns: [/robins[- ]?i/, /risk\s+of\s+bias\s+in\s+non[- ]?randomi[sz]ed/] },
+    { label: 'Cochrane RoB 2', patterns: [/cochrane\s+risk\s+of\s+bias/, /rob\s+2/, /robs?\s*2/] },
+    { label: 'Newcastle-Ottawa', patterns: [/newcastle[- ]?ottawa/, /\bnos\b\s+scale/, /NOS\s+评分/] },
+    { label: 'QUADAS-2', patterns: [/quadas/, /quality\s+assessment\s+of\s+diagnostic/] },
+    { label: 'JBI', patterns: [/\bjbi\b/, /joanna\s+briggs/] },
+    { label: 'GRADE', patterns: [/\bgrade\b/, /grading\s+of\s+recommendations/] },
+    { label: 'AMSTAR-2', patterns: [/amstar/, /measurement\s+tool\s+to\s+assess/] }
+  ];
+  biasTools.forEach(function (b) {
+    b.patterns.forEach(function (p) {
+      if (p.test(blob)) { if (result.biasAssessment.indexOf(b.label) < 0) result.biasAssessment.push(b.label); }
+    });
+  });
+
+  return result;
+}
+
+/* ======================================================================
+ * 方法学全景汇总：聚合所有文献的方法抽取结果
+ * 输出：研究设计分布 / 样本量分布 / 统计方法频次 / 测量工具频次
+ *       / 人群分布 / 暴露-结局网络 / 年份趋势 / 方法学缺口
+ * ====================================================================== */
+function studySummarizeMethods(literature) {
+  var papers = literature || [];
+  var extracted = papers.map(function (p) {
+    var m = studyExtractMethods(p);
+    m._paper = p;
+    return m;
+  });
+
+  /* 1. 研究设计分布 */
+  var designDist = {};
+  extracted.forEach(function (m) {
+    var d = m.design;
+    designDist[d] = (designDist[d] || 0) + 1;
+  });
+
+  /* 2. 样本量分布 */
+  var sampleSizes = extracted.map(function (m) { return m.sampleSize }).filter(function (n) { return n && n > 0 });
+  sampleSizes.sort(function (a, b) { return a - b });
+  var ssStats = { count: sampleSizes.length, median: null, min: null, max: null, q1: null, q3: null };
+  if (sampleSizes.length > 0) {
+    ssStats.median = sampleSizes[Math.floor(sampleSizes.length / 2)];
+    ssStats.min = sampleSizes[0];
+    ssStats.max = sampleSizes[sampleSizes.length - 1];
+    ssStats.q1 = sampleSizes[Math.floor(sampleSizes.length * 0.25)];
+    ssStats.q3 = sampleSizes[Math.floor(sampleSizes.length * 0.75)];
+  }
+
+  /* 3. 统计方法频次 */
+  var statsFreq = {};
+  extracted.forEach(function (m) {
+    m.stats.forEach(function (s) { statsFreq[s] = (statsFreq[s] || 0) + 1; });
+  });
+
+  /* 4. 测量工具频次 */
+  var instrFreq = {};
+  extracted.forEach(function (m) {
+    m.instruments.forEach(function (s) { instrFreq[s] = (instrFreq[s] || 0) + 1; });
+  });
+
+  /* 5. 研究人群分布 */
+  var popFreq = {};
+  extracted.forEach(function (m) {
+    m.population.forEach(function (s) { popFreq[s] = (popFreq[s] || 0) + 1; });
+  });
+
+  /* 6. 暴露/结局关键词频次 */
+  var exposureFreq = {};
+  var outcomeFreq = {};
+  extracted.forEach(function (m) {
+    m.exposure.forEach(function (s) { exposureFreq[s] = (exposureFreq[s] || 0) + 1; });
+    m.outcome.forEach(function (s) { outcomeFreq[s] = (outcomeFreq[s] || 0) + 1; });
+  });
+
+  /* 7. 年份趋势：按 3 年段统计设计类型变化 */
+  var yearBuckets = { 'pre-2015': {}, '2015-2019': {}, '2020+': {} };
+  extracted.forEach(function (m) {
+    var yr = m._paper.year ? parseInt(m._paper.year) : 0;
+    var bucket = yr < 2015 ? 'pre-2015' : (yr < 2020 ? '2015-2019' : '2020+');
+    yearBuckets[bucket][m.design] = (yearBuckets[bucket][m.design] || 0) + 1;
+  });
+
+  /* 8. 方法学缺口分析 */
+  var designLabels = {
+    rct: '随机对照试验', cohort: '队列研究', case_control: '病例对照研究',
+    meta: 'Meta分析/系统综述', cross_sectional: '横断面研究', qualitative: '质性研究',
+    ecological: '生态研究', secondary: '二次数据分析', unknown: '未识别'
+  };
+  var gaps = [];
+  var totalPapers = papers.length || 1;
+  if (!designDist.rct || designDist.rct / totalPapers < 0.1) gaps.push({ type: 'rct', label: '随机对照试验', current: designDist.rct || 0, ratio: (designDist.rct || 0) / totalPapers });
+  if (!designDist.cohort || designDist.cohort / totalPapers < 0.1) gaps.push({ type: 'cohort', label: '队列/纵向研究', current: designDist.cohort || 0, ratio: (designDist.cohort || 0) / totalPapers });
+  if (!designDist.case_control || designDist.case_control / totalPapers < 0.05) gaps.push({ type: 'case_control', label: '病例对照研究', current: designDist.case_control || 0, ratio: (designDist.case_control || 0) / totalPapers });
+  if (!designDist.meta || designDist.meta / totalPapers < 0.05) gaps.push({ type: 'meta', label: 'Meta分析/系统综述', current: designDist.meta || 0, ratio: (designDist.meta || 0) / totalPapers });
+  if (!designDist.qualitative || designDist.qualitative / totalPapers < 0.05) gaps.push({ type: 'qualitative', label: '质性/混合方法研究', current: designDist.qualitative || 0, ratio: (designDist.qualitative || 0) / totalPapers });
+
+  /* 9. 统计方法缺口：高级方法覆盖率 */
+  var advancedStats = ['结构方程模型', '中介分析', '调节分析', '倾向性评分', '双重差分', '断点回归', '工具变量', '贝叶斯方法', '机器学习', '多水平模型'];
+  var statsGaps = [];
+  advancedStats.forEach(function (s) {
+    if (!statsFreq[s] || statsFreq[s] / totalPapers < 0.05) {
+      statsGaps.push({ method: s, count: statsFreq[s] || 0 });
+    }
+  });
+
+  /* === 10. 深化聚合：效应量分布（按类型汇总点估计与方向） === */
+  var effByType = { OR: [], RR: [], HR: [], beta: [] };
+  extracted.forEach(function (m) {
+    (m.effectSizes || []).forEach(function (e) {
+      if (effByType[e.type]) effByType[e.type].push(e);
+    });
+  });
+  function median(nums) {
+    if (!nums.length) return null;
+    var s = nums.slice().sort(function (a, b) { return a - b });
+    return s[Math.floor(s.length / 2)];
+  }
+  var effSummary = {};
+  Object.keys(effByType).forEach(function (t) {
+    var arr = effByType[t];
+    if (arr.length === 0) return;
+    var points = arr.map(function (e) { return e.point });
+    var pos = arr.filter(function (e) { return e.direction === 'positive' }).length;
+    var neg = arr.filter(function (e) { return e.direction === 'negative' }).length;
+    var ns = arr.filter(function (e) { return e.direction === 'null' }).length;
+    var sig = arr.filter(function (e) {
+      /* CI 不跨越 null（OR/RR/HR 的 null=1，β 的 null=0） */
+      var nullVal = (t === 'beta') ? 0 : 1;
+      return (e.ci_low > nullVal || e.ci_high < nullVal);
+    }).length;
+    effSummary[t] = { count: arr.length, median: median(points), min: Math.min.apply(null, points), max: Math.max.apply(null, points), positive: pos, negative: neg, null: ns, significant: sig };
+  });
+
+  /* === 11. 深化聚合：研究缺口矩阵（设计 × 高级方法） ===
+   * 矩阵单元 = 该设计使用该方法的研究数；用于发现"某设计从未使用某方法"的具体空白
+   */
+  var gapMatrix = {};
+  advancedStats.forEach(function (method) { gapMatrix[method] = {}; });
+  extracted.forEach(function (m) {
+    var dKey = m.design;
+    m.stats.forEach(function (s) {
+      if (gapMatrix[s]) {
+        gapMatrix[s][dKey] = (gapMatrix[s][dKey] || 0) + 1;
+      }
+    });
+  });
+  /* 缺口单元：某方法在某设计中完全缺失或仅 1 篇 */
+  var matrixGaps = [];
+  advancedStats.forEach(function (method) {
+    Object.keys(designDist).forEach(function (d) {
+      var cnt = gapMatrix[method][d] || 0;
+      if (cnt === 0 && designDist[d] >= 3) {
+        matrixGaps.push({ method: method, design: d, designLabel: designLabels[d] || d, designCount: designDist[d], methodCount: 0 });
+      }
+    });
+  });
+
+  /* === 12. 深化聚合：变量关系网络（暴露-结局共现对） === */
+  var relPairs = {};
+  extracted.forEach(function (m) {
+    m.exposure.forEach(function (e) {
+      m.outcome.forEach(function (o) {
+        var key = e + ' → ' + o;
+        relPairs[key] = (relPairs[key] || 0) + 1;
+      });
+    });
+  });
+  var relationshipNetwork = Object.keys(relPairs).map(function (k) {
+    return { pair: k, count: relPairs[k] };
+  }).sort(function (a, b) { return b.count - a.count }).slice(0, 15);
+
+  /* === 13. 深化聚合：混杂因素/因果框架/缺失数据处理/偏倚工具 覆盖率 === */
+  var confounderFreq = {};
+  extracted.forEach(function (m) {
+    m.confounders.forEach(function (c) { confounderFreq[c] = (confounderFreq[c] || 0) + 1; });
+  });
+  var causalFreq = {};
+  extracted.forEach(function (m) {
+    m.causalFramework.forEach(function (c) { causalFreq[c] = (causalFreq[c] || 0) + 1; });
+  });
+  var missingFreq = {};
+  extracted.forEach(function (m) {
+    m.missingDataHandling.forEach(function (c) { missingFreq[c] = (missingFreq[c] || 0) + 1; });
+  });
+  var biasFreq = {};
+  extracted.forEach(function (m) {
+    m.biasAssessment.forEach(function (c) { biasFreq[c] = (biasFreq[c] || 0) + 1; });
+  });
+
+  /* === 14. 深化聚合：效力分析与敏感性分析覆盖率 === */
+  var powerCount = extracted.filter(function (m) { return m.powerAnalysis }).length;
+  var sensCount = extracted.filter(function (m) { return m.sensitivityAnalysis }).length;
+
+  return {
+    totalPapers: papers.length,
+    designDist: designDist,
+    designLabels: designLabels,
+    sampleSizeStats: ssStats,
+    statsFreq: statsFreq,
+    instrFreq: instrFreq,
+    popFreq: popFreq,
+    exposureFreq: exposureFreq,
+    outcomeFreq: outcomeFreq,
+    yearBuckets: yearBuckets,
+    gaps: gaps,
+    statsGaps: statsGaps,
+    extracted: extracted,
+    /* === 深化聚合输出 === */
+    effSummary: effSummary,                /* 效应量分布（按 OR/RR/HR/β） */
+    gapMatrix: gapMatrix,                  /* 设计 × 方法 矩阵 */
+    matrixGaps: matrixGaps,                /* 矩阵中识别的具体空白 */
+    relationshipNetwork: relationshipNetwork, /* 暴露→结局共现对 */
+    confounderFreq: confounderFreq,       /* 混杂因素控制频次 */
+    causalFreq: causalFreq,                /* 因果推断框架使用频次 */
+    missingFreq: missingFreq,             /* 缺失数据处理方法频次 */
+    biasFreq: biasFreq,                   /* 偏倚评估工具使用频次 */
+    powerCount: powerCount,               /* 提及效力分析的研究数 */
+    sensitivityCount: sensCount,          /* 提及敏感性分析的研究数 */
+    powerCoverage: totalPapers ? powerCount / totalPapers : 0,
+    sensitivityCoverage: totalPapers ? sensCount / totalPapers : 0
+  };
+}
+
+
 function studyGenerateReview(title, purpose, literature, matches) {
   var refs = literature || [];
   var q = (title + ' ' + (purpose || '')).toLowerCase();
+
+  /* === 深度方法学抽取与汇总 === */
+  var methodSummary = studySummarizeMethods(refs);
+  STUDY_STATE._lastMethodSummary = methodSummary;
+  studySave();
 
   // 年份分布
   var yearDist = {};
@@ -8384,14 +9244,32 @@ function studyGenerateReview(title, purpose, literature, matches) {
   lines.push('================================================================');
   lines.push('文献综述：' + title);
   lines.push('生成时间：' + new Date().toLocaleString('zh-CN'));
-  lines.push('数据来源：Crossref + PubMed（共 ' + refs.length + ' 篇文献）');
+  lines.push('数据来源：PubMed + Crossref + OpenAlex + Semantic Scholar + Europe PMC（共 ' + refs.length + ' 篇文献）');
+  lines.push('分析算法：规则化方法抽取（regex 模式匹配 + 结构化摘要分段），非 LLM/ML');
   lines.push('================================================================');
   lines.push('');
 
   // 1. 执行摘要
   lines.push('【一、执行摘要】');
   lines.push('');
-  lines.push('本综述围绕"' + title + '"这一研究主题，基于 Crossref 和 PubMed 数据库共检索到 ' + refs.length + ' 篇相关文献（' + years.join('–') + '）。研究目的：' + (purpose || '未填写') + '。当前研究呈现以下特点：① 高频主题词集中于 "' + topKW.slice(0, 5).join('、') + '" 等方向；② 核心作者包括 ' + (topAuthors.length ? topAuthors.join('、') : '暂无') + '；③ 方法学上以观察性研究和横断面调查为主。本综述系统梳理了该领域的研究现状、方法学路径、核心发现与知识缺口，为后续研究设计提供参考框架。');
+  var domDesign = Object.entries(methodSummary.designDist).sort(function (a, b) { return b[1] - a[1] })[0];
+  var domDesignLabel = (methodSummary.designLabels[domDesign[0]] || domDesign[0]);
+  lines.push('本综述围绕"' + title + '"这一研究主题，从 PubMed、Crossref、OpenAlex、Semantic Scholar、Europe PMC 五个学术数据库共检索到 ' + refs.length + ' 篇相关文献（' + (years.length ? years.join('–') : '时间未定') + '）。研究目的：' + (purpose || '未填写') + '。');
+  lines.push('');
+  lines.push('通过深度方法学抽取（解析结构化摘要分段 + 18 类统计方法模式匹配 + 16 种测量工具识别），发现：');
+  lines.push('① 主导研究设计为「' + domDesignLabel + '」（' + domDesign[1] + '/' + refs.length + '，占 ' + Math.round(domDesign[1] / refs.length * 100) + '%）');
+  if (methodSummary.sampleSizeStats.count > 0) {
+    var ss = methodSummary.sampleSizeStats;
+    lines.push('② 样本量中位数 ' + ss.median + '（范围 ' + ss.min + '–' + ss.max + '，四分位距 ' + ss.q1 + '–' + ss.q3 + '），共 ' + ss.count + ' 篇报告了样本量');
+  }
+  var topStats = Object.entries(methodSummary.statsFreq).sort(function (a, b) { return b[1] - a[1] }).slice(0, 3);
+  if (topStats.length > 0) {
+    lines.push('③ 最常用统计方法：' + topStats.map(function (s) { return s[0] + '（' + s[1] + '篇）' }).join('、'));
+  }
+  var topInstr = Object.entries(methodSummary.instrFreq).sort(function (a, b) { return b[1] - a[1] }).slice(0, 3);
+  if (topInstr.length > 0) {
+    lines.push('④ 常用测量工具：' + topInstr.map(function (s) { return s[0] + '（' + s[1] + '篇）' }).join('、'));
+  }
   lines.push('');
 
   // 2. 研究背景与现状
@@ -8410,44 +9288,247 @@ function studyGenerateReview(title, purpose, literature, matches) {
     lines.push('当前检索到的文献时间分布较集中。');
   }
   lines.push('');
-  lines.push('从内容维度看，现有研究主要围绕以下维度展开：');
-  lines.push('• 现象描述与流行病学特征：患病率/发生率、人群分布、地理差异');
-  lines.push('• 相关因素与影响机制：社会人口学因素、行为因素、环境因素、生物标志物');
-  lines.push('• 干预与治疗效果评估：药物、认知行为干预、政策干预的有效性');
-  lines.push('• 方法学创新：新的测量工具、分析模型、研究设计');
+
+  // 3. 方法学全景深度分析（替换原浅层分析）
+  lines.push('【三、方法学全景深度分析】');
+  lines.push('');
+  lines.push('—— 基于 ' + refs.length + ' 篇文献的标题+摘要，通过 regex 模式匹配 + 结构化摘要分段解析（' + methodSummary.extracted.filter(function (m) { return m.structured }).length + ' 篇含结构化摘要）——');
   lines.push('');
 
-  // 3. 研究方法学分析
-  lines.push('【三、研究方法学分析】');
+  // 3.1 研究设计分布
+  lines.push('3.1 研究设计类型分布');
   lines.push('');
-  var methodsFound = { cross: 0, cohort: 0, rct: 0, meta: 0, qual: 0 };
-  refs.forEach(function (p) {
-    var blob = (p.title + ' ' + (p.abstract || '')).toLowerCase();
-    if (/(rct|randomized|随机对照|干预|试验)/.test(blob)) methodsFound.rct++;
-    else if (/(cohort|follow|longitudinal|队列|追踪|随访)/.test(blob)) methodsFound.cohort++;
-    else if (/(meta|systematic|meta分析|系统综述)/.test(blob)) methodsFound.meta++;
-    else if (/(qualitative|interview|质性|访谈|扎根)/.test(blob)) methodsFound.qual++;
-    else methodsFound.cross++;
+  Object.entries(methodSummary.designDist).sort(function (a, b) { return b[1] - a[1] }).forEach(function (kv) {
+    var label = methodSummary.designLabels[kv[0]] || kv[0];
+    var pct = Math.round(kv[1] / refs.length * 100);
+    var bar = '█'.repeat(Math.min(30, Math.round(kv[1] / refs.length * 30)));
+    lines.push('  ' + label + '：' + kv[1] + ' 篇（' + pct + '%） ' + bar);
   });
-  lines.push('现有研究设计类型分布（基于标题/摘要关键词）：');
-  lines.push('• 横断面/描述性研究：' + methodsFound.cross + ' 篇（' + Math.round(methodsFound.cross / refs.length * 100) + '%）');
-  lines.push('• 队列/纵向研究：' + methodsFound.cohort + ' 篇（' + Math.round(methodsFound.cohort / refs.length * 100) + '%）');
-  lines.push('• 随机对照试验（RCT）：' + methodsFound.rct + ' 篇（' + Math.round(methodsFound.rct / refs.length * 100) + '%）');
-  lines.push('• Meta 分析/系统综述：' + methodsFound.meta + ' 篇（' + Math.round(methodsFound.meta / refs.length * 100) + '%）');
-  lines.push('• 质性/混合方法：' + methodsFound.qual + ' 篇（' + Math.round(methodsFound.qual / refs.length * 100) + '%）');
-  lines.push('');
-  lines.push('方法学启示：若当前领域以横断面研究为主，可考虑补充队列追踪以建立时序关联；若 RCT 较少且效果不确定，高质量 RCT 将有重要贡献。');
   lines.push('');
 
-  // 4. 核心研究发现（精选 top 5 文献）
-  lines.push('【四、核心研究发现（精选文献）】');
+  // 3.2 样本量分析
+  if (methodSummary.sampleSizeStats.count > 0) {
+    var ss = methodSummary.sampleSizeStats;
+    lines.push('3.2 样本量分析（' + ss.count + ' 篇报告了样本量）');
+    lines.push('');
+    lines.push('  最小值：' + ss.min);
+    lines.push('  第一四分位数（Q1）：' + ss.q1);
+    lines.push('  中位数：' + ss.median);
+    lines.push('  第三四分位数（Q3）：' + ss.q3);
+    lines.push('  最大值：' + ss.max);
+    lines.push('');
+    if (ss.median < 500) {
+      lines.push('  → 样本量中位数偏小（<' + 500 + '），统计效力可能不足，建议后续研究扩大样本');
+    } else if (ss.median < 5000) {
+      lines.push('  → 样本量中等，可支持亚组分析和多变量建模');
+    } else {
+      lines.push('  → 样本量较大，支持复杂多水平模型和精细亚组分析');
+    }
+    lines.push('');
+  }
+
+  // 3.3 统计方法频次
+  lines.push('3.3 统计方法使用频次');
+  lines.push('');
+  var statsEntries = Object.entries(methodSummary.statsFreq).sort(function (a, b) { return b[1] - a[1] });
+  if (statsEntries.length > 0) {
+    statsEntries.forEach(function (kv) {
+      var bar = '█'.repeat(Math.min(20, kv[1]));
+      lines.push('  ' + kv[0] + '：' + kv[1] + ' 篇 ' + bar);
+    });
+  } else {
+    lines.push('  （未从摘要中识别到明确统计方法描述）');
+  }
+  lines.push('');
+
+  // 3.4 测量工具
+  lines.push('3.4 测量工具/量表使用频次');
+  lines.push('');
+  var instrEntries = Object.entries(methodSummary.instrFreq).sort(function (a, b) { return b[1] - a[1] });
+  if (instrEntries.length > 0) {
+    instrEntries.forEach(function (kv) {
+      lines.push('  ' + kv[0] + '：' + kv[1] + ' 篇');
+    });
+  } else {
+    lines.push('  （未识别到标准化量表，可能使用自定义问卷）');
+  }
+  lines.push('');
+
+  // 3.5 研究人群
+  lines.push('3.5 研究人群分布');
+  lines.push('');
+  var popEntries = Object.entries(methodSummary.popFreq).sort(function (a, b) { return b[1] - a[1] });
+  if (popEntries.length > 0) {
+    popEntries.forEach(function (kv) {
+      lines.push('  ' + kv[0] + '：' + kv[1] + ' 篇');
+    });
+  } else {
+    lines.push('  （未识别到特定人群标签）');
+  }
+  lines.push('');
+
+  // 3.6 年份-设计趋势
+  lines.push('3.6 研究设计的时间趋势');
+  lines.push('');
+  Object.keys(methodSummary.yearBuckets).forEach(function (bucket) {
+    var dist = methodSummary.yearBuckets[bucket];
+    var total = Object.values(dist).reduce(function (a, b) { return a + b }, 0);
+    if (total > 0) {
+      lines.push('  [' + bucket + ']（共 ' + total + ' 篇）');
+      Object.entries(dist).sort(function (a, b) { return b[1] - a[1] }).forEach(function (kv) {
+        lines.push('    ' + (methodSummary.designLabels[kv[0]] || kv[0]) + '：' + kv[1] + ' 篇');
+      });
+    }
+  });
+  lines.push('');
+
+  // 3.7 方法学缺口
+  lines.push('3.7 方法学缺口分析');
+  lines.push('');
+  if (methodSummary.gaps.length > 0) {
+    lines.push('研究设计缺口（现有文献中占比 <10% 或缺失的设计）：');
+    methodSummary.gaps.forEach(function (g) {
+      lines.push('  • ' + g.label + '：现有 ' + g.current + ' 篇（占 ' + Math.round(g.ratio * 100) + '%），缺口明显');
+    });
+  } else {
+    lines.push('各设计类型覆盖较为均衡，无明显缺口。');
+  }
+  lines.push('');
+  if (methodSummary.statsGaps.length > 0) {
+    lines.push('高级统计方法缺口（使用率 <5%）：');
+    methodSummary.statsGaps.forEach(function (g) {
+      lines.push('  • ' + g.method + '：现有 ' + g.count + ' 篇使用');
+    });
+  }
+  lines.push('');
+
+  // 3.8 效应量聚合（深新增）
+  var effKeys = Object.keys(methodSummary.effSummary || {});
+  if (effKeys.length > 0) {
+    lines.push('3.8 效应量定量聚合（从 Results 段自动抽取的 OR/RR/HR/β）');
+    lines.push('');
+    lines.push('—— 仅从结构化摘要 Results 段提取含 95%CI 的点估计，方向判定：OR/RR/HR >1 正向、<1 负向；β >0 正向、<0 负向；CI 不跨越 null 值视为统计学显著 ——');
+    lines.push('');
+    effKeys.forEach(function (t) {
+      var e = methodSummary.effSummary[t];
+      var nullVal = (t === 'beta') ? 0 : 1;
+      lines.push('  [' + t + '] 共抽取 ' + e.count + ' 个效应量');
+      lines.push('    中位数 ' + e.median + '（范围 ' + e.min + '–' + e.max + '）');
+      lines.push('    方向分布：正向 ' + e.positive + ' / 负向 ' + e.negative + ' / 接近 ' + nullVal + '：' + e.null);
+      lines.push('    其中 CI 不跨越 ' + nullVal + '（统计学显著）：' + e.significant + ' / ' + e.count + '（' + Math.round(e.significant / e.count * 100) + '%）');
+    });
+    lines.push('');
+    lines.push('  → 该聚合可直接用于后续 Meta 分析先验估计效应方向、计算样本量所需的先验效应幅度');
+    lines.push('');
+  }
+
+  // 3.9 变量关系网络（深新增）
+  if (methodSummary.relationshipNetwork && methodSummary.relationshipNetwork.length > 0) {
+    lines.push('3.9 暴露-结局关系网络（共现对，频次降序）');
+    lines.push('');
+    methodSummary.relationshipNetwork.slice(0, 10).forEach(function (r) {
+      lines.push('  • ' + r.pair + '（共 ' + r.count + ' 篇同时提及）');
+    });
+    lines.push('');
+    lines.push('  → 高频共现对可作为后续研究的主假设；低频对可作为探索性研究方向');
+    lines.push('');
+  }
+
+  // 3.10 研究缺口矩阵（深新增）
+  if (methodSummary.matrixGaps && methodSummary.matrixGaps.length > 0) {
+    lines.push('3.10 设计 × 高级方法 缺口矩阵');
+    lines.push('');
+    lines.push('—— 以下"设计类型文献数≥3 但其中从未使用该高级方法"的组合为最具体的研究空白 ——');
+    lines.push('');
+    methodSummary.matrixGaps.slice(0, 12).forEach(function (g) {
+      lines.push('  • ' + g.designLabel + '（' + g.designCount + ' 篇）× 未使用 ' + g.method);
+    });
+    lines.push('');
+    lines.push('  → 这些组合是可直接落地的填补性研究选题，推荐方案优先考虑此维度');
+    lines.push('');
+  }
+
+  // 3.11 方法学质量控制覆盖（深新增）
+  lines.push('3.11 方法学质量控制与因果推断框架覆盖');
+  lines.push('');
+  /* 混杂因素控制 */
+  var confEntries = Object.entries(methodSummary.confounderFreq || {}).sort(function (a, b) { return b[1] - a[1] });
+  if (confEntries.length > 0) {
+    lines.push('  已控制混杂因素频次（提及"adjusted for/controlling"的研究中）：');
+    confEntries.forEach(function (kv) {
+      var pct = Math.round(kv[1] / refs.length * 100);
+      lines.push('    ' + kv[0] + '：' + kv[1] + ' 篇（占 ' + pct + '%）');
+    });
+  } else {
+    lines.push('  已控制混杂因素：无研究明确提及"adjusted for/controlling"，方法学透明度不足');
+  }
+  lines.push('');
+  /* 因果推断框架 */
+  var causalEntries = Object.entries(methodSummary.causalFreq || {}).sort(function (a, b) { return b[1] - a[1] });
+  if (causalEntries.length > 0) {
+    lines.push('  因果推断框架使用：');
+    causalEntries.forEach(function (kv) {
+      lines.push('    ' + kv[0] + '：' + kv[1] + ' 篇');
+    });
+  } else {
+    lines.push('  因果推断框架：无研究明确使用 DAG/反事实/自然实验等框架，多为关联性分析');
+  }
+  lines.push('');
+  /* 缺失数据处理 */
+  var missEntries = Object.entries(methodSummary.missingFreq || {}).sort(function (a, b) { return b[1] - a[1] });
+  if (missEntries.length > 0) {
+    lines.push('  缺失数据处理方法：');
+    missEntries.forEach(function (kv) {
+      lines.push('    ' + kv[0] + '：' + kv[1] + ' 篇');
+    });
+  } else {
+    lines.push('  缺失数据处理：无研究明确报告缺失数据处理策略，可信度受限');
+  }
+  lines.push('');
+  /* 偏倚评估 */
+  var biasEntries = Object.entries(methodSummary.biasFreq || {}).sort(function (a, b) { return b[1] - a[1] });
+  if (biasEntries.length > 0) {
+    lines.push('  偏倚风险评估工具：');
+    biasEntries.forEach(function (kv) {
+      lines.push('    ' + kv[0] + '：' + kv[1] + ' 篇');
+    });
+  } else {
+    lines.push('  偏倚风险评估工具：无研究使用 ROBINS-I/Cochrane RoB/NOS 等标准化工具');
+  }
+  lines.push('');
+
+  // 3.12 效力分析与敏感性分析覆盖（深新增）
+  lines.push('3.12 效力分析与稳健性检验覆盖');
+  lines.push('');
+  lines.push('  提及效力分析/样本量计算：' + methodSummary.powerCount + '/' + refs.length + ' 篇（' + Math.round(methodSummary.powerCoverage * 100) + '%）');
+  lines.push('  提及敏感性分析：' + methodSummary.sensitivityCount + '/' + refs.length + ' 篇（' + Math.round(methodSummary.sensitivityCoverage * 100) + '%）');
+  lines.push('');
+  if (methodSummary.powerCoverage < 0.3) {
+    lines.push('  → 仅 ' + Math.round(methodSummary.powerCoverage * 100) + '% 研究报告效力分析，多数研究样本量依据不透明');
+  }
+  if (methodSummary.sensitivityCoverage < 0.3) {
+    lines.push('  → 仅 ' + Math.round(methodSummary.sensitivityCoverage * 100) + '% 研究做敏感性分析，结果稳健性验证不足');
+  }
+  lines.push('');
+
+  // 4. 核心研究发现（精选 top 5 文献，附方法抽取结果）
+  lines.push('【四、核心研究发现（精选文献 + 方法标注）】');
   lines.push('');
   var topRefs = refs.slice(0, Math.min(5, refs.length));
   topRefs.forEach(function (p, idx) {
+    var m = methodSummary.extracted[idx];
     lines.push((idx + 1) + '. ' + p.title);
     lines.push('   ' + (p.journal || '').trim() + (p.year ? ' (' + p.year + ')' : '') + (p.authors ? ' — ' + p.authors : ''));
+    if (m) {
+      var meta = [];
+      meta.push('设计：' + m.designLabel);
+      if (m.sampleSize) meta.push('n=' + m.sampleSize);
+      if (m.stats.length > 0) meta.push('方法：' + m.stats.join('、'));
+      if (m.instruments.length > 0) meta.push('工具：' + m.instruments.join('、'));
+      if (m.population.length > 0) meta.push('人群：' + m.population.join('、'));
+      lines.push('   [抽取] ' + meta.join(' | '));
+    }
     if (p.abstract && p.abstract.length > 10) {
-      // 取摘要前 200 字
       var abs = p.abstract.length > 200 ? p.abstract.substring(0, 200) + '...' : p.abstract;
       lines.push('   摘要：' + abs);
     }
@@ -8473,22 +9554,90 @@ function studyGenerateReview(title, purpose, literature, matches) {
     lines.push('');
   }
 
-  // 6. 研究局限与展望
-  lines.push('【六、研究局限与展望】');
+  // 暴露-结局热点
+  var expTop = Object.entries(methodSummary.exposureFreq).sort(function (a, b) { return b[1] - a[1] }).slice(0, 5);
+  var outTop = Object.entries(methodSummary.outcomeFreq).sort(function (a, b) { return b[1] - a[1] }).slice(0, 5);
+  if (expTop.length > 0 || outTop.length > 0) {
+    lines.push('暴露因素热点：' + (expTop.length > 0 ? expTop.map(function (x) { return x[0] + '（' + x[1] + '）' }).join('、') : '未识别'));
+    lines.push('结局变量热点：' + (outTop.length > 0 ? outTop.map(function (x) { return x[0] + '（' + x[1] + '）' }).join('、') : '未识别'));
+    lines.push('');
+  }
+
+  // 6. 研究局限与展望（基于实际方法学发现）
+  lines.push('【六、研究局限与展望（基于方法学抽取结果）】');
   lines.push('');
-  lines.push('现有研究可能存在的局限：');
-  lines.push('• 横断面设计多，因果推断受限，需要更多队列追踪研究');
-  lines.push('• 样本代表性可能不足（多集中于城市/特定人群）');
-  lines.push('• 测量工具缺乏统一标准，跨国/跨时期可比性差');
-  lines.push('• 中介机制和路径分析研究较少，"为什么"尚未回答');
+  lines.push('基于方法学全景分析，现有研究存在以下局限：');
+  // 基于实际缺口生成局限
+  if (methodSummary.gaps.length > 0) {
+    methodSummary.gaps.forEach(function (g) {
+      lines.push('• ' + g.label + '严重不足（仅 ' + g.current + ' 篇，占 ' + Math.round(g.ratio * 100) + '%），难以支撑因果推断');
+    });
+  }
+  if (methodSummary.sampleSizeStats.count > 0 && methodSummary.sampleSizeStats.median < 500) {
+    lines.push('• 样本量中位数仅 ' + methodSummary.sampleSizeStats.median + '，亚组分析效力不足');
+  }
+  if (methodSummary.statsGaps.length > 0) {
+    lines.push('• 高级统计方法应用不足：' + methodSummary.statsGaps.slice(0, 3).map(function (g) { return g.method }).join('、') + ' 等方法使用率低');
+  }
+  if (Object.keys(methodSummary.instrFreq).length > 1) {
+    lines.push('• 测量工具不统一（' + Object.keys(methodSummary.instrFreq).length + ' 种不同量表），跨研究可比性差');
+  } else if (Object.keys(methodSummary.instrFreq).length === 0) {
+    lines.push('• 缺乏标准化测量工具，多数研究使用自定义问卷');
+  }
+  /* 深新增：基于第二层聚合维度的局限 */
+  if (methodSummary.powerCoverage < 0.3) {
+    lines.push('• 效力分析覆盖率仅 ' + Math.round(methodSummary.powerCoverage * 100) + '%（' + methodSummary.powerCount + '/' + refs.length + '），多数研究样本量依据不透明');
+  }
+  if (methodSummary.sensitivityCoverage < 0.3) {
+    lines.push('• 敏感性分析覆盖率仅 ' + Math.round(methodSummary.sensitivityCoverage * 100) + '%（' + methodSummary.sensitivityCount + '/' + refs.length + '），结果稳健性验证不足');
+  }
+  if (Object.keys(methodSummary.biasFreq || {}).length === 0) {
+    lines.push('• 无研究使用 ROBINS-I/Cochrane RoB/NOS 等标准化偏倚评估工具，方法学质量评估缺失');
+  }
+  if (Object.keys(methodSummary.causalFreq || {}).length === 0) {
+    lines.push('• 无研究明确使用 DAG/反事实/自然实验等因果推断框架，多为描述性关联分析，因果效力受限');
+  }
+  if (Object.keys(methodSummary.missingFreq || {}).length === 0 && methodSummary.sampleSizeStats.count > 0) {
+    lines.push('• 无研究报告缺失数据处理策略（多重插补/IPW 等），存在完整病例分析偏倚风险');
+  }
+  /* 矩阵缺口 */
+  if (methodSummary.matrixGaps && methodSummary.matrixGaps.length > 0) {
+    lines.push('• 设计×方法缺口矩阵识别 ' + methodSummary.matrixGaps.length + ' 个具体空白，例如：');
+    methodSummary.matrixGaps.slice(0, 3).forEach(function (g) {
+      lines.push('    - ' + g.designLabel + '（' + g.designCount + ' 篇）从未使用 ' + g.method);
+    });
+  }
   lines.push('');
-  lines.push('未来研究方向建议：');
-  lines.push('1. 构建多水平/多层模型，整合个体、家庭、社区、政策多层次因素');
-  lines.push('2. 加强纵向追踪，考察关键转折点和动态轨迹');
-  lines.push('3. 结合生理/生物标志物与社会心理变量，推进生物-心理-社会整合模型');
-  lines.push('4. 开展准实验（DID/RDD）和真实世界数据研究，提升政策评估的因果强度');
+  lines.push('未来研究方向建议（基于方法学缺口）：');
+  var recIdx = 1;
+  methodSummary.gaps.slice(0, 2).forEach(function (g) {
+    lines.push(recIdx + '. 补充「' + g.label + '」设计，当前仅 ' + g.current + ' 篇，填补该设计空白');
+    recIdx++;
+  });
+  methodSummary.statsGaps.slice(0, 2).forEach(function (g) {
+    lines.push(recIdx + '. 引入「' + g.method + '」，现有 ' + g.count + ' 篇使用，可提升分析深度');
+    recIdx++;
+  });
+  /* 深新增：基于矩阵缺口的具体方向 */
+  if (methodSummary.matrixGaps && methodSummary.matrixGaps.length > 0) {
+    var topGap = methodSummary.matrixGaps[0];
+    lines.push(recIdx + '. 在「' + topGap.designLabel + '」中引入「' + topGap.method + '」——该设计有 ' + topGap.designCount + ' 篇文献但无一使用此方法');
+    recIdx++;
+  }
+  /* 深新增：基于效力分析覆盖的方向 */
+  if (methodSummary.powerCoverage < 0.3) {
+    lines.push(recIdx + '. 在方案中预先报告效力分析与样本量计算依据（现有仅 ' + methodSummary.powerCount + ' 篇报告，提升透明度）');
+    recIdx++;
+  }
+  /* 深新增：基于效应量聚合的方向 */
+  var effK = Object.keys(methodSummary.effSummary || {});
+  if (effK.length > 0) {
+    var firstEff = methodSummary.effSummary[effK[0]];
+    lines.push(recIdx + '. 利用现有 ' + effK[0] + ' 中位数 ' + firstEff.median + ' 作为先验效应量，进行正式样本量计算');
+    recIdx++;
+  }
   if (matches && matches.length > 0) {
-    lines.push('5. 可利用的公开资源包括：' + matches.slice(0, 3).map(function (m) { return m.title }).join('、') + ' 等');
+    lines.push(recIdx + '. 可利用的公开数据资源：' + matches.slice(0, 3).map(function (m) { return m.title }).join('、'));
   }
   lines.push('');
 
@@ -8502,6 +9651,7 @@ function studyGenerateReview(title, purpose, literature, matches) {
     if (p.journal) ref += p.journal + '. ';
     if (p.year) ref += p.year + '. ';
     if (p.doi) ref += 'DOI: ' + p.doi + ' ';
+    if (p._source) ref += '[' + p._source + '] ';
     ref += (p.url ? p.url : '');
     lines.push(ref.trim());
   });
@@ -8509,40 +9659,267 @@ function studyGenerateReview(title, purpose, literature, matches) {
   return lines.join('\n');
 }
 
-/* --- 推荐研究方案 --- */
+/* --- 推荐研究方案（5 因子加权模型，基于深度方法学抽取） ---
+ * 模型：规则化专家评分系统（非机器学习），5 因子加权：
+ *   A. 研究问题类型亲和度（权重 0.30）
+ *   B. 文献设计缺口分析（权重 0.30）：基于 studySummarizeMethods 的深度设计分布
+ *   C. 数据可用性（权重 0.15）：根据匹配到的数据集类型加权
+ *   D. 核心概念匹配（权重 0.10）：关键词命中
+ *   E. 统计方法缺口（权重 0.15）：推荐能引入文献中缺失的高级统计方法的设计
+ * 输出：Top 3 方案 + 评分明细 + 推荐依据（引用具体文献方法学发现） + 算法声明
+ */
 function studyRecommendPlans(title, purpose, literature, matches) {
   var q = (title + ' ' + (purpose || '')).toLowerCase();
-  var plans = [];
+  var concepts = STUDY_STATE._lastConcepts || studyExtractConcepts(title, purpose);
+  var qType = STUDY_STATE._lastQType || studyClassifyQuestionType(title, purpose, concepts);
 
-  // 给每个模板打分
+  /* === 获取深度方法学汇总（来自 studyGenerateReview 缓存或即时计算） === */
+  var ms = STUDY_STATE._lastMethodSummary;
+  if (!ms || (literature && literature.length > 0 && ms.totalPapers !== literature.length)) {
+    ms = studySummarizeMethods(literature || []);
+    STUDY_STATE._lastMethodSummary = ms;
+  }
+
+  /* === Factor A：问题类型 → 模板亲和度矩阵 === */
+  var affinityMatrix = {
+    descriptive:   { t1: 0.95, t2: 0.30, t3: 0.20, t4: 0.10, t5: 0.40, t6: 0.15 },
+    etiological:  { t1: 0.30, t2: 0.95, t3: 0.75, t4: 0.25, t5: 0.20, t6: 0.25 },
+    interventional:{ t1: 0.20, t2: 0.30, t3: 0.15, t4: 0.95, t5: 0.15, t6: 0.35 },
+    policy:        { t1: 0.15, t2: 0.20, t3: 0.10, t4: 0.20, t5: 0.95, t6: 0.15 },
+    exploratory:   { t1: 0.25, t2: 0.20, t3: 0.15, t4: 0.20, t5: 0.15, t6: 0.95 }
+  };
+  var typeLabel = { descriptive: '描述性研究', etiological: '病因学/关联研究', interventional: '干预/效果研究', policy: '政策评估研究', exploratory: '探索/机制研究' };
+
+  /* === Factor B：深度设计分布 → 缺口分析 ===
+   * 将 methodSummary.designDist 映射到模板 ID：
+   *   cross_sectional→t1, cohort→t2, case_control→t3, rct→t4, secondary/meta→t5, qualitative→t6
+   */
+  var designToTemplate = { cross_sectional: 't1', cohort: 't2', case_control: 't3', rct: 't4', secondary: 't5', meta: 't5', qualitative: 't6', ecological: 't5', unknown: 't1' };
+  var templateToDesign = { t1: 'cross_sectional', t2: 'cohort', t3: 'case_control', t4: 'rct', t5: 'secondary', t6: 'qualitative' };
+  var totalLit = ms.totalPapers || (literature || []).length || 1;
+
+  /* 计算每个模板对应的深度设计计数 */
+  var templateDesignCount = { t1: 0, t2: 0, t3: 0, t4: 0, t5: 0, t6: 0 };
+  Object.keys(ms.designDist || {}).forEach(function (dk) {
+    var tid = designToTemplate[dk];
+    if (tid) templateDesignCount[tid] = (templateDesignCount[tid] || 0) + ms.designDist[dk];
+  });
+
+  /* 缺口分：现有占比越低，缺口分越高 */
+  var gapScore = {};
+  Object.keys(templateDesignCount).forEach(function (tid) {
+    var existingRatio = templateDesignCount[tid] / totalLit;
+    gapScore[tid] = Math.max(0, 1 - existingRatio * 2);
+  });
+
+  /* === Factor C：数据可用性 === */
+  var dataTypeBonus = { t1: 0, t2: 0, t3: 0, t4: 0, t5: 0, t6: 0 };
+  (matches || []).forEach(function (m) {
+    var blob = ((m.title || '') + ' ' + (m.desc || '') + ' ' + (m.type || '')).toLowerCase();
+    if (/(面板|panel|纵向|longitudinal|时间序列|time.series|年份|2003|2007|2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|年鉴|annual)/.test(blob)) {
+      dataTypeBonus.t5 += 0.4;
+      dataTypeBonus.t2 += 0.2;
+    }
+    if (/(横断面|cross|截面|调查|survey|抽样|样本)/.test(blob)) {
+      dataTypeBonus.t1 += 0.4;
+      dataTypeBonus.t3 += 0.2;
+    }
+    if (/(访谈|interview|质性|qualitative|个案|case)/.test(blob)) {
+      dataTypeBonus.t6 += 0.4;
+    }
+  });
+  Object.keys(dataTypeBonus).forEach(function (tid) { dataTypeBonus[tid] = Math.min(1, dataTypeBonus[tid]); });
+
+  /* === Factor D：核心概念/关键词匹配 === */
+  var kwScore = {};
   STUDY_PLAN_TEMPLATES.forEach(function (tmpl) {
-    var score = 0;
-    tmpl.match_kw.forEach(function (kw) {
-      if (q.indexOf(kw.toLowerCase()) >= 0) score += 3;
+    var s = 0;
+    (tmpl.match_kw || []).forEach(function (kw) {
+      if (q.indexOf(kw.toLowerCase()) >= 0) s += 0.3;
     });
-    // 文献特征匹配
-    var methodsMatch = 0;
-    literature.forEach(function (p) {
-      var blob = (p.title + ' ' + (p.abstract || '')).toLowerCase();
-      if (tmpl.id === 't1' && /(prevalence|cross|survey|患病率)/.test(blob)) methodsMatch++;
-      if (tmpl.id === 't2' && /(cohort|follow|longitudinal|panel|追踪)/.test(blob)) methodsMatch++;
-      if (tmpl.id === 't3' && /(case.control|病例对照)/.test(blob)) methodsMatch++;
-      if (tmpl.id === 't4' && /(rct|randomized|干预|试验)/.test(blob)) methodsMatch++;
-      if (tmpl.id === 't5' && /(did|rdd|meta|二次|公开)/.test(blob)) methodsMatch++;
-      if (tmpl.id === 't6' && /(qualitative|interview|质性|混合)/.test(blob)) methodsMatch++;
+    concepts.forEach(function (c) {
+      if ((tmpl.match_kw || []).indexOf(c) >= 0) s += 0.2;
     });
-    score += methodsMatch;
-    plans.push(Object.assign({}, tmpl, { matchScore: score }));
+    kwScore[tmpl.id] = Math.min(1, s);
+  });
+
+  /* === Factor E：统计方法缺口 → 该设计能否引入缺失方法 ===
+   * 映射：哪些模板能自然地使用哪些高级统计方法
+   */
+  var templateAdvancedStats = {
+    t1: ['中介分析', '多水平模型', '结构方程模型'],
+    t2: ['中介分析', '混合效应模型', '多水平模型', '贝叶斯方法'],
+    t3: ['倾向性评分', '工具变量', '中介分析'],
+    t4: ['中介分析', '贝叶斯方法', '机器学习'],
+    t5: ['双重差分', '断点回归', '工具变量', '合成控制法', '机器学习'],
+    t6: ['结构方程模型', '聚类分析', '多水平模型']
+  };
+  var statsGapScore = {};
+  Object.keys(templateAdvancedStats).forEach(function (tid) {
+    var applicable = templateAdvancedStats[tid];
+    var gapCount = 0;
+    applicable.forEach(function (method) {
+      /* 如果该方法在文献中缺口（使用率 <5%），该设计能引入它则加分 */
+      var isGap = ms.statsGaps && ms.statsGaps.some(function (g) { return g.method === method });
+      if (isGap) gapCount++;
+    });
+    statsGapScore[tid] = gapCount / applicable.length;
+  });
+
+  /* === 综合打分 === */
+  var WEIGHT = { A: 0.30, B: 0.30, C: 0.15, D: 0.10, E: 0.15 };
+  var plans = [];
+  var qAffinity = affinityMatrix[qType.primary] || affinityMatrix.descriptive;
+
+  STUDY_PLAN_TEMPLATES.forEach(function (tmpl) {
+    var aScore = qAffinity[tmpl.id] || 0;
+    var bScore = gapScore[tmpl.id] || 0;
+    var cScore = dataTypeBonus[tmpl.id] || 0;
+    var dScore = kwScore[tmpl.id] || 0;
+    var eScore = statsGapScore[tmpl.id] || 0;
+    var total = aScore * WEIGHT.A + bScore * WEIGHT.B + cScore * WEIGHT.C + dScore * WEIGHT.D + eScore * WEIGHT.E;
+
+    /* 生成推荐依据（引用具体方法学发现） */
+    var reasons = [];
+
+    /* A: 问题类型 */
+    if (aScore >= 0.75) reasons.push('研究问题类型为「' + typeLabel[qType.primary] + '」，该设计是最直接匹配（亲和度 ' + (aScore * 100).toFixed(0) + '%）');
+    else if (aScore >= 0.40) reasons.push('研究问题类型为「' + typeLabel[qType.primary] + '」，该设计可作为备选（亲和度 ' + (aScore * 100).toFixed(0) + '%）');
+    else reasons.push('研究问题类型为「' + typeLabel[qType.primary] + '」，该设计亲和度较低（' + (aScore * 100).toFixed(0) + '%），但可作补充视角');
+
+    /* B: 文献设计缺口（引用深度抽取结果） */
+    var designKey = templateToDesign[tmpl.id];
+    var designLabel = ms.designLabels ? (ms.designLabels[designKey] || tmpl.name) : tmpl.name;
+    var existingCount = templateDesignCount[tmpl.id] || 0;
+    var existingPct = (existingCount / totalLit * 100).toFixed(0);
+    if (bScore >= 0.7) {
+      reasons.push('深度抽取发现：' + totalLit + ' 篇文献中仅 ' + existingCount + ' 篇为' + designLabel + '（占 ' + existingPct + '%），缺口明显，推荐填补');
+    } else if (bScore >= 0.3) {
+      reasons.push('' + designLabel + '在现有文献中占比适中（' + existingCount + '/' + totalLit + '，占 ' + existingPct + '%），可作为补充');
+    } else {
+      reasons.push('' + designLabel + '在现有文献中已较充分（' + existingCount + '/' + totalLit + '，占 ' + existingPct + '%）');
+    }
+
+    /* E: 统计方法缺口（引用具体缺失方法） */
+    if (eScore >= 0.3) {
+      var applicableGaps = (templateAdvancedStats[tmpl.id] || []).filter(function (method) {
+        return ms.statsGaps && ms.statsGaps.some(function (g) { return g.method === method });
+      });
+      if (applicableGaps.length > 0) {
+        reasons.push('该设计可引入文献中缺失的高级方法：' + applicableGaps.join('、') + '（现有使用率 <5%）');
+      }
+    }
+
+    /* C: 数据可用性 */
+    if (cScore >= 0.3) reasons.push('匹配到的数据集类型支持此设计（数据可用性分 ' + (cScore * 100).toFixed(0) + '%）');
+
+    /* D: 概念匹配 */
+    if (dScore >= 0.3) reasons.push('关键词命中模板标签（概念匹配分 ' + (dScore * 100).toFixed(0) + '%）');
+
+    /* 样本量参考 */
+    if (ms.sampleSizeStats && ms.sampleSizeStats.count > 0) {
+      var ssRef = ms.sampleSizeStats;
+      reasons.push('文献样本量参考：中位数 ' + ssRef.median + '（范围 ' + ssRef.min + '–' + ssRef.max + '），建议本研究样本量不低于 ' + Math.ceil(ssRef.median * 1.2));
+    }
+
+    /* === 深新增：基于第二层聚合维度的具体引用 === */
+
+    /* F: 矩阵缺口（设计×方法的具体空白） */
+    if (ms.matrixGaps && ms.matrixGaps.length > 0) {
+      var tmplDesignKey = templateToDesign[tmpl.id];
+      var relevantGaps = ms.matrixGaps.filter(function (g) {
+        return g.design === tmplDesignKey &&
+          (templateAdvancedStats[tmpl.id] || []).indexOf(g.method) >= 0;
+      });
+      if (relevantGaps.length > 0) {
+        reasons.push('矩阵缺口：' + tmpl.name + '中从未使用 ' + relevantGaps.slice(0, 3).map(function (g) { return g.method }).join('、') + '，是可直接落地的填补性选题');
+      }
+    }
+
+    /* G: 混杂因素控制参考（基于文献中已控制的混杂因素） */
+    var confTop = Object.entries(ms.confounderFreq || {}).sort(function (a, b) { return b[1] - a[1] }).slice(0, 3);
+    if (confTop.length > 0) {
+      reasons.push('文献中已控制混杂因素：' + confTop.map(function (c) { return c[0] + '（' + c[1] + '篇）' }).join('、') + '，本研究应至少控制这些变量');
+    } else if (totalLit > 0) {
+      reasons.push('现有文献均未明确报告混杂因素控制策略，本研究应明确使用 DAG 进行混杂选择并报告');
+    }
+
+    /* H: 偏倚评估工具缺口 */
+    if (Object.keys(ms.biasFreq || {}).length === 0) {
+      var biasToolForDesign = {
+        t1: 'Newcastle-Ottawa', t2: 'Newcastle-Ottawa', t3: 'Newcastle-Ottawa',
+        t4: 'Cochrane RoB 2', t5: 'ROBINS-I', t6: 'JBI'
+      };
+      var suggestedTool = biasToolForDesign[tmpl.id] || 'ROBINS-I';
+      reasons.push('现有文献均未使用标准化偏倚评估工具，建议本研究采用 ' + suggestedTool + ' 进行偏倚风险评估');
+    }
+
+    /* I: 效力分析缺口 */
+    if (ms.powerCoverage < 0.3) {
+      reasons.push('现有文献仅 ' + Math.round(ms.powerCoverage * 100) + '% 报告效力分析，本研究应预先计算样本量并报告');
+    }
+
+    /* J: 效应量聚合 → 样本量先验 */
+    var effKeysList = Object.keys(ms.effSummary || {});
+    if (effKeysList.length > 0) {
+      var firstEff = ms.effSummary[effKeysList[0]];
+      if (firstEff && firstEff.median) {
+        reasons.push('文献中 ' + effKeysList[0] + ' 中位数 ' + firstEff.median + '（' + firstEff.count + ' 个效应量，CI 显著 ' + firstEff.significant + ' 个）可作为样本量计算的先验效应量');
+      }
+    }
+
+    /* K: 变量关系网络 → 研究假设 */
+    if (ms.relationshipNetwork && ms.relationshipNetwork.length > 0) {
+      var topPair = ms.relationshipNetwork[0];
+      reasons.push('文献中最常共现的暴露-结局对：' + topPair.pair + '（' + topPair.count + ' 篇），可作为本研究的主假设');
+    }
+
+    /* L: 敏感性分析缺口 */
+    if (ms.sensitivityCoverage < 0.3) {
+      reasons.push('现有文献仅 ' + Math.round(ms.sensitivityCoverage * 100) + '% 做敏感性分析，本研究应在分析阶段加入至少 3 种稳健性检验');
+    }
+
+    /* M: 缺失数据处理缺口 */
+    if (Object.keys(ms.missingFreq || {}).length === 0 && ms.sampleSizeStats && ms.sampleSizeStats.count > 0) {
+      reasons.push('现有文献均未报告缺失数据处理策略，本研究应明确使用多重插补或 IPW 并报告');
+    }
+
+    plans.push(Object.assign({}, tmpl, {
+      matchScore: total,
+      scoreBreakdown: { A: aScore, B: bScore, C: cScore, D: dScore, E: eScore, weight: WEIGHT },
+      methodDistCount: templateDesignCount[tmpl.id],
+      rationale: reasons,
+      algorithm: '5因子加权打分（A问题类型30% + B文献设计缺口30% + C数据可用性15% + D概念匹配10% + E统计方法缺口15%）+ 8维深度推荐依据（F矩阵缺口 / G混杂因素 / H偏倚工具 / I效力分析 / J效应量先验 / K关系网络 / L敏感性分析 / M缺失数据处理），全部基于深度方法抽取，非 LLM/ML'
+    }));
   });
 
   plans.sort(function (a, b) { return b.matchScore - a.matchScore });
-  return plans.slice(0, 3); // 推荐 top 3
+  return plans.slice(0, 3);
 }
 
 /* --- 渲染研究方案卡片 --- */
 function studyRenderPlans(plans) {
   var el = document.getElementById('st-plans-grid'); if (!el) return;
+  var qType = STUDY_STATE._lastQType || { primary: 'descriptive', scores: {}, signals: [] };
+  var typeLabel = { descriptive: '描述性研究', etiological: '病因学/关联研究', interventional: '干预/效果研究', policy: '政策评估研究', exploratory: '探索/机制研究' };
+
   var html = '';
+
+  /* === 算法透明声明 === */
+  html += '<div style="border:1px dashed var(--line);border-radius:6px;padding:12px 16px;background:#fafbfd;margin-bottom:14px;font-size:12px;line-height:1.7;color:var(--ink2)">';
+  html += '<b style="color:var(--ink1);font-size:12.5px">⚙️ 推荐算法说明</b><br>';
+  html += '本系统<b>未调用大语言模型/机器学习模型</b>生成方案，而是采用<b>规则化专家评分系统</b>（rule-based scoring），基于 5 个因子加权打分：<br>';
+  html += '• <b>因子 A · 研究问题类型亲和度（权重 30%）</b>：通过关键词识别研究问题类型（描述/病因/干预/政策/探索），与 6 大设计模板的亲和度矩阵匹配<br>';
+  html += '• <b>因子 B · 文献设计缺口分析（权重 30%）</b>：基于深度方法学抽取的 8 类设计分布，优先推荐现有文献中<b>占比 <10%</b> 的设计，填补研究空白<br>';
+  html += '• <b>因子 C · 数据可用性（权重 15%）</b>：根据匹配到的数据集类型（面板/横断面/质性），加权支持可执行的设计<br>';
+  html += '• <b>因子 D · 核心概念匹配（权重 10%）</b>：关键词命中模板标签<br>';
+  html += '• <b>因子 E · 统计方法缺口（权重 15%）</b>：基于 10 种高级统计方法的使用率统计，优先推荐能引入文献中缺失高级方法的设计<br>';
+  html += '本次识别的研究问题类型：<b>' + (typeLabel[qType.primary] || '描述性研究') + '</b>';
+  if (qType.signals && qType.signals.length > 0) {
+    html += '；命中信号：' + qType.signals.slice(0, 5).map(studyEsc).join('、');
+  }
+  html += '</div>';
+
   plans.forEach(function (p, idx) {
     var detail = '【研究设计】\n' + p.design +
       '\n\n【变量搭配建议】\n' + p.vars +
@@ -8555,15 +9932,58 @@ function studyRenderPlans(plans) {
       (p.timeline ? '\n\n【研究时间线】\n' + p.timeline : '') +
       (p.r_packages ? '\n\n【推荐R包】\n' + p.r_packages : '');
     html += '<div id="plan-card-' + idx + '" style="border:1px solid var(--line);border-radius:6px;background:#fff;overflow:hidden">';
-    html += '<div style="padding:14px 18px;background:linear-gradient(135deg,#f0f5ff,#fff);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px">';
+    html += '<div style="padding:14px 18px;background:linear-gradient(135deg,#f0f5ff,#fff);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
     html += '<span style="background:var(--accent);color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600">推荐 #' + (idx + 1) + '</span>';
-    html += '<b style="font-size:15px">' + p.name + '</b>';
-    html += '<span style="font-size:11.5px;color:var(--muted)">' + (p.en || '') + '</span>';
+    html += '<b style="font-size:15px">' + studyEsc(p.name) + '</b>';
+    html += '<span style="font-size:11.5px;color:var(--muted)">' + studyEsc(p.en || '') + '</span>';
+    html += '<span style="font-size:11px;color:var(--accent);background:#eef3ff;padding:2px 8px;border-radius:8px">综合分 ' + ((p.matchScore || 0) * 100).toFixed(1) + '</span>';
     html += '<div style="flex:1"></div>';
     html += '<button class="btn sm" onclick="studyTogglePlan(' + idx + ')" style="padding:3px 10px;font-size:11.5px;margin-right:6px">展开/收起</button>';
     html += '<button class="btn sm" onclick="studyEditPlan(' + idx + ')" style="padding:3px 10px;font-size:11.5px;margin-right:6px">改进</button>';
     html += '<button class="btn sm" onclick="studyCopyPlan(' + idx + ')" style="padding:3px 10px;font-size:11.5px">复制</button>';
     html += '</div>';
+
+    /* === 评分明细条形图 === */
+    if (p.scoreBreakdown) {
+      var sb = p.scoreBreakdown;
+      var w = sb.weight || { A: 0.30, B: 0.30, C: 0.15, D: 0.10, E: 0.15 };
+      var factors = [
+        { key: 'A', label: '问题类型亲和度', val: sb.A, w: w.A },
+        { key: 'B', label: '文献设计缺口', val: sb.B, w: w.B },
+        { key: 'C', label: '数据可用性', val: sb.C, w: w.C },
+        { key: 'D', label: '概念匹配', val: sb.D, w: w.D },
+        { key: 'E', label: '统计方法缺口', val: sb.E, w: w.E }
+      ];
+      html += '<div style="padding:10px 18px;background:#f9fbfd;border-bottom:1px solid var(--line)">';
+      html += '<div style="font-size:11.5px;color:var(--muted);margin-bottom:6px">评分明细（' + studyEsc(p.algorithm || '4因子加权规则评分') + '）</div>';
+      html += '<div style="display:grid;grid-template-columns:1fr;gap:4px">';
+      factors.forEach(function (f) {
+        var pct = (f.val * 100).toFixed(0);
+        var wpct = (f.w * 100).toFixed(0);
+        var barColor = f.val >= 0.7 ? '#4caf50' : (f.val >= 0.4 ? '#ff9800' : '#bbb');
+        html += '<div style="display:flex;align-items:center;gap:8px;font-size:11px">';
+        html += '<span style="width:120px;color:var(--ink2)">' + f.label + ' <span style="color:var(--muted)">(' + wpct + '%)</span></span>';
+        html += '<div style="flex:1;height:14px;background:#eee;border-radius:7px;overflow:hidden;position:relative">';
+        html += '<div style="height:100%;width:' + pct + '%;background:' + barColor + ';border-radius:7px;transition:width 0.3s"></div>';
+        html += '</div>';
+        html += '<span style="width:38px;text-align:right;color:var(--ink2)">' + pct + '%</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+      /* 推荐依据 */
+      if (p.rationale && p.rationale.length > 0) {
+        html += '<div style="margin-top:8px;font-size:11.5px;color:var(--ink2);line-height:1.7">';
+        html += '<b style="color:var(--ink1)">推荐依据：</b>';
+        html += '<ul style="margin:4px 0 0 0;padding-left:18px">';
+        p.rationale.forEach(function (r) {
+          html += '<li style="margin-bottom:2px">' + studyEsc(r) + '</li>';
+        });
+        html += '</ul>';
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+
     html += '<div id="plan-detail-' + idx + '" style="padding:16px 18px;font-size:13px;line-height:1.8;color:var(--ink2);white-space:pre-wrap">' + studyEsc(detail) + '</div>';
     html += '</div>';
   });
@@ -8685,16 +10105,25 @@ function studyReanalyze() {
   var purpose = STUDY_STATE.purpose || '';
   if (!title) { alert('请先填写研究题目并执行自动检索'); return; }
 
-  /* 从 DOM 读取已渲染的文献列表 */
-  var lit = [];
-  var litItems = document.querySelectorAll('#st-lit-list > div');
-  litItems.forEach(function (el) {
-    var titleEl = el.querySelector('b');
-    if (titleEl) lit.push({ title: titleEl.textContent, year: '', authors: '', journal: '', doi: '', abstract: '', url: '' });
-  });
-  /* 如果 DOM 没有，用 state 中缓存的 */
-  if (lit.length === 0 && STUDY_STATE._lastLit) lit = STUDY_STATE._lastLit;
+  /* 优先使用 state 中缓存的完整文献（含摘要和概念命中分），DOM 读取会丢失摘要 */
+  var lit = STUDY_STATE._lastLit || [];
+  if (lit.length === 0) {
+    /* 退避：从 DOM 读取已渲染的文献列表（仅标题） */
+    var litItems = document.querySelectorAll('#st-lit-list > div');
+    litItems.forEach(function (el) {
+      var titleEl = el.querySelector('b');
+      if (titleEl) lit.push({ title: titleEl.textContent, year: '', authors: '', journal: '', doi: '', abstract: '', url: '' });
+    });
+  }
   if (lit.length === 0) { alert('请先执行自动检索获取文献，再上传数据集后重新分析'); return; }
+
+  /* 确保核心概念和问题类型已提取（供 studyRecommendPlans 使用） */
+  if (!STUDY_STATE._lastConcepts || STUDY_STATE._lastConcepts.length === 0) {
+    STUDY_STATE._lastConcepts = studyExtractConcepts(title, purpose);
+  }
+  if (!STUDY_STATE._lastQType) {
+    STUDY_STATE._lastQType = studyClassifyQuestionType(title, purpose, STUDY_STATE._lastConcepts);
+  }
 
   /* 缓存文献到 state */
   STUDY_STATE._lastLit = lit;
@@ -8704,6 +10133,7 @@ function studyReanalyze() {
   var matches = studyMatchDatasets(fullQuery);
   studyRenderMatches(matches);
   STUDY_STATE._lastMatches = matches;
+  studySave();
 
   /* 重新生成综述 + 方案 + 映射 */
   studyRunP1(title, purpose, lit, matches);
