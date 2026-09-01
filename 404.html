@@ -4283,6 +4283,7 @@ section.page.active{display:block}
     <button data-p="search" class="">文献/数据集检索</button>
     <button data-p="agent" class=""> 文献研究智能体</button>
     <button data-p="health">卫生健康数据智能库</button>
+    <button data-p="study">研究助手</button>
     <button data-p="library">⭐ 我的收藏</button>
     <button data-p="about">ℹ 关于</button>
   </div>
@@ -4681,6 +4682,76 @@ else:
     </div>
   </div>
 
+<!-- ============ PAGE: STUDY ASSISTANT ============ -->
+<section id="p-study" class="page">
+  <div class="page-title">
+    <h2>研究助手</h2>
+    <div class="meta">输入研究题目 → 自动检索数据集与文献 → 为后续分析做准备</div>
+  </div>
+
+  <div style="max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:20px">
+
+    <!-- === Phase 1: 项目输入 === -->
+    <div style="border:1px solid var(--line);border-radius:6px;padding:20px 24px;background:#fff">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">1</span>
+        <b style="font-size:15px">研究题目与目的</b>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div>
+          <label style="font-size:12.5px;color:var(--muted);display:block;margin-bottom:4px">研究题目 <span style="color:var(--danger)">*</span></label>
+          <input id="st-title" style="width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:3px;font-size:14px;outline:none;font-family:inherit" placeholder="例如：城乡医疗资源分布差异对老年健康公平性的影响">
+        </div>
+        <div>
+          <label style="font-size:12.5px;color:var(--muted);display:block;margin-bottom:4px">研究目的 / 假设 <span style="color:var(--danger)">*</span></label>
+          <textarea id="st-purpose" style="width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:3px;font-size:14px;outline:none;font-family:inherit;min-height:72px;resize:vertical" placeholder="描述你的研究假设、核心问题、预期贡献..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- === Phase 2: 多数据集输入 === -->
+    <div style="border:1px solid var(--line);border-radius:6px;padding:20px 24px;background:#fff">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">2</span>
+          <b style="font-size:15px">数据集列表</b>
+          <span style="font-size:12px;color:var(--muted)">支持多个数据集，填信息后平台会自动匹配现有资源</span>
+        </div>
+        <button class="btn sm teal" onclick="studyAddDataset()" style="padding:5px 12px;font-size:12.5px">+ 添加数据集</button>
+      </div>
+      <div id="st-datasets" style="display:flex;flex-direction:column;gap:12px"></div>
+      <div style="margin-top:10px;font-size:11.5px;color:var(--muted)">P1 阶段将支持上传标准化 Excel 模板自动解析，当前先用表单填写</div>
+    </div>
+
+    <!-- === Phase 3: 开始分析按钮 === -->
+    <div style="display:flex;justify-content:center">
+      <button class="btn primary" onclick="studyRun()" style="padding:12px 40px;font-size:15px;font-weight:600">开始自动检索 →</button>
+    </div>
+
+    <!-- === Phase 4: 结果展示区 === -->
+    <div id="st-results" style="display:none">
+      <div id="st-matches-wrap" style="margin-top:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">3</span>
+          <b style="font-size:15px">匹配到的数据集</b>
+          <span id="st-matches-count" style="font-size:12px;color:var(--muted)"></span>
+        </div>
+        <div id="st-matches-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px"></div>
+      </div>
+
+      <div id="st-lit-wrap" style="margin-top:28px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">4</span>
+          <b style="font-size:15px">相关文献（Crossref + PubMed）</b>
+          <span id="st-lit-count" style="font-size:12px;color:var(--muted)"></span>
+        </div>
+        <div id="st-lit-list" style="display:flex;flex-direction:column;gap:10px"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <!-- ============ PAGE 5: ABOUT ============ -->
 <section id="p-about" class="page">
   <div class="page-title"><h2>ℹ 关于 &amp; 透明声明</h2><div class="meta">平台说明 · 隐私 · 引用</div></div>
@@ -4770,6 +4841,7 @@ function go(p){
   });
   if(p==='library') renderLib();
   if(p==='home') renderHomeStats();
+  if(p==='study') studyInit();
   if(p==='analyze' && !window._analyzeInited){
     // 首次进入分析台：自动加载示例数据，让变量立即可见
     window._analyzeInited=true;
@@ -7765,7 +7837,7 @@ function loadAgentDataToAnalyze(){
 /* ========= INIT ========= */
 window.addEventListener('hashchange',function(){
   var p=(location.hash||'#/home').replace('#/','');
-  if(['home','search','agent','analyze','library','about'].indexOf(p)>=0) go(p);
+  if(['home','search','agent','analyze','library','health','study','about'].indexOf(p)>=0) go(p);
 });
 function init(){
   renderHomeStats();
@@ -7795,6 +7867,234 @@ function init(){
   <div id="lit-modal" class="modal"></div>
 </div>
 
+<script>
+/* ============ STUDY ASSISTANT P0 ============ */
+var STUDY_STATE = {
+  title: '',
+  purpose: '',
+  datasets: [{idx: 1, name: '', source: '', year: '', file_path: ''}]
+};
+
+function studyInit() {
+  var ls = null;
+  try { ls = localStorage.getItem('STUDY_STATE') } catch (e) {}
+  if (ls) { try { var p = JSON.parse(ls); if (p && p.datasets) STUDY_STATE = p } catch (e) {} }
+  if (!STUDY_STATE.datasets || STUDY_STATE.datasets.length === 0) {
+    STUDY_STATE.datasets = [{idx: 1, name: '', source: '', year: '', file_path: ''}];
+  }
+  var t = document.getElementById('st-title'); if (t) t.value = STUDY_STATE.title || '';
+  var p2 = document.getElementById('st-purpose'); if (p2) p2.value = STUDY_STATE.purpose || '';
+  studyRenderDatasets();
+}
+
+function studySave() {
+  STUDY_STATE.title = (document.getElementById('st-title') || {}).value || '';
+  STUDY_STATE.purpose = (document.getElementById('st-purpose') || {}).value || '';
+  try { localStorage.setItem('STUDY_STATE', JSON.stringify(STUDY_STATE)) } catch (e) {}
+}
+
+function studyAddDataset() {
+  var max = 0;
+  STUDY_STATE.datasets.forEach(function (d) { if (d.idx > max) max = d.idx });
+  STUDY_STATE.datasets.push({idx: max + 1, name: '', source: '', year: '', file_path: ''});
+  studySave(); studyRenderDatasets();
+}
+
+function studyRemoveDataset(idx) {
+  STUDY_STATE.datasets = STUDY_STATE.datasets.filter(function (d) { return d.idx !== idx });
+  if (STUDY_STATE.datasets.length === 0) STUDY_STATE.datasets.push({idx: 1, name: '', source: '', year: '', file_path: ''});
+  studySave(); studyRenderDatasets();
+}
+
+function studyRenderDatasets() {
+  var el = document.getElementById('st-datasets'); if (!el) return;
+  var html = '';
+  STUDY_STATE.datasets.forEach(function (d, i) {
+    html += '<div style="border:1px solid var(--line);border-radius:4px;padding:14px 16px;background:#fafbfd">';
+    html += '<div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">';
+    html += '<b style="font-size:13.5px;color:var(--accent)">数据集 #' + d.idx + '</b>';
+    html += '<div style="flex:1"></div>';
+    html += '<button class="btn sm" onclick="studyRemoveDataset(' + d.idx + ')" style="color:var(--danger);border-color:#fecaca;padding:3px 10px;font-size:11.5px;background:#fff;cursor:pointer">删除</button>';
+    html += '</div>';
+    html += '<div style="display:grid;grid-template-columns:2fr 1fr 1.5fr;gap:10px">';
+    html += '<input placeholder="数据集名称" value="' + d.name + '" oninput="STUDY_STATE.datasets[' + i + '].name=this.value;studySave()" style="padding:7px 10px;border:1px solid var(--line);border-radius:3px;font-size:13px;outline:none;font-family:inherit">';
+    html += '<input placeholder="来源" value="' + d.source + '" oninput="STUDY_STATE.datasets[' + i + '].source=this.value;studySave()" style="padding:7px 10px;border:1px solid var(--line);border-radius:3px;font-size:13px;outline:none;font-family:inherit">';
+    html += '<input placeholder="采集年份" value="' + (d.year || '') + '" oninput="STUDY_STATE.datasets[' + i + '].year=this.value;studySave()" style="padding:7px 10px;border:1px solid var(--line);border-radius:3px;font-size:13px;outline:none;font-family:inherit">';
+    html += '</div>';
+    html += '<div style="margin-top:10px">';
+    html += '<input placeholder="数据文件路径 或 百度网盘链接" value="' + (d.file_path || '') + '" oninput="STUDY_STATE.datasets[' + i + '].file_path=this.value;studySave()" style="width:100%;padding:7px 10px;border:1px solid var(--line);border-radius:3px;font-size:13px;outline:none;font-family:inherit">';
+    html += '</div>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+/* ---- 匹配现有数据集 ---- */
+function studyMatchDatasets(query) {
+  var qs = query.toLowerCase().split(/[\s,，、。;；]+/).filter(function (x) { return x.length >= 2 });
+  var out = [];
+  var seen = {};
+  if (typeof DATASETS !== 'undefined') {
+    DATASETS.forEach(function (d) {
+      var blob = ((d.title || '') + ' ' + (d.description || '') + ' ' + (d.keywords || []).join(' ')).toLowerCase();
+      var score = 0;
+      qs.forEach(function (t) { if (blob.indexOf(t) >= 0) score += 2 });
+      if (score >= 2) {
+        var key = 'ds:' + d.title;
+        if (!seen[key]) { seen[key] = true; out.push({score: score, type: '公开数据集', title: d.title, desc: d.description || '', url: d.url || '#'}) }
+      }
+    });
+  }
+  if (typeof H_CAT_DESC !== 'undefined') {
+    Object.keys(H_CAT_DESC).forEach(function (k) {
+      var d = H_CAT_DESC[k];
+      var blob = ((d.cn || '') + ' ' + (d.desc || '') + ' ' + (d.topics || []).join(' ') + ' ' + k).toLowerCase();
+      var score = 0;
+      qs.forEach(function (t) { if (blob.indexOf(t) >= 0) score += 2 });
+      if (score >= 2) {
+        var key = 'health:' + k;
+        if (!seen[key]) { seen[key] = true; out.push({score: score, type: '卫生健康年鉴', title: k + ' - ' + d.cn, desc: d.desc || '', url: (H_CAT_PANS[k] || {}).url || '#'}) }
+      }
+    });
+  }
+  out.sort(function (a, b) { return b.score - a.score });
+  return out.slice(0, 12);
+}
+
+/* ---- Crossref ---- */
+async function studyFetchCrossref(q) {
+  try {
+    var url = 'https://api.crossref.org/works?rows=10&sort=relevance&query.bibliographic=' + encodeURIComponent(q);
+    var r = await fetch(url); if (!r.ok) return [];
+    var j = await r.json();
+    return (j.message.items || []).map(function (p) {
+      return {
+        title: p.title ? ('' + p.title[0]) : '(无标题)',
+        year: (p.issued && p.issued['date-parts']) ? p.issued['date-parts'][0][0] : '',
+        journal: p['container-title'] ? p['container-title'][0] : '',
+        doi: p.DOI || '',
+        url: p.URL || ('https://doi.org/' + (p.DOI || '')),
+        authors: (p.author || []).map(function (a) { return a.family || a.name || '' }).slice(0, 3).join(', '),
+        abstract: ''
+      };
+    });
+  } catch (e) { console.warn('crossref err', e); return [] }
+}
+
+/* ---- PubMed ---- */
+async function studyFetchPubMed(q) {
+  try {
+    var sUrl = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=8&retmode=json&term=' + encodeURIComponent(q);
+    var sr = await fetch(sUrl); if (!sr.ok) return [];
+    var sj = await sr.json();
+    var ids = (sj.esearchresult && sj.esearchresult.idlist) || [];
+    if (ids.length === 0) return [];
+    var fUrl = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&id=' + ids.join(',');
+    var fr = await fetch(fUrl); if (!fr.ok) return [];
+    var txt = await fr.text();
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(txt, 'text/xml');
+    var pubs = doc.querySelectorAll('PubmedArticle');
+    var out = [];
+    pubs.forEach(function (p) {
+      var title = p.querySelector('ArticleTitle');
+      var yearNode = p.querySelector('PubDate Year');
+      var journal = p.querySelector('Journal Title');
+      var pmid = p.querySelector('PMID');
+      var abs = p.querySelector('AbstractText');
+      var authors = Array.from(p.querySelectorAll('Author')).map(function (a) {
+        var ln = a.querySelector('LastName'); var fn = a.querySelector('ForeName');
+        return (ln ? ln.textContent : '') + (fn ? ' ' + fn.textContent : '');
+      }).slice(0, 3).join(', ');
+      out.push({
+        title: title ? title.textContent : '(无标题)',
+        year: yearNode ? yearNode.textContent : '',
+        journal: journal ? journal.textContent : '',
+        doi: '',
+        url: 'https://pubmed.ncbi.nlm.nih.gov/' + (pmid ? pmid.textContent : ''),
+        authors: authors,
+        abstract: abs ? abs.textContent : ''
+      });
+    });
+    return out;
+  } catch (e) { console.warn('pubmed err', e); return [] }
+}
+
+/* ---- 主入口 ---- */
+async function studyRun() {
+  var titleEl = document.getElementById('st-title');
+  var purposeEl = document.getElementById('st-purpose');
+  var title = (titleEl ? titleEl.value : '').trim();
+  var purpose = (purposeEl ? purposeEl.value : '').trim();
+  if (!title) { alert('请填写研究题目'); titleEl && titleEl.focus(); return }
+  STUDY_STATE.title = title; STUDY_STATE.purpose = purpose;
+  studySave();
+  var fullQuery = title + (purpose ? ' ' + purpose.substring(0, 80) : '');
+
+  var results = document.getElementById('st-results'); if (results) results.style.display = 'block';
+  var mWrap = document.getElementById('st-matches-grid'); if (mWrap) mWrap.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:20px">匹配中...</div>';
+  var lWrap = document.getElementById('st-lit-list'); if (lWrap) lWrap.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:20px">检索 Crossref + PubMed 中...</div>';
+
+  var matches = studyMatchDatasets(fullQuery);
+  studyRenderMatches(matches);
+
+  var refs = await Promise.all([
+    studyFetchCrossref(fullQuery).catch(function () { return [] }),
+    studyFetchPubMed(title).catch(function () { return [] })
+  ]);
+  var allLit = refs[0].concat(refs[1]);
+  var seen = {}; var uniq = [];
+  allLit.forEach(function (p) { var k = (p.title || '').substring(0, 30).toLowerCase(); if (!seen[k]) { seen[k] = true; uniq.push(p) } });
+  uniq.sort(function (a, b) { return (b.year || 0) - (a.year || 0) });
+  studyRenderLit(uniq);
+}
+
+function studyRenderMatches(list) {
+  var el = document.getElementById('st-matches-grid'); if (!el) return;
+  var cnt = document.getElementById('st-matches-count'); if (cnt) cnt.textContent = '' + list.length + ' 条';
+  if (list.length === 0) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:24px 0">暂未匹配到公开数据集。<br>你可以在下方"数据集列表"里手动填入你已找到的数据集信息。</div>';
+    return;
+  }
+  var html = '';
+  list.forEach(function (m) {
+    html += '<div style="border:1px solid var(--line);border-radius:6px;padding:14px;background:#fff;display:flex;flex-direction:column;gap:6px">';
+    html += '<span style="font-size:11px;color:var(--accent);font-weight:600">[' + m.type + '] 匹配分 ' + m.score + '</span>';
+    html += '<div style="font-weight:600;font-size:14px">' + m.title + '</div>';
+    if (m.desc) html += '<div style="font-size:12px;color:var(--muted);line-height:1.55">' + m.desc.substring(0, 160) + (m.desc.length > 160 ? '...' : '') + '</div>';
+    html += '<a href="' + m.url + '" target="_blank" style="font-size:12.5px;margin-top:4px">→ 查看/下载</a>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function studyRenderLit(list) {
+  var el = document.getElementById('st-lit-list'); if (!el) return;
+  var cnt = document.getElementById('st-lit-count'); if (cnt) cnt.textContent = '' + list.length + ' 篇（Crossref + PubMed）';
+  if (list.length === 0) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:24px 0">Crossref / PubMed 未返回结果，试试调整关键词或缩短研究题目。</div>';
+    return;
+  }
+  var html = '';
+  list.forEach(function (p) {
+    html += '<div style="border-left:3px solid var(--accent);padding:10px 14px;background:#fafbfd;border-radius:0 4px 4px 0">';
+    html += '<div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap">';
+    html += '<b style="font-size:14px">' + p.title + '</b>';
+    if (p.year) html += '<span style="font-size:11.5px;color:var(--muted)">(' + p.year + ')</span>';
+    html += '</div>';
+    if (p.authors) html += '<div style="font-size:12px;color:var(--ink2);margin-top:2px">' + p.authors + '</div>';
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:2px">';
+    if (p.journal) html += p.journal;
+    if (p.doi) html += ' · DOI: ' + p.doi;
+    html += '</div>';
+    if (p.abstract) html += '<div style="font-size:12px;color:var(--ink2);margin-top:4px;line-height:1.55">' + p.abstract.substring(0, 240) + (p.abstract.length > 240 ? '...' : '') + '</div>';
+    html += '<div style="margin-top:4px"><a href="' + p.url + '" target="_blank" style="font-size:12.5px">→ 查看原文</a></div>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+</script>
 <script src="datasets.js?v=20260901"></script>
 <script src="literature.js?v=20260901"></script>
 <script>
