@@ -4808,65 +4808,22 @@ else:
         <div id="st-varmap-grid" style="display:flex;flex-direction:column;gap:16px"></div>
       </div>
 
-      <!-- === Phase 9: 脚本生成与本地执行（P4） === -->
-      <div id="st-script-wrap" style="margin-top:32px;display:none">
+      <!-- === Phase 9: 代码框架推荐（R + Python） === -->
+      <div id="st-code-wrap" style="margin-top:32px;display:none">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
           <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">9</span>
-          <b style="font-size:15px">分析脚本生成与本地执行</b>
-          <span style="font-size:11.5px;color:var(--muted)">自动生成 R 脚本 → 连接本地 Companion Agent → 执行并回传结果</span>
+          <b style="font-size:15px">代码框架推荐</b>
+          <span style="font-size:11.5px;color:var(--muted)">基于推荐方案提供 R 和 Python 代码框架描述，供本地开发参考</span>
         </div>
-
-        <!-- Agent 连接状态 -->
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:10px 16px;border:1px solid var(--line);border-radius:6px;background:#f8fafc">
-          <div id="st-agent-status" style="display:flex;align-items:center;gap:8px">
-            <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1" id="st-agent-dot"></span>
-            <span style="font-size:13px;color:var(--muted)" id="st-agent-text">未连接</span>
-          </div>
-          <button class="btn sm" onclick="studyConnectAgent()" style="padding:5px 14px;font-size:12.5px">连接 Companion Agent</button>
-          <span style="font-size:11px;color:var(--muted)">| 需先启动本地 companion_agent.py（端口 7878）</span>
-          <a href="companion_agent.py" download style="font-size:11px;color:var(--accent);margin-left:6px">下载 Agent 脚本</a>
-        </div>
-
-        <!-- 脚本生成区 -->
-        <div style="margin-bottom:14px">
-          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-            <select id="st-method-select" onchange="studyGenerateScript()" style="padding:6px 12px;border:1px solid var(--line);border-radius:4px;font-size:13px;cursor:pointer">
-              <option value="">选择分析方法...</option>
-              <option value="descriptive">描述性统计 + 回归（横断面）</option>
-              <option value="cohort_survival">队列研究 + 生存分析</option>
-              <option value="case_control">病例对照 + 条件Logistic</option>
-              <option value="did">双重差分（DID）</option>
-              <option value="mediation">中介效应分析</option>
-              <option value="xgboost">XGBoost 预测模型</option>
-              <option value="panel_fe">面板固定效应回归</option>
-            </select>
-            <button class="btn sm" onclick="studyGenerateScript()" style="padding:5px 14px;font-size:12.5px">生成脚本</button>
-            <button class="btn sm" onclick="studyCopyScript()" style="padding:5px 14px;font-size:12.5px">复制脚本</button>
-            <button class="btn sm" onclick="studyDownloadScript()" style="padding:5px 14px;font-size:12.5px">下载 .R 文件</button>
-          </div>
-          <textarea id="st-script-area" style="width:100%;min-height:280px;padding:14px;border:1px solid var(--line);border-radius:6px;font-size:13px;font-family:'Consolas','Courier New',monospace;line-height:1.6;resize:vertical;outline:none;background:#1e293b;color:#e2e8f0" placeholder="选择分析方法后自动生成 R 脚本..." spellcheck="false"></textarea>
-        </div>
-
-        <!-- 执行按钮 -->
-        <div style="display:flex;gap:10px;margin-bottom:14px">
-          <button class="btn primary" onclick="studyExecuteScript()" style="padding:8px 28px;font-size:13px;font-weight:600;background:#10b981">▶ 执行 R 脚本</button>
-          <span id="st-exec-status" style="font-size:12px;color:var(--muted);display:flex;align-items:center"></span>
-        </div>
-
-        <!-- 执行结果 -->
-        <div id="st-exec-result" style="display:none">
-          <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--ink2)">执行结果：</div>
-          <div id="st-exec-output" style="background:#0f172a;color:#a7f3d0;padding:14px 16px;border-radius:6px;font-size:12.5px;font-family:monospace;white-space:pre-wrap;max-height:400px;overflow-y:auto;border:1px solid #334155"></div>
-          <div id="st-exec-plots" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:14px"></div>
-        </div>
+        <div id="st-code-grid" style="display:flex;flex-direction:column;gap:16px"></div>
       </div>
 
-      <!-- === Phase 10: 创新方法模块（P5） === -->
+      <!-- === Phase 10: 创新方法参考库 === -->
       <div id="st-methods-wrap" style="margin-top:32px;display:none">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
           <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">10</span>
-          <b style="font-size:15px">创新方法模块库</b>
-          <span style="font-size:11.5px;color:var(--muted)">高级统计方法模板，一键生成对应 R 脚本</span>
+          <b style="font-size:15px">创新方法参考库</b>
+          <span style="font-size:11.5px;color:var(--muted)">高级统计方法说明与代码框架，点击查看详情</span>
         </div>
         <div id="st-methods-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px"></div>
       </div>
@@ -8603,7 +8560,6 @@ function studyRenderPlans(plans) {
     html += '<b style="font-size:15px">' + p.name + '</b>';
     html += '<span style="font-size:11.5px;color:var(--muted)">' + (p.en || '') + '</span>';
     html += '<div style="flex:1"></div>';
-    html += '<button class="btn sm" onclick="studyGenerateScript(' + idx + ')" style="padding:3px 10px;font-size:11.5px;margin-right:6px;background:#10b981;color:#fff;border:none;cursor:pointer">生成R脚本</button>';
     html += '<button class="btn sm" onclick="studyTogglePlan(' + idx + ')" style="padding:3px 10px;font-size:11.5px;margin-right:6px">展开/收起</button>';
     html += '<button class="btn sm" onclick="studyEditPlan(' + idx + ')" style="padding:3px 10px;font-size:11.5px;margin-right:6px">改进</button>';
     html += '<button class="btn sm" onclick="studyCopyPlan(' + idx + ')" style="padding:3px 10px;font-size:11.5px">复制</button>';
@@ -8710,8 +8666,8 @@ function studyRunP1(title, purpose, literature, matches) {
   }
 
   // === 显示 P4-P6 区域 ===
-  var scriptWrap = document.getElementById('st-script-wrap');
-  if (scriptWrap) scriptWrap.style.display = 'block';
+  var codeWrap = document.getElementById('st-code-wrap');
+  if (codeWrap) { codeWrap.style.display = 'block'; studyRenderCodeFrameworks(plans); }
   var methodsWrap = document.getElementById('st-methods-wrap');
   if (methodsWrap) { methodsWrap.style.display = 'block'; studyRenderMethods(); }
   var exportWrap = document.getElementById('st-export-wrap');
@@ -9190,601 +9146,361 @@ function studyMapVars(allVars, planVars) {
   };
 }
 
-/* ============ P4: 脚本生成与本地执行 ============ */
+/* ============ P4: 代码框架推荐（R + Python） ============ */
 
-var STUDY_AGENT_URL = 'http://127.0.0.1:7878';
-var STUDY_AGENT_CONNECTED = false;
-
-/* --- 连接 Companion Agent --- */
-function studyConnectAgent() {
-  var dot = document.getElementById('st-agent-dot');
-  var txt = document.getElementById('st-agent-text');
-  var statusEl = document.getElementById('st-exec-status');
-  if (dot) dot.style.background = '#fbbf24';
-  if (txt) txt.textContent = '连接中...';
-
-  fetch(STUDY_AGENT_URL + '/health', { method: 'GET', signal: AbortSignal.timeout(5000) })
-    .then(function (r) { return r.json() })
-    .then(function (data) {
-      STUDY_AGENT_CONNECTED = true;
-      if (dot) dot.style.background = '#22c55e';
-      if (txt) txt.textContent = '已连接 · R ' + (data.r_detected ? '✅ ' + (data.r_path || '').split('\\').pop() : '❌ 未检测到');
-      if (statusEl) statusEl.textContent = data.r_detected ? 'R 环境就绪' : '未检测到 R，请安装 R 后重试';
-    })
-    .catch(function (err) {
-      STUDY_AGENT_CONNECTED = false;
-      if (dot) dot.style.background = '#ef4444';
-      if (txt) txt.textContent = '连接失败';
-      if (statusEl) statusEl.textContent = '请先启动 companion_agent.py（python companion_agent.py）';
-    });
-}
-
-/* --- R 脚本模板库 --- */
-var STUDY_R_TEMPLATES = {
-  descriptive: function (vars, title) {
-    var y = (vars.find(function (v) { return v.roleCode === 'Y' }) || {}).varName || 'Y';
-    var xs = vars.filter(function (v) { return v.roleCode === 'X' }).map(function (v) { return v.varName });
-    var cs = vars.filter(function (v) { return v.roleCode === 'C' }).map(function (v) { return v.varName });
-    var allX = xs.concat(cs).join(' + ');
-    return [
-      '# ==========================================',
-      '# 研究题目: ' + title,
-      '# 分析方法: 横断面描述性统计 + 多因素回归',
-      '# 生成时间: ' + new Date().toLocaleString('zh-CN'),
-      '# ==========================================',
-      '',
+/* --- 每个方案对应的 R/Python 代码框架描述 --- */
+var STUDY_CODE_FRAMEWORKS = {
+  t1: { /* 横断面 */
+    r: [
       '## ---- 加载包 ----',
-      'if (!require("ggplot2")) install.packages("ggplot2")',
-      'if (!require("tableone")) install.packages("tableone")',
-      'if (!require("gtsummary")) install.packages("gtsummary")',
-      'library(ggplot2)',
-      'library(tableone)',
-      'library(gtsummary)',
+      'library(ggplot2); library(tableone); library(gtsummary); library(survey)',
       '',
       '## ---- 读取数据 ----',
-      '# 请修改为您的实际数据文件路径',
-      '# df <- read.csv("your_data.csv", fileEncoding = "UTF-8")',
-      '# 或 readxl::read_excel("your_data.xlsx")',
+      'df <- read.csv("your_data.csv", fileEncoding = "UTF-8")',
       '',
       '## ---- 描述性统计 ----',
-      '# 替换为您的实际变量名',
-      'vars <- c("' + xs.join('", "') + '")',
-      'cat_vars <- c()  # 在此填入分类变量名',
-      '',
-      '# 创建基线特征表',
-      'tab1 <- CreateTableOne(vars = vars, factorVars = cat_vars, data = df)',
+      'tab1 <- CreateTableOne(vars = c("age","sex","edu"), factorVars = c("sex","edu"), data = df)',
       'print(tab1, showAllLevels = TRUE)',
       '',
       '## ---- 单因素分析 ----',
-      'cat("\\n==== 单因素分析 ====\n")',
-      'for (x in c("' + xs.join('", "') + '")) {',
-      '  cat("\\n---", x, "---\\n")',
-      '  f <- as.formula(paste("' + y + '~", x))',
-      '  if (is.numeric(df[[x]])) {',
-      '    print(summary(lm(f, data = df)))',
-      '  } else {',
-      '    print(chisq.test(table(df[[x]], df[["' + y + '"]])))',
-      '  }',
-      '}',
+      'chisq.test(table(df$exposure, df$outcome))   # 分类 vs 分类',
+      't.test(age ~ outcome, data = df)               # 连续 vs 分类',
       '',
-      '## ---- 多因素回归模型 ----',
-      'cat("\\n==== 多因素Logistic回归 ====\n")',
-      allX ? 'fml <- as.formula("' + y + ' ~ ' + allX + '")' : '',
-      allX ? 'model <- glm(' + y + ' ~ ' + allX + ', data = df, family = binomial(link = "logit"))' : '',
-      allX ? 'print(summary(model))' : '',
-      allX ? 'exp(cbind(OR = coef(model), confint(model)))' : '',
+      '## ---- 多因素Logistic回归 ----',
+      'model <- glm(outcome ~ age + sex + edu + exposure, data = df, family = binomial)',
+      'summary(model)',
+      'exp(cbind(OR = coef(model), confint(model)))   # OR + 95%CI',
       '',
       '## ---- 可视化 ----',
-      'ggplot(df, aes(x = ' + (xs[0] || 'age') + ', fill = factor(' + y + '))) +',
-      '  geom_histogram(position = "dodge", bins = 30) +',
-      '  theme_minimal() +',
-      '  labs(title = "' + title + '", x = "' + (xs[0] || 'X') + '", y = "频数")',
-      ''
-    ].join('\n');
+      'ggplot(df, aes(x = age, fill = factor(outcome))) +',
+      '  geom_histogram(position = "dodge", bins = 30) + theme_minimal()'
+    ].join('\n'),
+    python: [
+      'import pandas as pd',
+      'import statsmodels.api as sm',
+      'from scipy import stats',
+      'import matplotlib.pyplot as plt',
+      '',
+      '# 读取数据',
+      'df = pd.read_csv("your_data.csv")',
+      '',
+      '# 描述性统计',
+      'print(df.describe())',
+      'print(df.groupby("outcome").describe())',
+      '',
+      '# 卡方检验',
+      'chi2, p, dof, expected = stats.chi2_contingency(',
+      '    pd.crosstab(df["exposure"], df["outcome"]))',
+      'print(f"Chi2={chi2:.2f}, p={p:.4f}")',
+      '',
+      '# Logistic回归',
+      'X = sm.add_constant(df[["age", "sex", "edu", "exposure"]])',
+      'y = df["outcome"]',
+      'model = sm.Logit(y, X).fit()',
+      'print(model.summary())',
+      'print("Odds Ratios:", np.exp(model.params))',
+      '',
+      '# 可视化',
+      'df.hist(column="age", by="outcome", bins=30)',
+      'plt.tight_layout(); plt.show()'
+    ].join('\n'),
+    r_packages: 'ggplot2, tableone, gtsummary, survey, dplyr',
+    py_packages: 'pandas, statsmodels, scipy, matplotlib, numpy',
+    notes: '建议使用 survey 包处理复杂抽样设计（如有抽样权重）；gtsummary 可直接生成发表级三线表。'
   },
-
-  cohort_survival: function (vars, title) {
-    var y = (vars.find(function (v) { return v.roleCode === 'Y' }) || {}).varName || 'event';
-    var t = (vars.find(function (v) { return v.roleCode === 'T' }) || {}).varName || 'time';
-    var xs = vars.filter(function (v) { return v.roleCode === 'X' }).map(function (v) { return v.varName });
-    var cs = vars.filter(function (v) { return v.roleCode === 'C' }).map(function (v) { return v.varName });
-    var allX = xs.concat(cs).join(' + ');
-    return [
-      '# ==========================================',
-      '# 研究题目: ' + title,
-      '# 分析方法: 队列研究 + Kaplan-Meier + Cox回归',
-      '# 生成时间: ' + new Date().toLocaleString('zh-CN'),
-      '# ==========================================',
+  t2: { /* 队列 */
+    r: [
+      'library(survival); library(survminer)',
       '',
-      '## ---- 加载包 ----',
-      'if (!require("survival")) install.packages("survival")',
-      'if (!require("survminer")) install.packages("survminer")',
-      'library(survival)',
-      'library(survminer)',
+      '## ---- Kaplan-Meier ----',
+      'km_fit <- survfit(Surv(time, event) ~ 1, data = df)',
+      'ggsurvplot(km_fit, conf.int = TRUE, xlab = "随访时间", ylab = "生存概率")',
       '',
-      '## ---- 读取数据 ----',
-      '# df <- read.csv("your_data.csv")',
-      '# 需要变量: 事件(' + y + ') 时间(' + t + ') 协变量',
-      '',
-      '## ---- Kaplan-Meier 生存曲线 ----',
-      'cat("==== Kaplan-Meier 生存分析 ====\n")',
-      'km_fit <- survfit(Surv(' + t + ', ' + y + ') ~ 1, data = df)',
-      'print(km_fit)',
-      'ggsurvplot(km_fit, data = df, conf.int = TRUE,',
-      '  title = "' + title + ' - 生存曲线",',
-      '  xlab = "随访时间", ylab = "生存概率")',
-      '',
-      '## ---- 分组比较 ----',
-      xs[0] ? 'km_group <- survfit(Surv(' + t + ', ' + y + ') ~ ' + xs[0] + ', data = df)' : '',
-      xs[0] ? 'ggsurvplot(km_group, data = df, pval = TRUE, conf.int = TRUE,' : '',
-      xs[0] ? '  title = "分组生存曲线", xlab = "时间", ylab = "生存概率")' : '',
-      '',
-      '## ---- Log-rank 检验 ----',
-      xs[0] ? 'sd <- survdiff(Surv(' + t + ', ' + y + ') ~ ' + xs[0] + ', data = df)' : '',
-      xs[0] ? 'print(sd)' : '',
+      '## ---- 分组比较 + Log-rank ----',
+      'km_group <- survfit(Surv(time, event) ~ group, data = df)',
+      'ggsurvplot(km_group, pval = TRUE, conf.int = TRUE)',
+      'survdiff(Surv(time, event) ~ group, data = df)',
       '',
       '## ---- Cox 比例风险模型 ----',
-      'cat("\n==== Cox 回归 ====\n")',
-      allX ? 'cox_model <- coxph(Surv(' + t + ', ' + y + ') ~ ' + allX + ', data = df)' : '',
-      allX ? 'print(summary(cox_model))' : '',
-      allX ? '' : 'cox_model <- coxph(Surv(' + t + ', ' + y + ') ~ 1, data = df)',
+      'cox_model <- coxph(Surv(time, event) ~ age + sex + exposure, data = df)',
+      'summary(cox_model)',
+      'cox.zph(cox_model)  # PH假定检验',
+      'ggforest(cox_model, data = df)  # 森林图'
+    ].join('\n'),
+    python: [
+      'from lifelines import KaplanMeierFitter, CoxPHFitter',
+      'from lifelines.statistics import logrank_test',
+      'import matplotlib.pyplot as plt',
       '',
-      '## ---- PH假定检验 ----',
-      'cat("\n==== 比例风险假定检验 ====\n")',
-      'print(cox.zph(cox_model))',
+      '# Kaplan-Meier',
+      'kmf = KaplanMeierFitter()',
+      'kmf.fit(df["time"], event_observed=df["event"])',
+      'kmf.plot_survival_function()',
       '',
-      '## ---- 森林图 ----',
-      'ggforest(cox_model, data = df, main = "Cox回归森林图")',
-      ''
-    ].join('\n');
+      '# 分组比较',
+      'for name, group in df.groupby("group"):',
+      '    kmf.fit(group["time"], group["event"], label=name)',
+      '    kmf.plot_survival_function()',
+      '',
+      '# Log-rank检验',
+      'result = logrank_test(df[df.group==0]["time"], df[df.group==1]["time"],',
+      '                      df[df.group==0]["event"], df[df.group==1]["event"])',
+      'print(f"p = {result.p_value:.4f}")',
+      '',
+      '# Cox回归',
+      'cph = CoxPHFitter()',
+      'cph.fit(df[["time", "event", "age", "sex", "exposure"]], "time", "event")',
+      'cph.print_summary()'
+    ].join('\n'),
+    r_packages: 'survival, survminer, coxme, cmprsk',
+    py_packages: 'lifelines, pandas, matplotlib',
+    notes: '如有竞争风险，使用 cmprsk 包的 Fine-Gray 模型；混合效应 Cox 用 coxme 包。'
   },
-
-  case_control: function (vars, title) {
-    var y = (vars.find(function (v) { return v.roleCode === 'Y' }) || {}).varName || 'group';
-    var xs = vars.filter(function (v) { return v.roleCode === 'X' }).map(function (v) { return v.varName });
-    var ms = vars.filter(function (v) { return v.roleCode === 'M' }).map(function (v) { return v.varName });
-    var cs = vars.filter(function (v) { return v.roleCode === 'C' }).map(function (v) { return v.varName });
-    var allX = xs.concat(cs).join(' + ');
-    var strata = ms.join(' + ');
-    return [
-      '# ==========================================',
-      '# 研究题目: ' + title,
-      '# 分析方法: 病例对照 + 条件Logistic回归',
-      '# 生成时间: ' + new Date().toLocaleString('zh-CN'),
-      '# ==========================================',
+  t3: { /* 病例对照 */
+    r: [
+      'library(survival); library(Epi)',
       '',
-      '## ---- 加载包 ----',
-      'if (!require("survival")) install.packages("survival")',
-      'library(survival)',
+      '## ---- 条件Logistic回归（匹配设计）----',
+      '# 需要匹配集ID变量 match_id',
+      'clogit_model <- clogit(group ~ exposure + age + strata(match_id), data = df)',
+      'summary(clogit_model)',
+      'exp(cbind(OR = coef(clogit_model), confint(clogit_model)))',
       '',
-      '## ---- 读取数据 ----',
-      '# df <- read.csv("your_data.csv")',
-      '# 需要匹配集ID变量(如 match_id)和组别(' + y + ': 0=对照 1=病例)',
+      '## ---- 无条件Logistic（无匹配）----',
+      'logit_model <- glm(group ~ exposure + age + sex, data = df, family = binomial)',
+      'summary(logit_model)',
       '',
-      '## ---- 描述性统计 ----',
-      'cat("==== 基线特征比较 ====\n")',
-      '# print(TableOne(..., strata = "' + y + '"))',
+      '## ---- 交互作用分析 ----',
+      '# RERI = OR11 - OR10 - OR01 + 1',
+      '# AP = RERI / OR11',
+      'model_int <- glm(group ~ exposure * modifier, data = df, family = binomial)',
+      'summary(model_int)'
+    ].join('\n'),
+    python: [
+      'import statsmodels.api as sm',
+      'from scipy import stats',
+      'import pandas as pd',
       '',
-      '## ---- 单因素分析 ----',
-      'cat("\n==== 单因素 OR 计算 ====\n")',
-      xs[0] ? 'for (x in c("' + xs.join('", "') + '")) {' : '',
-      xs[0] ? '  tab <- table(df[["' + y + '"]], df[[x]])' : '',
-      xs[0] ? '  cat("\n---", x, "---\n")' : '',
-      xs[0] ? '  print(tab)' : '',
-      xs[0] ? '  if (all(dim(tab) > 1)) print(fisher.test(tab))' : '',
-      xs[0] ? '}' : '',
+      '# 条件Logistic（需 statsmodels 的 ConditionalLogit）',
+      'from statsmodels.discrete.conditional_models import ConditionalLogit',
+      'model = ConditionalLogit(',
+      '    endog=df["group"], exog=df[["exposure", "age"]],',
+      '    groups=df["match_id"]',
+      ').fit()',
+      'print(model.summary())',
       '',
-      '## ---- 条件Logistic回归 ----',
-      'cat("\n==== 条件Logistic回归 ====\n")',
-      '# 使用 clogit: 需要匹配集变量 match_id',
-      strata && allX ? 'clogit_model <- clogit(' + y + ' ~ ' + allX + ' + strata(match_id), data = df)' : '# clogit_model <- clogit(' + y + ' ~ ' + (allX || 'exposure') + ' + strata(match_id), data = df)',
-      strata && allX ? 'print(summary(clogit_model))' : '',
-      strata && allX ? 'exp(cbind(OR = coef(clogit_model), confint(clogit_model)))' : '',
+      '# 无条件Logistic',
+      'X = sm.add_constant(df[["exposure", "age", "sex"]])',
+      'logit = sm.Logit(df["group"], X).fit()',
+      'print(logit.summary())',
+      'print("OR:", np.exp(logit.params))',
       '',
-      '## ---- 无条件Logistic回归（如无匹配） ----',
-      'cat("\n==== 无条件Logistic回归 ====\n")',
-      allX ? 'logit_model <- glm(' + y + ' ~ ' + allX + ', data = df, family = binomial)' : '',
-      allX ? 'print(summary(logit_model))' : '',
-      allX ? 'exp(cbind(OR = coef(logit_model), confint(logit_model)))' : '',
-      ''
-    ].join('\n');
+      '# McNemar检验（1:1匹配）',
+      'from statsmodels.stats.contingency_tables import mcnemar',
+      'table = pd.crosstab(df.loc[df.group==0, "exposure"],',
+      '                    df.loc[df.group==1, "exposure"])',
+      'print(mcnemar(table, exact=True))'
+    ].join('\n'),
+    r_packages: 'survival (clogit), Epi, forestplot',
+    py_packages: 'statsmodels, scipy, pandas',
+    notes: '条件Logistic在Python中需 statsmodels ≥ 0.13；R的 survival::clogit 更成熟，推荐优先使用R。'
   },
-
-  did: function (vars, title) {
-    var y = (vars.find(function (v) { return v.roleCode === 'Y' }) || {}).varName || 'Y';
-    var d = (vars.find(function (v) { return v.roleCode === 'D' }) || {}).varName || 'treat';
-    var t = (vars.find(function (v) { return v.roleCode === 'T' }) || {}).varName || 'post';
-    var cs = vars.filter(function (v) { return v.roleCode === 'C' }).map(function (v) { return v.varName });
-    var panelId = (vars.find(function (v) { return /panel|id|地区|省/i.test(v.varName) }) || {}).varName || 'province_id';
-    var covs = cs.join(' + ');
-    return [
-      '# ==========================================',
-      '# 研究题目: ' + title,
-      '# 分析方法: 双重差分（DID）',
-      '# 生成时间: ' + new Date().toLocaleString('zh-CN'),
-      '# ==========================================',
+  t4: { /* RCT */
+    r: [
+      'library(lme4); library(mediation); library(ggplot2)',
       '',
-      '## ---- 加载包 ----',
-      'if (!require("fixest")) install.packages("fixest")',
-      'if (!require("ggplot2")) install.packages("ggplot2")',
-      'library(fixest)',
-      'library(ggplot2)',
+      '## ---- ANCOVA（校正基线）----',
+      'model_ancova <- aov(outcome ~ treatment + baseline, data = df)',
+      'summary(model_ancova)',
       '',
-      '## ---- 读取数据 ----',
-      '# df <- read.csv("your_panel_data.csv")',
-      '# 需要面板ID(' + panelId + ') 时间(' + t + ') 处理(' + d + ') 结局(' + y + ')',
+      '## ---- 混合效应模型（重复测量）----',
+      'lmer_model <- lmer(outcome ~ treatment * time + (1|subject), data = df)',
+      'summary(lmer_model)',
       '',
-      '## ---- 基本DID模型 ----',
-      'cat("==== 基本DID模型 ====\n")',
-      'did_basic <- feols(' + y + ' ~ ' + d + ':' + t + ' | ' + panelId + ' + ' + t + ', data = df)',
-      'print(summary(did_basic))',
+      '## ---- 中介分析 ----',
+      'med_model <- lm(mediator ~ treatment, data = df)',
+      'out_model <- lm(outcome ~ treatment + mediator, data = df)',
+      'med_result <- mediate(med_model, out_model, treat = "treatment",',
+      '                      mediator = "mediator", sims = 1000, boot = TRUE)',
+      'summary(med_result)'
+    ].join('\n'),
+    python: [
+      'import statsmodels.api as sm',
+      'from statsmodels.formula.api import ols',
+      'import pandas as pd',
       '',
-      '## ---- 加入协变量 ----',
-      covs ? 'did_cov <- feols(' + y + ' ~ ' + d + ':' + t + ' + ' + covs + ' | ' + panelId + ' + ' + t + ', data = df)' : '',
-      covs ? 'print(summary(did_cov))' : '',
+      '# ANCOVA',
+      'model = ols("outcome ~ treatment + baseline", data=df).fit()',
+      'print(sm.stats.anova_lm(model, typ=2))',
       '',
-      '## ---- 动态DID（事件研究法） ----',
-      'cat("\n==== 动态效应（事件研究） ====\n")',
-      '# 需要相对处理时间变量(rel_time)',
-      '# did_dynamic <- feols(' + y + ' ~ i(rel_time, ref = -1) | ' + panelId + ' + ' + t + ', data = df)',
-      '# summary(did_dynamic)',
+      '# 混合效应模型（需 statsmodels MixedLM）',
+      'md = sm.MixedLM.from_formula("outcome ~ treatment * time",',
+      '                             groups="subject", data=df)',
+      'mdf = md.fit()',
+      'print(mdf.summary())',
+      '',
+      '# 中介分析（需自行实现或使用 mediation 包）',
+      '# 步骤1: M ~ X',
+      'med = ols("mediator ~ treatment", data=df).fit()',
+      '# 步骤2: Y ~ X + M',
+      'out = ols("outcome ~ treatment + mediator", data=df).fit()',
+      '# 间接效应 = a*b，可用Bootstrap求CI'
+    ].join('\n'),
+    r_packages: 'lme4, mediation, nlme, powerSurvEpi',
+    py_packages: 'statsmodels, pandas, numpy',
+    notes: 'RCT分析推荐R（mediation包更成熟）；聚类随机试验需考虑ICC，使用lmer的随机效应。'
+  },
+  t5: { /* 二次分析/DID */
+    r: [
+      'library(fixest); library(MatchIt); library(rdrobust)',
+      '',
+      '## ---- 双重差分（DID）----',
+      'did_model <- feols(Y ~ treat:post | entity + year, data = df)',
+      'summary(did_model)',
+      '',
+      '## ---- 动态DID（事件研究）----',
+      '# did_dynamic <- feols(Y ~ i(rel_time, ref = -1) | entity + year, data = df)',
       '# iplot(did_dynamic, main = "动态DID效应")',
       '',
-      '## ---- 平行趋势检验 ----',
-      'cat("\n==== 平行趋势检验 ====\n")',
-      '# 使用事件研究法系数检验 pre-trend',
-      '# 如所有 pre 期系数不显著 → 平行趋势成立',
+      '## ---- PSM-DID ----',
+      'm <- matchit(treat ~ gdp + pop_density, data = df[df$year == pre_year, ])',
+      'df_matched <- match.data(m)',
+      'did_psm <- feols(Y ~ treat:post | entity + year, data = df_matched)',
       '',
-      '## ---- 稳健性检验 ----',
-      'cat("\n==== 稳健性检验 ====\n")',
-      '# 1. 安慰剂检验（随机伪造处理时间）',
-      '# 2. 更换样本期间',
-      '# 3. PSM-DID',
-      'if (!require("MatchIt")) install.packages("MatchIt")',
-      '# m <- matchit(' + d + ' ~ ' + (covs || 'covariates') + ', data = df[df$' + t + ' == 0, ])',
-      '# df_matched <- match.data(m)',
-      '# did_psm <- feols(' + y + ' ~ ' + d + ':' + t + ' | ' + panelId + ' + ' + t + ', data = df_matched)',
-      '# summary(did_psm)',
-      ''
-    ].join('\n');
+      '## ---- 断点回归（RDD）----',
+      'rdrobust(Y = df$Y, X = df$running_var, c = 0)'
+    ].join('\n'),
+    python: [
+      'import statsmodels.api as sm',
+      'from linearmodels.panel import PanelOLS',
+      'import pandas as pd',
+      '',
+      '# 面板DID（需设置多级索引）',
+      'df = df.set_index(["entity", "year"])',
+      'df["treat_post"] = df["treat"] * df["post"]',
+      'model = PanelOLS.from_formula("Y ~ treat_post + EntityEffects + TimeEffects",',
+      '                              data=df).fit()',
+      'print(model.summary)',
+      '',
+      '# PSM (需 causalinference 或 sklearn)',
+      'from sklearn.linear_model import LogisticRegression',
+      'ps_model = LogisticRegression().fit(',
+      '    df[["gdp", "pop_density"]], df["treat"])',
+      'df["ps"] = ps_model.predict_proba(df[["gdp", "pop_density"]])[:, 1]',
+      '',
+      '# RDD (需 rdrobust 的 Python 接口或自行实现)',
+      '# 可使用 rdrobust 包: pip install rdrobust'
+    ].join('\n'),
+    r_packages: 'fixest, rdrobust, MatchIt, Synth, plm',
+    py_packages: 'linearmodels, statsmodels, sklearn, pandas',
+    notes: 'R的fixest包在面板DID中效率极高，推荐优先使用R；Python的linearmodels可做替代。'
   },
-
-  mediation: function (vars, title) {
-    var y = (vars.find(function (v) { return v.roleCode === 'Y' }) || {}).varName || 'Y';
-    var xs = vars.filter(function (v) { return v.roleCode === 'X' }).map(function (v) { return v.varName });
-    var x = xs[0] || 'X';
-    var cs = vars.filter(function (v) { return v.roleCode === 'C' }).map(function (v) { return v.varName });
-    var covs = cs.join(' + ');
-    return [
-      '# ==========================================',
-      '# 研究题目: ' + title,
-      '# 分析方法: 中介效应分析（causal mediation）',
-      '# 生成时间: ' + new Date().toLocaleString('zh-CN'),
-      '# ==========================================',
+  t6: { /* 混合方法 */
+    r: [
+      'library(lavaan); library(ggplot2)',
       '',
-      '## ---- 加载包 ----',
-      'if (!require("mediation")) install.packages("mediation")',
-      'library(mediation)',
+      '## ---- 定量部分：SEM/路径分析 ----',
+      "model <- '",
+      '  # 测量模型',
+      '  health =~ self_health + chronic_count + adl',
+      '  # 结构模型',
+      '  health ~ resources + income + education',
+      "'",
+      'fit <- sem(model, data = df)',
+      'summary(fit, standardized = TRUE, fit.measures = TRUE)',
       '',
-      '## ---- 读取数据 ----',
-      '# df <- read.csv("your_data.csv")',
-      '# 需要自变量(' + x + ') 中介变量(mediator) 因变量(' + y + ')',
-      '# 请将 mediator 替换为实际中介变量名',
+      '## ---- 定性部分：主题分析 ----',
+      '# 定性分析通常用 NVivo/ATLAS.ti 编码',
+      '# R中可用 RQDA 包（已停更）或导出编码矩阵后用R分析',
+      '# 整合：联合显示矩阵（Joint Display）'
+    ].join('\n'),
+    python: [
+      'import pandas as pd',
+      'import semopy  # SEM',
       '',
-      '## ---- 步骤1: 中介变量模型（M ~ X） ----',
-      'cat("==== 中介变量模型 ====\n")',
-      covs ? 'med_model <- lm(mediator ~ ' + x + ' + ' + covs + ', data = df)' : 'med_model <- lm(mediator ~ ' + x + ', data = df)',
-      'print(summary(med_model))',
+      '# 定量部分：SEM',
+      'model = """',
+      '    health =~ self_health + chronic_count + adl',
+      '    health ~ resources + income + education',
+      '"""',
+      'mod = semopy.Model(model)',
+      'mod.fit(df)',
+      'print(mod.inspect())',
       '',
-      '## ---- 步骤2: 因变量模型（Y ~ X + M） ----',
-      'cat("\n==== 因变量模型 ====\n")',
-      covs ? 'out_model <- lm(' + y + ' ~ ' + x + ' + mediator + ' + covs + ', data = df)' : 'out_model <- lm(' + y + ' ~ ' + x + ' + mediator, data = df)',
-      'print(summary(out_model))',
+      '# 定性部分：主题分析（可用文本分析工具）',
+      'from sklearn.feature_extraction.text import TfidfVectorizer',
+      'from sklearn.cluster import KMeans',
+      '# 对访谈文本做TF-IDF + 聚类，辅助识别主题',
+      'vectorizer = TfidfVectorizer(max_features=100)',
+      'X = vectorizer.fit_transform(interview_texts)',
+      'km = KMeans(n_clusters=5).fit(X)',
       '',
-      '## ---- 步骤3: 中介效应分解 ----',
-      'cat("\n==== 中介效应分析 ====\n")',
-      'med_result <- mediate(med_model, out_model, treat = "' + x + '", mediator = "mediator",',
-      '  sims = 1000, boot = TRUE)',
-      'print(summary(med_result))',
-      '',
-      '## ---- 效应分解 ----',
-      'cat("\n==== 效应分解 ====\n")',
-      'cat("总效应 (Total Effect) =", med_result$d.avg, "\n")',
-      'cat("直接效应 (ACDE) =", med_result$d.avg, "\n")',
-      'cat("间接效应 (ACME) =", med_result$z.avg, "\n")',
-      'cat("中介比例 =", med_result$z.avg / med_result$d.avg, "\n")',
-      '',
-      '## ---- 敏感性分析 ----',
-      'cat("\n==== 敏感性分析（rho） ====\n")',
-      'medsens_result <- medsens(med_result)',
-      'print(summary(medsens_result))',
-      ''
-    ].join('\n');
-  },
-
-  xgboost: function (vars, title) {
-    var y = (vars.find(function (v) { return v.roleCode === 'Y' }) || {}).varName || 'Y';
-    var xs = vars.filter(function (v) { return v.roleCode === 'X' }).map(function (v) { return v.varName });
-    var cs = vars.filter(function (v) { return v.roleCode === 'C' }).map(function (v) { return v.varName });
-    var allVars = xs.concat(cs);
-    var varList = allVars.join('", "');
-    return [
-      '# ==========================================',
-      '# 研究题目: ' + title,
-      '# 分析方法: XGBoost 预测模型',
-      '# 生成时间: ' + new Date().toLocaleString('zh-CN'),
-      '# ==========================================',
-      '',
-      '## ---- 加载包 ----',
-      'if (!require("xgboost")) install.packages("xgboost")',
-      'if (!require("caret")) install.packages("caret")',
-      'if (!require("pROC")) install.packages("pROC")',
-      'library(xgboost)',
-      'library(caret)',
-      'library(pROC)',
-      '',
-      '## ---- 读取数据 ----',
-      '# df <- read.csv("your_data.csv")',
-      '# 因变量: ' + y + ' 特征变量: ' + allVars.join(', '),
-      '',
-      '## ---- 数据准备 ----',
-      'set.seed(42)',
-      'features <- c("' + varList + '")',
-      'df_clean <- df[complete.cases(df[, c("' + y + '", features)]), ]',
-      '',
-      '## ---- 训练/测试分割 ----',
-      'train_idx <- createDataPartition(df_clean[["' + y + '"]], p = 0.7, list = FALSE)',
-      'train_data <- df_clean[train_idx, ]',
-      'test_data <- df_clean[-train_idx, ]',
-      '',
-      'cat("训练集:", nrow(train_data), "测试集:", nrow(test_data), "\n")',
-      '',
-      '## ---- XGBoost 矩阵 ----',
-      'dtrain <- xgb.DMatrix(',
-      '  data = as.matrix(train_data[, features]),',
-      '  label = train_data[["' + y + '"]]',
-      ')',
-      'dtest <- xgb.DMatrix(',
-      '  data = as.matrix(test_data[, features]),',
-      '  label = test_data[["' + y + '"]]',
-      ')',
-      '',
-      '## ---- 模型训练 ----',
-      'cat("\n==== XGBoost 模型训练 ====\n")',
-      'params <- list(',
-      '  objective = "binary:logistic",',
-      '  eval_metric = "auc",',
-      '  max_depth = 6,',
-      '  eta = 0.1,',
-      '  subsample = 0.8,',
-      '  colsample_bytree = 0.8',
-      ')',
-      '',
-      'xgb_model <- xgb.train(',
-      '  params = params,',
-      '  data = dtrain,',
-      '  nrounds = 200,',
-      '  watchlist = list(train = dtrain, test = dtest),',
-      '  early_stopping_rounds = 20,',
-      '  verbose = 1',
-      ')',
-      '',
-      '## ---- 预测与评估 ----',
-      'cat("\n==== 模型评估 ====\n")',
-      'pred_prob <- predict(xgb_model, dtest)',
-      'pred_class <- ifelse(pred_prob > 0.5, 1, 0)',
-      '',
-      'cat("AUC:", auc(test_data[["' + y + '"]], pred_prob), "\n")',
-      'print(confusionMatrix(factor(pred_class), factor(test_data[["' + y + '"]])))',
-      '',
-      '## ---- 特征重要性 ----',
-      'cat("\n==== 特征重要性 ====\n")',
-      'importance <- xgb.importance(feature_names = features, model = xgb_model)',
-      'print(importance)',
-      'xgb.plot.importance(importance_matrix = importance, top_n = 15)',
-      '',
-      '## ---- 交叉验证 ----',
-      'cat("\n==== 5折交叉验证 ====\n")',
-      'cv_model <- xgb.cv(',
-      '  params = params,',
-      '  data = dtrain,',
-      '  nrounds = 200,',
-      '  nfold = 5,',
-      '  early_stopping_rounds = 20,',
-      '  verbose = FALSE',
-      ')',
-      'print(tail(cv_model$evaluation_log))',
-      ''
-    ].join('\n');
-  },
-
-  panel_fe: function (vars, title) {
-    var y = (vars.find(function (v) { return v.roleCode === 'Y' }) || {}).varName || 'Y';
-    var xs = vars.filter(function (v) { return v.roleCode === 'X' }).map(function (v) { return v.varName });
-    var cs = vars.filter(function (v) { return v.roleCode === 'C' }).map(function (v) { return v.varName });
-    var allX = xs.concat(cs).join(' + ');
-    var panelId = (vars.find(function (v) { return /panel|id|地区|省/i.test(v.varName) }) || {}).varName || 'entity_id';
-    var timeVar = (vars.find(function (v) { return v.roleCode === 'T' }) || {}).varName || 'year';
-    return [
-      '# ==========================================',
-      '# 研究题目: ' + title,
-      '# 分析方法: 面板固定效应回归',
-      '# 生成时间: ' + new Date().toLocaleString('zh-CN'),
-      '# ==========================================',
-      '',
-      '## ---- 加载包 ----',
-      'if (!require("plm")) install.packages("plm")',
-      'if (!require("fixest")) install.packages("fixest")',
-      'library(plm)',
-      'library(fixest)',
-      '',
-      '## ---- 读取面板数据 ----',
-      '# df <- read.csv("your_panel.csv")',
-      '# 需要面板ID(' + panelId + ') 时间(' + timeVar + ') 因变量(' + y + ')',
-      '',
-      '## ---- 转换为面板数据格式 ----',
-      'pdf <- pdata.frame(df, index = c("' + panelId + '", "' + timeVar + '"))',
-      '',
-      '## ---- 固定效应模型 ----',
-      'cat("==== 固定效应模型 ====\n")',
-      allX ? 'fe_model <- plm(' + y + ' ~ ' + allX + ' | factor(' + panelId + '), data = pdf, model = "within")' : '',
-      allX ? 'print(summary(fe_model))' : '',
-      '',
-      '## ---- 使用 fixest（更快） ----',
-      'cat("\n==== fixest 固定效应 ====\n")',
-      allX ? 'fe_fast <- feols(' + y + ' ~ ' + allX + ' | ' + panelId + ', data = df)' : '',
-      allX ? 'print(summary(fe_fast))' : '',
-      '',
-      '## ---- 双向固定效应（个体+时间） ----',
-      'cat("\n==== 双向固定效应 ====\n")',
-      allX ? 'twfe <- feols(' + y + ' ~ ' + allX + ' | ' + panelId + ' + ' + timeVar + ', data = df)' : '',
-      allX ? 'print(summary(twfe))' : '',
-      '',
-      '## ---- 聚类稳健标准误 ----',
-      'cat("\n==== 聚类稳健标准误 ====\n")',
-      allX ? 'fe_cluster <- feols(' + y + ' ~ ' + allX + ' | ' + panelId + ', data = df, cluster = "' + panelId + '")' : '',
-      allX ? 'print(summary(fe_cluster))' : '',
-      '',
-      '## ---- Hausman 检验（FE vs RE） ----',
-      'cat("\n==== Hausman 检验 ====\n")',
-      allX ? 're_model <- plm(' + y + ' ~ ' + allX + ', data = pdf, model = "random")' : '',
-      allX ? 'print(phtest(fe_model, re_model))' : '',
-      ''
-    ].join('\n');
+      '# 整合：联合显示矩阵需手动构建'
+    ].join('\n'),
+    r_packages: 'lavaan, ggplot2, semPlot',
+    py_packages: 'semopy, sklearn, pandas',
+    notes: '混合方法的核心在于整合（integration），建议用联合显示矩阵连接定量和定性发现。'
   }
 };
 
-/* --- 生成R脚本（按钮入口） --- */
-function studyGenerateScript(planIdx) {
-  /* 如果从方案卡片点击，自动选择方法 */
-  var sel = document.getElementById('st-method-select');
-  if (planIdx !== undefined && planIdx !== null) {
-    var plans = STUDY_STATE._lastPlans || [];
-    var plan = plans[planIdx];
-    if (plan) {
-      var methodMap = { t1: 'descriptive', t2: 'cohort_survival', t3: 'case_control', t4: 'descriptive', t5: 'did', t6: 'descriptive' };
-      var method = methodMap[plan.id] || 'descriptive';
-      if (sel) sel.value = method;
+/* --- 渲染代码框架推荐 --- */
+function studyRenderCodeFrameworks(plans) {
+  var el = document.getElementById('st-code-grid');
+  if (!el) return;
+  var html = '';
+  plans.forEach(function (p, idx) {
+    var fw = STUDY_CODE_FRAMEWORKS[p.id];
+    if (!fw) return;
+    html += '<div style="border:1px solid var(--line);border-radius:6px;background:#fff;overflow:hidden">';
+    html += '<div style="padding:12px 18px;background:linear-gradient(135deg,#f0f5ff,#fff);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px">';
+    html += '<span style="background:var(--accent);color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600">方案 ' + (idx + 1) + '</span>';
+    html += '<b style="font-size:14px">' + p.name + '</b>';
+    html += '<div style="flex:1"></div>';
+    html += '<button class="btn sm" onclick="studyToggleCode(' + idx + ',\'r\')" style="padding:3px 10px;font-size:11.5px;margin-right:4px">R</button>';
+    html += '<button class="btn sm" onclick="studyToggleCode(' + idx + ',\'py\')" style="padding:3px 10px;font-size:11.5px;margin-right:4px">Python</button>';
+    html += '<button class="btn sm" onclick="studyCopyCode(' + idx + ')" style="padding:3px 10px;font-size:11.5px">复制</button>';
+    html += '</div>';
+
+    /* R 代码 */
+    html += '<div id="code-r-' + idx + '" style="padding:0">';
+    html += '<div style="padding:8px 18px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line)"><b>R 代码框架</b> | 推荐包: ' + (fw.r_packages || '') + '</div>';
+    html += '<pre style="margin:0;padding:14px 18px;font-size:12.5px;font-family:Consolas,monospace;line-height:1.6;white-space:pre-wrap;background:#1e293b;color:#e2e8f0;overflow-x:auto">' + studyEsc(fw.r) + '</pre>';
+    html += '</div>';
+
+    /* Python 代码（默认隐藏） */
+    html += '<div id="code-py-' + idx + '" style="padding:0;display:none">';
+    html += '<div style="padding:8px 18px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line)"><b>Python 代码框架</b> | 推荐包: ' + (fw.py_packages || '') + '</div>';
+    html += '<pre style="margin:0;padding:14px 18px;font-size:12.5px;font-family:Consolas,monospace;line-height:1.6;white-space:pre-wrap;background:#1e293b;color:#e2e8f0;overflow-x:auto">' + studyEsc(fw.python) + '</pre>';
+    html += '</div>';
+
+    /* 说明 */
+    if (fw.notes) {
+      html += '<div style="padding:10px 18px;font-size:12px;color:var(--ink2);background:#f8fafc;border-top:1px solid var(--line)"><b>说明:</b> ' + fw.notes + '</div>';
     }
-  }
-
-  var method = sel ? sel.value : '';
-  if (!method) return;
-
-  /* 获取映射的变量 */
-  var mappedVars = [];
-  if (STUDY_STATE.uploadedDatasets && STUDY_STATE.uploadedDatasets.length > 0 && STUDY_STATE._lastPlans) {
-    var allVars = [];
-    STUDY_STATE.uploadedDatasets.forEach(function (ds) {
-      ds.variables.forEach(function (v) {
-        allVars.push({ name: v.name, type: v.type, label: v.label, values: v.values });
-      });
-    });
-    var plans = STUDY_STATE._lastPlans || [];
-    if (plans.length > 0) {
-      var planVars = studyExtractPlanVars(plans[0]);
-      var mapped = studyMapVars(allVars, planVars);
-      mappedVars = mapped.matches.map(function (m) {
-        return { roleCode: m.roleCode, varName: m.varName, varType: m.varType, varLabel: m.varLabel };
-      });
-    }
-  }
-
-  var template = STUDY_R_TEMPLATES[method];
-  if (!template) return;
-  var script = template(mappedVars, STUDY_STATE.title || '研究项目');
-
-  var area = document.getElementById('st-script-area');
-  if (area) area.value = script;
-
-  /* 显示脚本区 */
-  var wrap = document.getElementById('st-script-wrap');
-  if (wrap) wrap.style.display = 'block';
-
-  /* 同时显示创新方法库 */
-  var mw = document.getElementById('st-methods-wrap');
-  if (mw) { mw.style.display = 'block'; studyRenderMethods(); }
-
-  /* 显示导出区 */
-  var ew = document.getElementById('st-export-wrap');
-  if (ew) ew.style.display = 'block';
+    html += '</div>';
+  });
+  el.innerHTML = html;
 }
 
-/* --- 复制脚本 --- */
-function studyCopyScript() {
-  var area = document.getElementById('st-script-area');
-  if (!area || !area.value) { alert('请先生成脚本'); return; }
-  navigator.clipboard.writeText(area.value).then(function () { alert('脚本已复制 ✅') });
+function studyToggleCode(idx, lang) {
+  var rEl = document.getElementById('code-r-' + idx);
+  var pyEl = document.getElementById('code-py-' + idx);
+  if (!rEl || !pyEl) return;
+  if (lang === 'r') { rEl.style.display = 'block'; pyEl.style.display = 'none'; }
+  else { rEl.style.display = 'none'; pyEl.style.display = 'block'; }
 }
 
-/* --- 下载脚本 --- */
-function studyDownloadScript() {
-  var area = document.getElementById('st-script-area');
-  if (!area || !area.value) { alert('请先生成脚本'); return; }
-  var blob = new Blob([area.value], { type: 'text/plain;charset=utf-8' });
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url; a.download = 'analysis.R';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+function studyCopyCode(idx) {
+  var plans = STUDY_STATE._lastPlans || [];
+  var fw = STUDY_CODE_FRAMEWORKS[(plans[idx] || {}).id];
+  if (!fw) return;
+  /* 复制当前可见的代码 */
+  var rEl = document.getElementById('code-r-' + idx);
+  var text = (rEl && rEl.style.display !== 'none') ? fw.r : fw.python;
+  navigator.clipboard.writeText(text).then(function () { alert('代码已复制 ✅'); });
 }
 
-/* --- 执行脚本 --- */
-function studyExecuteScript() {
-  var area = document.getElementById('st-script-area');
-  if (!area || !area.value) { alert('请先生成脚本'); return; }
-
-  var statusEl = document.getElementById('st-exec-status');
-  var resultEl = document.getElementById('st-exec-result');
-  var outputEl = document.getElementById('st-exec-output');
-  var plotsEl = document.getElementById('st-exec-plots');
-
-  if (!STUDY_AGENT_CONNECTED) {
-    if (statusEl) statusEl.textContent = '⚠ 未连接 Agent，正在尝试连接...';
-    studyConnectAgent();
-    setTimeout(function () {
-      if (STUDY_AGENT_CONNECTED) studyExecuteScript();
-      else if (statusEl) statusEl.textContent = '❌ 连接失败，请先启动 companion_agent.py';
-    }, 3000);
-    return;
-  }
-
-  if (statusEl) statusEl.textContent = '⏳ 执行中...';
-  if (resultEl) resultEl.style.display = 'block';
-  if (outputEl) outputEl.textContent = '正在执行 R 脚本，请稍候...';
-  if (plotsEl) plotsEl.innerHTML = '';
-
-  fetch(STUDY_AGENT_URL + '/execute', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ script: area.value, language: 'R' }),
-    signal: AbortSignal.timeout(300000)
-  })
-    .then(function (r) { return r.json() })
-    .then(function (data) {
-      if (data.success) {
-        if (statusEl) statusEl.textContent = '✅ 执行完成';
-        if (outputEl) outputEl.textContent = data.output || '(无输出)';
-        if (data.plots && data.plots.length > 0 && plotsEl) {
-          data.plots.forEach(function (p) {
-            var img = document.createElement('img');
-            img.src = p;
-            img.style.cssText = 'max-width:100%;border:1px solid var(--line);border-radius:6px';
-            plotsEl.appendChild(img);
-          });
-        }
-      } else {
-        if (statusEl) statusEl.textContent = '❌ 执行出错';
-        if (outputEl) outputEl.textContent = data.error || data.output || '未知错误';
-      }
-    })
-    .catch(function (err) {
-      if (statusEl) statusEl.textContent = '❌ 连接失败';
-      if (outputEl) outputEl.textContent = '执行请求失败: ' + err.message + '\n\n请确认 companion_agent.py 正在运行（端口 7878）';
-    });
-}
-
-/* ============ P5: 创新方法模块库 ============ */
+/* ============ P5: 创新方法参考库 ============ */
 
 var STUDY_METHOD_LIBRARY = [
   {
@@ -9792,48 +9508,66 @@ var STUDY_METHOD_LIBRARY = [
     desc: '利用面板数据评估政策干预的因果效应，是政策评估的金标准方法。支持动态效应和平行趋势检验。',
     methods: ['双向固定效应', '事件研究法', 'PSM-DID', '安慰剂检验', '合成控制法'],
     packages: 'fixest, rdrobust, MatchIt, Synth',
+    py_packages: 'linearmodels, statsmodels, sklearn',
     difficulty: '进阶',
-    generate: function () { studySelectMethod('did'); }
+    r_framework: 'did_model <- feols(Y ~ treat:post | entity + year, data = df)\nsummary(did_model)\n# 动态效应\n# feols(Y ~ i(rel_time, ref=-1) | entity + year, data = df)',
+    py_framework: 'from linearmodels.panel import PanelOLS\nmodel = PanelOLS.from_formula("Y ~ treat_post + EntityEffects + TimeEffects", data=df).fit()',
+    notes: 'R的fixest包效率最高，推荐优先使用。平行趋势检验是DID的核心前提。'
   },
   {
     id: 'mediation', name: '中介效应分析', icon: '🔀',
     desc: '分解总效应为直接效应和间接效应，揭示暴露→中介→结局的机制路径。支持因果中介分析和敏感性分析。',
     methods: ['Baron & Kenny', 'causal mediation', 'Bootstrap CI', '敏感性分析(rho)'],
     packages: 'mediation, lavaan',
+    py_packages: 'statsmodels, numpy (自行实现Bootstrap)',
     difficulty: '进阶',
-    generate: function () { studySelectMethod('mediation'); }
+    r_framework: 'library(mediation)\nmed_model <- lm(M ~ X, data = df)\nout_model <- lm(Y ~ X + M, data = df)\nmed_result <- mediate(med_model, out_model, treat="X", mediator="M", sims=1000, boot=TRUE)\nsummary(med_result)',
+    py_framework: '# Python无专用中介包，需手动实现\nimport statsmodels.api as sm\nmed = sm.OLS.from_formula("M ~ X", data=df).fit()\nout = sm.OLS.from_formula("Y ~ X + M", data=df).fit()\n# 间接效应 = med.params["X"] * out.params["M"]\n# Bootstrap求CI',
+    notes: 'R的mediation包是因果中介分析的标准工具，Python需手动实现Bootstrap。'
   },
   {
     id: 'cohort_survival', name: '生存分析', icon: '⏱',
     desc: '分析时间-事件数据，包括Kaplan-Meier曲线、Cox回归、竞争风险模型。适合队列和随访研究。',
     methods: ['Kaplan-Meier', 'Cox PH', '竞争风险(Fine-Gray)', '时变协变量', 'PH假定检验'],
     packages: 'survival, survminer, cmprsk',
+    py_packages: 'lifelines',
     difficulty: '进阶',
-    generate: function () { studySelectMethod('cohort_survival'); }
+    r_framework: 'library(survival); library(survminer)\nkm <- survfit(Surv(time, event) ~ group, data = df)\nggsurvplot(km, pval=TRUE, conf.int=TRUE)\ncox <- coxph(Surv(time, event) ~ age + sex, data = df)\nsummary(cox); cox.zph(cox)',
+    py_framework: 'from lifelines import KaplanMeierFitter, CoxPHFitter\nkmf = KaplanMeierFitter()\nkmf.fit(df["time"], df["event"])\nkmf.plot_survival_function()\ncph = CoxPHFitter()\ncph.fit(df[["time","event","age","sex"]], "time", "event")\ncph.print_summary()',
+    notes: 'R的survival+survminer组合最成熟；Python的lifelines是最佳替代，但竞争风险需额外处理。'
   },
   {
     id: 'xgboost', name: 'XGBoost 机器学习', icon: '🤖',
     desc: '梯度提升树模型，支持特征重要性、交叉验证、超参数调优。适合预测建模和风险因素筛选。',
     methods: ['XGBoost', '交叉验证', '特征重要性', 'AUC评估', 'SHAP值'],
     packages: 'xgboost, caret, pROC, SHAPforxgboost',
+    py_packages: 'xgboost, scikit-learn, shap',
     difficulty: '高级',
-    generate: function () { studySelectMethod('xgboost'); }
+    r_framework: 'library(xgboost)\ndtrain <- xgb.DMatrix(data = as.matrix(X), label = y)\nmodel <- xgb.train(params = list(objective="binary:logistic", max_depth=6, eta=0.1),\n                  data = dtrain, nrounds = 200)\nxgb.importance(model = model)',
+    py_framework: 'import xgboost as xgb\nfrom sklearn.model_selection import cross_val_score\nmodel = xgb.XGBClassifier(max_depth=6, learning_rate=0.1, n_estimators=200)\nmodel.fit(X_train, y_train)\nprint(model.feature_importances_)\n# SHAP\nimport shap\nexplainer = shap.TreeExplainer(model)\nshap_values = explainer.shap_values(X_test)',
+    notes: 'Python的XGBoost+SHAP组合在机器学习可解释性方面更优；R的caret提供统一的调参框架。'
   },
   {
     id: 'panel_fe', name: '面板固定效应', icon: '📈',
     desc: '利用面板数据的组内变异消除不可观测混杂，是经济学和流行病学中因果推断的核心工具。',
     methods: ['固定效应', '随机效应', '双向固定效应', 'Hausman检验', '聚类标准误'],
     packages: 'plm, fixest, sandwich',
+    py_packages: 'linearmodels, statsmodels',
     difficulty: '进阶',
-    generate: function () { studySelectMethod('panel_fe'); }
+    r_framework: 'library(fixest)\nfe <- feols(Y ~ X1 + X2 | entity + year, data = df)\nsummary(fe)\n# 聚类标准误\nfe_cluster <- feols(Y ~ X1 + X2 | entity, data = df, cluster = "entity")',
+    py_framework: 'from linearmodels.panel import PanelOLS\ndf = df.set_index(["entity", "year"])\nmodel = PanelOLS.from_formula("Y ~ X1 + X2 + EntityEffects + TimeEffects", data=df)\nresult = model.fit(cov_type="clustered", cluster_entity=True)\nprint(result.summary)',
+    notes: 'R的fixest在大样本面板中速度远超plm；Python的linearmodels支持聚类标准误。'
   },
   {
     id: 'case_control', name: '条件Logistic回归', icon: '🔬',
     desc: '匹配设计的病例对照分析，通过条件似然估计OR值。支持1:1和1:n匹配。',
     methods: ['条件Logistic', 'McNemar检验', 'RERI交互', '剂量-反应'],
-    packages: 'survival, Epi',
+    packages: 'survival (clogit), Epi',
+    py_packages: 'statsmodels (ConditionalLogit)',
     difficulty: '进阶',
-    generate: function () { studySelectMethod('case_control'); }
+    r_framework: 'library(survival)\nmodel <- clogit(group ~ exposure + age + strata(match_id), data = df)\nsummary(model)\nexp(cbind(OR = coef(model), confint(model)))',
+    py_framework: 'from statsmodels.discrete.conditional_models import ConditionalLogit\nmodel = ConditionalLogit(endog=df["group"], exog=df[["exposure","age"]],\n                       groups=df["match_id"]).fit()\nprint(model.summary())\nprint("OR:", np.exp(model.params))',
+    notes: 'R的survival::clogit是标准实现；Python需statsmodels ≥ 0.13，推荐优先使用R。'
   }
 ];
 
@@ -9841,27 +9575,67 @@ function studyRenderMethods() {
   var el = document.getElementById('st-methods-grid');
   if (!el) return;
   var html = '';
-  STUDY_METHOD_LIBRARY.forEach(function (m) {
+  STUDY_METHOD_LIBRARY.forEach(function (m, idx) {
     var diffColor = m.difficulty === '高级' ? '#f59e0b' : '#3b82f6';
-    html += '<div style="border:1px solid var(--line);border-radius:6px;padding:16px;background:#fff;cursor:pointer;transition:border-color .2s" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--line)\'" onclick="studySelectMethod(\'' + m.id + '\')">';
+    html += '<div style="border:1px solid var(--line);border-radius:6px;padding:0;background:#fff;overflow:hidden" id="method-card-' + idx + '">';
+    html += '<div style="padding:16px;cursor:pointer" onclick="studyToggleMethod(' + idx + ')">';
     html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">';
     html += '<span style="font-size:24px">' + m.icon + '</span>';
     html += '<div><b style="font-size:14px">' + m.name + '</b><br><span style="font-size:11px;color:' + diffColor + ';font-weight:600">' + m.difficulty + '</span></div>';
+    html += '<div style="flex:1"></div>';
+    html += '<span style="font-size:12px;color:var(--muted)" id="method-toggle-' + idx + '">展开 ▼</span>';
     html += '</div>';
-    html += '<div style="font-size:12px;color:var(--ink2);line-height:1.6;margin-bottom:8px">' + m.desc + '</div>';
-    html += '<div style="font-size:11px;color:var(--muted);margin-bottom:6px"><b>方法:</b> ' + m.methods.join(', ') + '</div>';
-    html += '<div style="font-size:11px;color:var(--muted);margin-bottom:10px"><b>R包:</b> ' + m.packages + '</div>';
-    html += '<button class="btn sm primary" style="width:100%;padding:6px;font-size:12px" onclick="event.stopPropagation();studySelectMethod(\'' + m.id + '\')">生成 R 脚本</button>';
+    html += '<div style="font-size:12px;color:var(--ink2);line-height:1.6;margin-bottom:6px">' + m.desc + '</div>';
+    html += '<div style="font-size:11px;color:var(--muted)"><b>方法:</b> ' + m.methods.join(', ') + '</div>';
+    html += '</div>';
+    /* 展开内容 */
+    html += '<div id="method-detail-' + idx + '" style="display:none;border-top:1px solid var(--line);padding:14px 16px">';
+    html += '<div style="display:flex;gap:8px;margin-bottom:10px">';
+    html += '<button class="btn sm" onclick="studyToggleMethodLang(' + idx + ',\'r\')" style="padding:4px 12px;font-size:11.5px" id="method-lang-r-' + idx + '">R</button>';
+    html += '<button class="btn sm" onclick="studyToggleMethodLang(' + idx + ',\'py\')" style="padding:4px 12px;font-size:11.5px" id="method-lang-py-' + idx + '">Python</button>';
+    html += '<button class="btn sm" onclick="studyCopyMethod(' + idx + ')" style="padding:4px 12px;font-size:11.5px;margin-left:auto">复制</button>';
+    html += '</div>';
+    html += '<div id="method-r-' + idx + '"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">R包: ' + m.packages + '</div><pre style="margin:0;padding:12px;font-size:12px;font-family:Consolas,monospace;white-space:pre-wrap;background:#1e293b;color:#e2e8f0;border-radius:4px;overflow-x:auto">' + studyEsc(m.r_framework) + '</pre></div>';
+    html += '<div id="method-py-' + idx + '" style="display:none"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Python包: ' + m.py_packages + '</div><pre style="margin:0;padding:12px;font-size:12px;font-family:Consolas,monospace;white-space:pre-wrap;background:#1e293b;color:#e2e8f0;border-radius:4px;overflow-x:auto">' + studyEsc(m.py_framework) + '</pre></div>';
+    if (m.notes) html += '<div style="margin-top:8px;font-size:11.5px;color:var(--ink2);background:#f8fafc;padding:8px 10px;border-radius:4px"><b>说明:</b> ' + m.notes + '</div>';
+    html += '</div>';
     html += '</div>';
   });
   el.innerHTML = html;
 }
 
+function studyToggleMethod(idx) {
+  var detail = document.getElementById('method-detail-' + idx);
+  var toggle = document.getElementById('method-toggle-' + idx);
+  if (!detail) return;
+  if (detail.style.display === 'none') {
+    detail.style.display = 'block';
+    if (toggle) toggle.textContent = '收起 ▲';
+  } else {
+    detail.style.display = 'none';
+    if (toggle) toggle.textContent = '展开 ▼';
+  }
+}
+
+function studyToggleMethodLang(idx, lang) {
+  var rEl = document.getElementById('method-r-' + idx);
+  var pyEl = document.getElementById('method-py-' + idx);
+  if (!rEl || !pyEl) return;
+  if (lang === 'r') { rEl.style.display = 'block'; pyEl.style.display = 'none'; }
+  else { rEl.style.display = 'none'; pyEl.style.display = 'block'; }
+}
+
+function studyCopyMethod(idx) {
+  var m = STUDY_METHOD_LIBRARY[idx];
+  if (!m) return;
+  var rEl = document.getElementById('method-r-' + idx);
+  var text = (rEl && rEl.style.display !== 'none') ? m.r_framework : m.py_framework;
+  navigator.clipboard.writeText(text).then(function () { alert('代码已复制 ✅'); });
+}
+
 function studySelectMethod(methodId) {
-  var sel = document.getElementById('st-method-select');
-  if (sel) sel.value = methodId;
-  studyGenerateScript();
-  var wrap = document.getElementById('st-script-wrap');
+  /* 滚动到方法参考库区域 */
+  var wrap = document.getElementById('st-methods-wrap');
   if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -9939,10 +9713,15 @@ function studyExportProject(format) {
     });
   }
 
-  /* 脚本 */
-  var area = document.getElementById('st-script-area');
-  if (area && area.value) {
-    md += '## 分析脚本（R）\n\n```r\n' + area.value + '\n```\n\n';
+  /* 代码框架 */
+  if (plans.length > 0) {
+    plans.forEach(function (p, i) {
+      var fw = STUDY_CODE_FRAMEWORKS[p.id];
+      if (fw) {
+        md += '### 方案 ' + (i + 1) + ' 代码框架（R）\n\n```r\n' + fw.r + '\n```\n\n';
+        md += '### 方案 ' + (i + 1) + ' 代码框架（Python）\n\n```python\n' + fw.python + '\n```\n\n';
+      }
+    });
   }
 
   md += '---\n*由研究助手自动生成 | https://haiyan-codes.github.io/research-data-hub-v2/*\n';
@@ -10031,13 +9810,10 @@ function studyNewProject() {
   var results = document.getElementById('st-results');
   if (results) results.style.display = 'none';
 
-  ['st-script-wrap', 'st-methods-wrap', 'st-export-wrap'].forEach(function (id) {
+  ['st-code-wrap', 'st-methods-wrap', 'st-export-wrap'].forEach(function (id) {
     var el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
-
-  var area = document.getElementById('st-script-area');
-  if (area) area.value = '';
 
   var el = document.getElementById('st-project-saved');
   if (el) el.textContent = '✅ 已新建项目';
