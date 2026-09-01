@@ -4808,6 +4808,86 @@ else:
         <div id="st-varmap-grid" style="display:flex;flex-direction:column;gap:16px"></div>
       </div>
 
+      <!-- === Phase 9: 脚本生成与本地执行（P4） === -->
+      <div id="st-script-wrap" style="margin-top:32px;display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">9</span>
+          <b style="font-size:15px">分析脚本生成与本地执行</b>
+          <span style="font-size:11.5px;color:var(--muted)">自动生成 R 脚本 → 连接本地 Companion Agent → 执行并回传结果</span>
+        </div>
+
+        <!-- Agent 连接状态 -->
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:10px 16px;border:1px solid var(--line);border-radius:6px;background:#f8fafc">
+          <div id="st-agent-status" style="display:flex;align-items:center;gap:8px">
+            <span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1" id="st-agent-dot"></span>
+            <span style="font-size:13px;color:var(--muted)" id="st-agent-text">未连接</span>
+          </div>
+          <button class="btn sm" onclick="studyConnectAgent()" style="padding:5px 14px;font-size:12.5px">连接 Companion Agent</button>
+          <span style="font-size:11px;color:var(--muted)">| 需先启动本地 companion_agent.py（端口 7878）</span>
+          <a href="companion_agent.py" download style="font-size:11px;color:var(--accent);margin-left:6px">下载 Agent 脚本</a>
+        </div>
+
+        <!-- 脚本生成区 -->
+        <div style="margin-bottom:14px">
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+            <select id="st-method-select" onchange="studyGenerateScript()" style="padding:6px 12px;border:1px solid var(--line);border-radius:4px;font-size:13px;cursor:pointer">
+              <option value="">选择分析方法...</option>
+              <option value="descriptive">描述性统计 + 回归（横断面）</option>
+              <option value="cohort_survival">队列研究 + 生存分析</option>
+              <option value="case_control">病例对照 + 条件Logistic</option>
+              <option value="did">双重差分（DID）</option>
+              <option value="mediation">中介效应分析</option>
+              <option value="xgboost">XGBoost 预测模型</option>
+              <option value="panel_fe">面板固定效应回归</option>
+            </select>
+            <button class="btn sm" onclick="studyGenerateScript()" style="padding:5px 14px;font-size:12.5px">生成脚本</button>
+            <button class="btn sm" onclick="studyCopyScript()" style="padding:5px 14px;font-size:12.5px">复制脚本</button>
+            <button class="btn sm" onclick="studyDownloadScript()" style="padding:5px 14px;font-size:12.5px">下载 .R 文件</button>
+          </div>
+          <textarea id="st-script-area" style="width:100%;min-height:280px;padding:14px;border:1px solid var(--line);border-radius:6px;font-size:13px;font-family:'Consolas','Courier New',monospace;line-height:1.6;resize:vertical;outline:none;background:#1e293b;color:#e2e8f0" placeholder="选择分析方法后自动生成 R 脚本..." spellcheck="false"></textarea>
+        </div>
+
+        <!-- 执行按钮 -->
+        <div style="display:flex;gap:10px;margin-bottom:14px">
+          <button class="btn primary" onclick="studyExecuteScript()" style="padding:8px 28px;font-size:13px;font-weight:600;background:#10b981">▶ 执行 R 脚本</button>
+          <span id="st-exec-status" style="font-size:12px;color:var(--muted);display:flex;align-items:center"></span>
+        </div>
+
+        <!-- 执行结果 -->
+        <div id="st-exec-result" style="display:none">
+          <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--ink2)">执行结果：</div>
+          <div id="st-exec-output" style="background:#0f172a;color:#a7f3d0;padding:14px 16px;border-radius:6px;font-size:12.5px;font-family:monospace;white-space:pre-wrap;max-height:400px;overflow-y:auto;border:1px solid #334155"></div>
+          <div id="st-exec-plots" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:14px"></div>
+        </div>
+      </div>
+
+      <!-- === Phase 10: 创新方法模块（P5） === -->
+      <div id="st-methods-wrap" style="margin-top:32px;display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">10</span>
+          <b style="font-size:15px">创新方法模块库</b>
+          <span style="font-size:11.5px;color:var(--muted)">高级统计方法模板，一键生成对应 R 脚本</span>
+        </div>
+        <div id="st-methods-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px"></div>
+      </div>
+
+      <!-- === Phase 11: 文档导出与项目工作台（P6） === -->
+      <div id="st-export-wrap" style="margin-top:32px;display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">11</span>
+          <b style="font-size:15px">文档导出与项目工作台</b>
+          <span style="font-size:11.5px;color:var(--muted)">导出完整研究方案 / 保存项目会话</span>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn primary" onclick="studyExportProject('md')" style="padding:8px 20px;font-size:13px;font-weight:600">导出研究方案 (.md)</button>
+          <button class="btn" onclick="studyExportProject('txt')" style="padding:8px 20px;font-size:13px">导出研究方案 (.txt)</button>
+          <button class="btn" onclick="studySaveProject()" style="padding:8px 20px;font-size:13px">保存项目快照</button>
+          <button class="btn" onclick="studyLoadProject()" style="padding:8px 20px;font-size:13px">加载项目快照</button>
+          <button class="btn" onclick="studyNewProject()" style="padding:8px 20px;font-size:13px;color:var(--danger)">新建项目</button>
+        </div>
+        <div id="st-project-saved" style="margin-top:10px;font-size:12px;color:var(--muted)"></div>
+      </div>
+
     </div>
 
   </div>
@@ -8210,63 +8290,93 @@ function studyRenderLit(list) {
 var STUDY_PLAN_TEMPLATES = [
   {
     id: 't1', name: '横断面描述性研究', en: 'Cross-sectional Descriptive Study',
-    desc: '对特定时点/时期目标人群的健康或疾病状况进行"快照"式测量，回答"现状是什么"。',
-    match_kw: ['调查','患病率','分布','特征','现状','描述','prevalence','survey','cross-sectional','横断面'],
-    design: '一次性收集数据（可以是多时点但各时点独立），测量暴露和结局，计算患病率/均值/率等指标。',
-    vars: '因变量（Y）：疾病/健康状况的存在与否或程度\n自变量（X）：社会人口学（年龄、性别、教育、收入）、行为（吸烟、运动）、环境变量\n控制变量：研究中心、测量时点',
-    methods: '频率/比例、卡方检验、t 检验、方差分析、非参数检验、简单回归',
-    datasets: '全国性调查（NHSS、CMHS、CHARLS、CLHLS）、卫生健康年鉴年度截面',
-    output: '患病率/暴露率表、人口金字塔、热力图、简单条形图/箱线图'
+    desc: '对特定时点/时期目标人群的健康或疾病状况进行"快照"式测量，回答"现状是什么"。适用于估计患病率/暴露率、描述疾病分布、探索关联假设。',
+    match_kw: ['调查','患病率','分布','特征','现状','描述','prevalence','survey','cross-sectional','横断面','关联','现患'],
+    design: '一次性收集数据（可以是多时点但各时点独立），测量暴露和结局，计算患病率/均值/率等指标。设计要点：① 明确目标人群和抽样框架；② 采用分层多阶段整群抽样或简单随机抽样；③ 样本量需满足亚组分析需求（每组≥30例）；④ 使用标准化测量工具保证信效度。',
+    vars: '因变量（Y）：疾病/健康状况的存在与否或程度（如自评健康、慢病数、抑郁评分）\n自变量（X）：社会人口学（年龄、性别、教育、收入、婚姻）、行为因素（吸烟、饮酒、运动、饮食）、环境变量（城乡、区域、医疗可及性）\n控制变量（C）：调查年份、测量中心、抽样权重\n权重变量（W）：个体抽样权重（如有需在分析中使用 svy 前缀）',
+    methods: '描述性统计（频率/比例/均值/中位数）、卡方检验/Fisher精确检验（分类变量）、t检验/Mann-Whitney（连续变量）、单因素/多因素Logistic回归、Poisson回归（计数结局）、Ordinal回归（有序结局）、趋势检验（Cochran-Armitage）、标化率计算（直接法/间接法）',
+    datasets: '全国性调查（NHSS、CMHS、CHARLS、CLHLS、CFPS）、卫生健康年鉴年度截面数据',
+    output: '患病率/暴露率表（含95%CI）、人口金字塔、地理分布热力图、亚组比较条形图/箱线图、多因素回归结果表（OR/β及95%CI）',
+    sample_size: '估计患病率 p=0.3, 精度 d=0.05, α=0.05 → n ≈ Z²×p(1-p)/d² ≈ 323人/组。考虑设计效应 deff=2 和无应答率 20%，实际需 ~770人/组。',
+    power: '检出 OR≥1.5 需 n≥434（暴露率30%，α=0.05，power=0.80）；检出均值差异 d=0.3SD 需 n≥176/组',
+    ethics: '需通过机构伦理委员会审批（如使用公开数据通常可申请豁免）；知情同意书需涵盖数据用途、保密措施、自愿参与条款',
+    timeline: '方案设计(2周) → 伦理审批(4-8周) → 数据收集(4-12周) → 数据清洗(2周) → 分析(3周) → 撰写(4周)',
+    r_packages: 'survey（加权分析）、ggplot2（可视化）、tableone（基线特征表）、gtsummary（发表级表格）'
   },
   {
     id: 't2', name: '队列追踪研究', en: 'Cohort Study / Longitudinal',
-    desc: '在一段时间内追踪同一人群，观察暴露因素如何预测结局的发生。回答"为什么"和"谁有更高风险"。',
-    match_kw: ['追踪','随访','队列','长期','纵向','预测','风险','incidence','cohort','follow','longitudinal','panel'],
-    design: '基线调查 → 定期随访（6月/12月/24月），收集同一批个体的重复测量数据，构建面板。',
-    vars: '因变量（Y）：结局的发生（新发疾病、死亡、行为变化）\n时间变量（T）：随访时间点\n自变量（X）：基线暴露因素、时间变协变量\n随机效应：个体、社区',
-    methods: '混合效应模型（REML）、广义估计方程（GEE）、多水平模型（MLM）、Cox 比例风险模型、固定效应面板回归',
-    datasets: 'CLHLS（1998+ 每2年）、CHARLS（2011+ 每2年）、CFPS、CHNS、CKB 前瞻队列',
-    output: '发生率曲线（Kaplan-Meier）、固定效应系数森林图、轨迹图、生存分析表'
+    desc: '在一段时间内追踪同一人群，观察暴露因素如何预测结局的发生。回答"为什么"和"谁有更高风险"。适用于确定时序关联、计算发病率、识别风险因素。',
+    match_kw: ['追踪','随访','队列','长期','纵向','预测','风险','incidence','cohort','follow','longitudinal','panel','轨迹','发病'],
+    design: '基线调查 → 定期随访（6月/12月/24月），收集同一批个体的重复测量数据，构建面板。设计要点：① 明确暴露和结局的时序关系；② 失访率控制在≤20%；③ 记录失访原因并做敏感性分析；④ 考虑竞争风险（如死于其他原因）。',
+    vars: '因变量（Y）：结局的发生（新发疾病、死亡、行为变化、量表分数变化）\n时间变量（T）：随访时间点、随访月数\n自变量（X）：基线暴露因素、时间变协变量（如反复测量的BMI）\n随机效应：个体ID、社区/家庭聚类\n竞争风险：其他原因死亡（如适用）',
+    methods: 'Kaplan-Meier生存曲线+Log-rank检验、Cox比例风险模型（PH假定检验）、竞争风险模型（Fine-Gray）、混合效应模型（REML/ML）、广义估计方程（GEE）、多水平模型（MLM）、固定效应面板回归、轨迹分析（GMM/LCGA）、时变协变量Cox模型',
+    datasets: 'CLHLS（1998+ 每2年）、CHARLS（2011+ 每2年）、CFPS（2010+ 每2年）、CHNS（1989-2015）、CKB 前瞻队列',
+    output: '累积发生率曲线（Kaplan-Meier）、HR森林图、混合效应系数图、个体轨迹图（spaghetti plot）、预测模型校准图、时变效应图',
+    sample_size: '检出 HR=1.5，α=0.05，power=0.80，暴露率30%，事件率20% → 需 ~1200人（至少240事件）',
+    power: 'Cox模型中检测 HR=1.3 需 ≥460 事件；混合效应模型检测跨水平交互需 n>30 群组 × 30 个体',
+    ethics: '需跟踪结局（含死亡登记），需特别关注隐私保护和数据安全；随访过程中发现的新风险需及时告知参与者',
+    timeline: '方案设计(3周) → 伦理审批(6-8周) → 基线调查(8-12周) → 随访周期(6-36月) → 数据分析(4周) → 撰写(6周)',
+    r_packages: 'survival（生存分析）、coxme（混合效应Cox）、lme4/nlme（混合效应）、geepack（GEE）、lavaan（SEM/轨迹）'
   },
   {
     id: 't3', name: '病例对照研究', en: 'Case-Control Study',
-    desc: '比较"有某结局"的病例和"无某结局"的对照，回溯性地查看其既往暴露差异。适合罕见病或长潜伏期结局。',
-    match_kw: ['病例对照','回顾','回溯','odds','病例组','对照组','case-control','retrospective'],
-    design: '确定病例组（确诊/发生结局）+ 匹配对照组（按年龄/性别/地区匹配 1:1 或 1:2-4），收集既往暴露信息。',
-    vars: '因变量：组别（病例=1/对照=0）\n自变量：既往暴露（OR 估计）\n匹配变量：年龄、性别、居住地',
-    methods: '条件逻辑回归（Conditional Logistic Regression）、匹配分析、精确检验（Fisher）、中介分析',
-    datasets: '医院病例登记 + 社区对照、CHARLS/CLHLS 中可按结局筛选病例',
-    output: 'OR 值森林图、暴露分布条形图、人口学匹配表'
+    desc: '比较"有某结局"的病例和"无某结局"的对照，回溯性地查看其既往暴露差异。适合罕见病或长潜伏期结局，经济高效。',
+    match_kw: ['病例对照','回顾','回溯','odds','病例组','对照组','case-control','retrospective','罕见','匹配'],
+    design: '确定病例组（确诊/发生结局）+ 匹配对照组（按年龄/性别/地区匹配 1:1 或 1:2-4），收集既往暴露信息。设计要点：① 病例需有明确诊断标准；② 对照应来自相同源人群；③ 匹配因素不宜过多（避免过度匹配）；④ 暴露信息最好有客观记录（减少回忆偏倚）。',
+    vars: '因变量：组别（病例=1/对照=0）\n自变量：既往暴露（OR 估计）\n匹配变量（M）：年龄（±5岁）、性别、居住地\n混杂控制：教育、收入、职业',
+    methods: '条件Logistic回归（Conditional Logistic Regression）、Mantel-Haenszel分层分析、精确检验（Fisher exact）、匹配比检验（McNemar）、剂量-反应关系（趋势检验）、中介分析、交互作用分析（RERI/AP/SI）',
+    datasets: '医院病例登记 + 社区对照、CHARLS/CLHLS 中可按结局筛选病例、卫生统计年鉴中按地区/年份构建伪队列',
+    output: 'OR值森林图（含95%CI）、暴露分布条形图、剂量-反应趋势图、匹配平衡性表、交互作用分析表',
+    sample_size: '检出 OR=2.0，α=0.05，power=0.80，暴露率(对照)10% → 病例:对照=1:1 需各 ≥158例；1:4匹配可减少病例数至 ~95例',
+    power: '检出 OR=1.5 需各≥690例；检出交互作用（RERI）需更大样本（通常>1000/组）',
+    ethics: '需确保病例隐私（尤其罕见病可识别个体）；回顾性研究通常可申请伦理豁免，但需说明数据来源合规',
+    timeline: '方案设计(3周) → 伦理审批(4-6周) → 病例/对照招募(8-16周) → 暴露信息收集(4-8周) → 分析(3周) → 撰写(4周)',
+    r_packages: 'survival（clogit条件Logistic）、Epi（RERI/AP交互）、gtsummary、forestplot'
   },
   {
     id: 't4', name: '实验/干预研究（RCT）', en: 'Randomized Controlled Trial',
-    desc: '将研究对象随机分配到干预组和对照组，检验干预的因果效应。回答"这个方法有效吗"。',
-    match_kw: ['干预','随机','对照','试验','实验','效果','有效性','efficacy','intervention','rct','trial'],
-    design: '随机化（个体/聚类水平）→ 干预/对照 → 盲法（单/双盲）→ 基线+随访测量 → 意向治疗（ITT）分析。',
-    vars: '因变量：主要结局（Primary Outcome）、次要结局（Secondary Outcome）\n处理变量：干预分配（0/1）\n协变量：基线测量值、中心、分层因素',
-    methods: '线性回归/ANCOVA（校正基线）、广义线性模型、生存分析（时间-事件结局）、非劣效性检验、组内相关系数（簇随机）',
-    datasets: '自行收集或文献 Meta 分析；卫生健康年鉴中可做准实验（政策前后 DID）',
-    output: '效应量森林图、终点事件曲线、基线平衡性表、亚组分析图'
+    desc: '将研究对象随机分配到干预组和对照组，检验干预的因果效应。回答"这个方法有效吗"。是因果推断的金标准。',
+    match_kw: ['干预','随机','对照','试验','实验','效果','有效性','efficacy','intervention','rct','trial','randomised','randomized'],
+    design: '随机化（个体/聚类水平）→ 干预/对照 → 盲法（单/双盲）→ 基线+随访测量 → 意向治疗（ITT）分析。设计要点：① 随机化方案需预先注册（ClinicalTrials.gov）；② 样本量计算需考虑聚类设计效应（ICC）；③ 主要结局需在方案中预先指定；④ 遵循CONSORT报告规范。',
+    vars: '因变量（Y）：主要结局（Primary Outcome，如HbA1c降幅）、次要结局（Secondary Outcomes）\n处理变量（X）：干预分配（0=对照/1=干预）\n协变量（C）：基线测量值（作为ANCOVA协变量）、分层因素（中心、病情严重度）\n中介变量：行为改变、知识提升（中介分析）',
+    methods: 'ANCOVA（校正基线的协方差分析）、混合效应模型（重复测量）、广义线性模型、生存分析（时间-事件结局）、非劣效性检验、组内相关系数（ICC，簇随机）、中介分析（causal mediation）、调节效应分析',
+    datasets: '自行收集或文献Meta分析；卫生健康年鉴中可做准实验（政策实施前后 DID/RDD）',
+    output: 'CONSORT流程图、效应量森林图、终点事件曲线、基线平衡性表、亚组分析图、中介效应分解图',
+    sample_size: '检出效应量 d=0.3SD，α=0.05，power=0.80 → n≥352/组（1:1）；聚类随机需乘以设计效应 deff=1+ICC×(m-1)',
+    power: '检出 d=0.5SD 需 n≥64/组；非劣效界值 -0.3SD 需 n≥312/组；检出中介效应需更大样本',
+    ethics: '必须预注册（ClinicalTrials.gov/ChiCTR）；需独立的数据安全监察委员会（DSMB）；知情同意需涵盖随机化、可能的分组、副作用',
+    timeline: '方案设计+注册(4周) → 伦理审批(8-12周) → 招募+随机化(8-16周) → 干预期(12-52周) → 随访(4-12周) → 分析(3周) → 撰写(6周)',
+    r_packages: 'nlme/lme4（混合效应）、mediation（中介分析）、powerSurvEpi（生存样本量）、ggplot2、CONSORTcheck'
   },
   {
     id: 't5', name: '二手数据二次分析', en: 'Secondary Data Analysis',
-    desc: '利用公开数据集或已发表研究的数据进行重新分析，回答原研究未回答的问题。省时省力。',
-    match_kw: ['二次','二手','公开数据集','reanalysis','secondary','meta','DID','双重差分','断点','RDD'],
-    design: '基于公开数据（年鉴、调查、登记），可能采用准实验设计（DID、RDD、合成控制）或探索性分析。',
-    vars: '灵活，取决于数据结构；DID 需要处理变量（政策实施）+ 时间变量 + 组别（处理/对照地区）',
-    methods: '双重差分（DID）、断点回归（RDD）、合成控制法、事件研究法、固定效应回归、Meta 分析（文献合并）',
-    datasets: '卫生健康年鉴（2003-2023 长序列面板）、CHNS/CHARLS/CFPS、CMHS 亚组分析',
-    output: '平行趋势检验图、DID 系数动态图、处理效应散点图、Meta 森林图'
+    desc: '利用公开数据集或已发表研究的数据进行重新分析，回答原研究未回答的问题。经济高效，适合利用年鉴长序列数据做政策评估和趋势分析。',
+    match_kw: ['二次','二手','公开数据集','reanalysis','secondary','meta','DID','双重差分','断点','RDD','面板','政策','准实验','合成控制'],
+    design: '基于公开数据（年鉴、调查、登记），采用准实验设计（DID、RDD、合成控制）或探索性分析。设计要点：① 明确因果识别策略；② 检查平行趋势假定（DID）或连续性假定（RDD）；③ 处理样本选择偏差（PSM/IV）；④ 稳健性检验（安慰剂检验、更换带宽/时间窗口）。',
+    vars: '因变量（Y）：政策效果指标（如死亡率、利用率、费用）\n处理变量（D）：政策实施（0/1）\n时间变量（T）：政策前后年份\n组别（G）：处理组/对照组地区\n协变量（C）：GDP、人口结构、医疗资源\n面板ID：省份/地市代码',
+    methods: '双重差分（DID）+动态效应、断点回归（RDD，sharp/fuzzy）、合成控制法（SCM）、事件研究法（Event Study）、固定效应面板回归、工具变量（IV/2SLS）、倾向性评分匹配（PSM-DID）、Meta分析（随机效应模型）',
+    datasets: '卫生健康年鉴（2003-2023 长序列面板）、CHNS/CHARLS/CFPS、CMHS 亚组分析、全球疾病负担（GBD）',
+    output: '平行趋势检验图、DID动态系数图（事件研究图）、RDD断点图（局部线性回归）、合成控制 vs 实际对比图、Meta森林图、稳健性检验汇总表',
+    sample_size: '面板分析：需≥10个时间点×≥30个地区单元（共≥300观测值）；RDD：断点附近每侧≥100观测值；Meta分析：≥10篇独立研究',
+    power: 'DID检测效应量 0.2SD 需 N≥395/组×2期；RDD检测局部效应需断点附近密度充足',
+    ethics: '使用公开数据通常可申请伦理豁免；需遵守原始数据使用协议；Meta分析需遵循PRISMA规范',
+    timeline: '文献/数据收集(4周) → 数据合并清洗(3周) → 准实验设计实施(2周) → 分析+稳健性检验(4周) → 撰写(4周)',
+    r_packages: 'fixest（高效固定效应DID）、rdrobust（RDD）、Synth（合成控制）、metafor（Meta分析）、MatchIt（PSM）、plm（面板）'
   },
   {
     id: 't6', name: '混合方法研究', en: 'Mixed-Methods Research',
-    desc: '结合定量数据（统计分析）和定性数据（访谈、扎根理论），获得更全面深入的理解。',
-    match_kw: ['混合','质性','定性','访谈','扎根','探索','机制','解释','mixed','qualitative','interview','exploratory'],
-    design: '序列探索（先定性后定量）、序列解释（先定量后定性）、平行设计（同时收集两类数据）。',
-    vars: '定量部分：同上；定性部分：访谈提纲、编码框架、主题分析',
-    methods: '定量 + 定性三角验证；定性用 NVivo/ATLAS.ti 编码，定量用 SPSS/R。可做扎根理论（GT）或解释性序列设计。',
-    datasets: '自行收集访谈 + 公开数据集三角验证；或先用年鉴数据发现模式再解释',
-    output: '定量结果 + 定性主题图谱、编码树、参与者 quote、整合模型图'
+    desc: '结合定量数据（统计分析）和定性数据（访谈、扎根理论），获得更全面深入的理解。适合探索性研究和复杂干预机制研究。',
+    match_kw: ['混合','质性','定性','访谈','扎根','探索','机制','解释','mixed','qualitative','interview','exploratory','三角验证'],
+    design: '序列探索（先定性后定量）、序列解释（先定量后定性）、平行设计（同时收集两类数据）、嵌入式设计（定量为主、定性嵌入）。设计要点：① 明确两类数据的整合点；② 定性样本量通常到信息饱和为止（通常15-30人）；③ 需两人独立编码计算一致性（Kappa）；④ 遵循MMIC（混合方法质量评估）标准。',
+    vars: '定量部分：因变量/自变量/控制变量（同横断面或队列设计）\n定性部分：访谈提纲、编码框架（演绎+归纳）、核心主题\n整合变量：定量结果驱动的定性问题、定性发现解释的定量模式',
+    methods: '定量：回归分析、SEM/路径分析\n定性：主题分析（Braun & Clarke）、扎根理论（Strauss/Charmaz）、框架分析（Framework Analysis）\n整合：联合显示矩阵（Joint Display）、三角验证（Triangulation）、跟踪矩阵（Following a Thread）',
+    datasets: '自行收集访谈 + 公开数据集三角验证；或先用年鉴数据发现模式再做定性解释',
+    output: '定量结果表 + 定性主题图谱、编码树图、参与者引文展示、联合显示矩阵表、整合模型概念图',
+    sample_size: '定性部分：信息饱和通常15-30人（深访）或4-8组（焦点小组）；定量部分：同横断面设计',
+    power: '定性研究不做统计效力分析，以信息饱和为标准；定量部分参考横断面设计',
+    ethics: '需双重伦理审批（定量+定性）；定性需特别关注匿名化（改写可识别细节）、情感安全（敏感话题需提供心理支持资源）',
+    timeline: '方案设计(3周) → 伦理审批(6-8周) → 定性收集(6-10周) → 定性编码(4周) → 定量收集(8周) → 整合分析(3周) → 撰写(6周)',
+    r_packages: '定量：lavaan（SEM）、ggplot2；定性：RQDA（定性编码，已停更，可导出至CSV用R分析）；整合：无专用包，用Markdown联合展示'
   }
 ];
 
@@ -8477,18 +8587,28 @@ function studyRenderPlans(plans) {
   var el = document.getElementById('st-plans-grid'); if (!el) return;
   var html = '';
   plans.forEach(function (p, idx) {
-    var detail = '【研究设计】\n' + p.design + '\n\n【变量搭配建议】\n' + p.vars + '\n\n【推荐方法学】\n' + p.methods + '\n\n【可用数据源】\n' + p.datasets + '\n\n【预期产出】\n' + p.output;
+    var detail = '【研究设计】\n' + p.design +
+      '\n\n【变量搭配建议】\n' + p.vars +
+      '\n\n【推荐方法学】\n' + p.methods +
+      '\n\n【可用数据源】\n' + p.datasets +
+      '\n\n【预期产出】\n' + p.output +
+      (p.sample_size ? '\n\n【样本量估算】\n' + p.sample_size : '') +
+      (p.power ? '\n\n【统计效力】\n' + p.power : '') +
+      (p.ethics ? '\n\n【伦理考量】\n' + p.ethics : '') +
+      (p.timeline ? '\n\n【研究时间线】\n' + p.timeline : '') +
+      (p.r_packages ? '\n\n【推荐R包】\n' + p.r_packages : '');
     html += '<div id="plan-card-' + idx + '" style="border:1px solid var(--line);border-radius:6px;background:#fff;overflow:hidden">';
     html += '<div style="padding:14px 18px;background:linear-gradient(135deg,#f0f5ff,#fff);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px">';
     html += '<span style="background:var(--accent);color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600">推荐 #' + (idx + 1) + '</span>';
     html += '<b style="font-size:15px">' + p.name + '</b>';
     html += '<span style="font-size:11.5px;color:var(--muted)">' + (p.en || '') + '</span>';
     html += '<div style="flex:1"></div>';
+    html += '<button class="btn sm" onclick="studyGenerateScript(' + idx + ')" style="padding:3px 10px;font-size:11.5px;margin-right:6px;background:#10b981;color:#fff;border:none;cursor:pointer">生成R脚本</button>';
     html += '<button class="btn sm" onclick="studyTogglePlan(' + idx + ')" style="padding:3px 10px;font-size:11.5px;margin-right:6px">展开/收起</button>';
     html += '<button class="btn sm" onclick="studyEditPlan(' + idx + ')" style="padding:3px 10px;font-size:11.5px;margin-right:6px">改进</button>';
     html += '<button class="btn sm" onclick="studyCopyPlan(' + idx + ')" style="padding:3px 10px;font-size:11.5px">复制</button>';
     html += '</div>';
-    html += '<div id="plan-detail-' + idx + '" style="padding:16px 18px;font-size:13px;line-height:1.8;color:var(--ink2);white-space:pre-wrap">' + detail + '</div>';
+    html += '<div id="plan-detail-' + idx + '" style="padding:16px 18px;font-size:13px;line-height:1.8;color:var(--ink2);white-space:pre-wrap">' + studyEsc(detail) + '</div>';
     html += '</div>';
   });
   el.innerHTML = html;
@@ -8588,6 +8708,14 @@ function studyRunP1(title, purpose, literature, matches) {
     STUDY_STATE._lastPlans = plans;
     studySave();
   }
+
+  // === 显示 P4-P6 区域 ===
+  var scriptWrap = document.getElementById('st-script-wrap');
+  if (scriptWrap) scriptWrap.style.display = 'block';
+  var methodsWrap = document.getElementById('st-methods-wrap');
+  if (methodsWrap) { methodsWrap.style.display = 'block'; studyRenderMethods(); }
+  var exportWrap = document.getElementById('st-export-wrap');
+  if (exportWrap) exportWrap.style.display = 'block';
 
   // === 触发 P2：变量-方案映射 ===
   if (STUDY_STATE.uploadedDatasets && STUDY_STATE.uploadedDatasets.length > 0) {
@@ -9060,6 +9188,859 @@ function studyMapVars(allVars, planVars) {
     matched: matches.length,
     total: planVars.length
   };
+}
+
+/* ============ P4: 脚本生成与本地执行 ============ */
+
+var STUDY_AGENT_URL = 'http://127.0.0.1:7878';
+var STUDY_AGENT_CONNECTED = false;
+
+/* --- 连接 Companion Agent --- */
+function studyConnectAgent() {
+  var dot = document.getElementById('st-agent-dot');
+  var txt = document.getElementById('st-agent-text');
+  var statusEl = document.getElementById('st-exec-status');
+  if (dot) dot.style.background = '#fbbf24';
+  if (txt) txt.textContent = '连接中...';
+
+  fetch(STUDY_AGENT_URL + '/health', { method: 'GET', signal: AbortSignal.timeout(5000) })
+    .then(function (r) { return r.json() })
+    .then(function (data) {
+      STUDY_AGENT_CONNECTED = true;
+      if (dot) dot.style.background = '#22c55e';
+      if (txt) txt.textContent = '已连接 · R ' + (data.r_detected ? '✅ ' + (data.r_path || '').split('\\').pop() : '❌ 未检测到');
+      if (statusEl) statusEl.textContent = data.r_detected ? 'R 环境就绪' : '未检测到 R，请安装 R 后重试';
+    })
+    .catch(function (err) {
+      STUDY_AGENT_CONNECTED = false;
+      if (dot) dot.style.background = '#ef4444';
+      if (txt) txt.textContent = '连接失败';
+      if (statusEl) statusEl.textContent = '请先启动 companion_agent.py（python companion_agent.py）';
+    });
+}
+
+/* --- R 脚本模板库 --- */
+var STUDY_R_TEMPLATES = {
+  descriptive: function (vars, title) {
+    var y = (vars.find(function (v) { return v.roleCode === 'Y' }) || {}).varName || 'Y';
+    var xs = vars.filter(function (v) { return v.roleCode === 'X' }).map(function (v) { return v.varName });
+    var cs = vars.filter(function (v) { return v.roleCode === 'C' }).map(function (v) { return v.varName });
+    var allX = xs.concat(cs).join(' + ');
+    return [
+      '# ==========================================',
+      '# 研究题目: ' + title,
+      '# 分析方法: 横断面描述性统计 + 多因素回归',
+      '# 生成时间: ' + new Date().toLocaleString('zh-CN'),
+      '# ==========================================',
+      '',
+      '## ---- 加载包 ----',
+      'if (!require("ggplot2")) install.packages("ggplot2")',
+      'if (!require("tableone")) install.packages("tableone")',
+      'if (!require("gtsummary")) install.packages("gtsummary")',
+      'library(ggplot2)',
+      'library(tableone)',
+      'library(gtsummary)',
+      '',
+      '## ---- 读取数据 ----',
+      '# 请修改为您的实际数据文件路径',
+      '# df <- read.csv("your_data.csv", fileEncoding = "UTF-8")',
+      '# 或 readxl::read_excel("your_data.xlsx")',
+      '',
+      '## ---- 描述性统计 ----',
+      '# 替换为您的实际变量名',
+      'vars <- c("' + xs.join('", "') + '")',
+      'cat_vars <- c()  # 在此填入分类变量名',
+      '',
+      '# 创建基线特征表',
+      'tab1 <- CreateTableOne(vars = vars, factorVars = cat_vars, data = df)',
+      'print(tab1, showAllLevels = TRUE)',
+      '',
+      '## ---- 单因素分析 ----',
+      'cat("\\n==== 单因素分析 ====\n")',
+      'for (x in c("' + xs.join('", "') + '")) {',
+      '  cat("\\n---", x, "---\\n")',
+      '  f <- as.formula(paste("' + y + '~", x))',
+      '  if (is.numeric(df[[x]])) {',
+      '    print(summary(lm(f, data = df)))',
+      '  } else {',
+      '    print(chisq.test(table(df[[x]], df[["' + y + '"]])))',
+      '  }',
+      '}',
+      '',
+      '## ---- 多因素回归模型 ----',
+      'cat("\\n==== 多因素Logistic回归 ====\n")',
+      allX ? 'fml <- as.formula("' + y + ' ~ ' + allX + '")' : '',
+      allX ? 'model <- glm(' + y + ' ~ ' + allX + ', data = df, family = binomial(link = "logit"))' : '',
+      allX ? 'print(summary(model))' : '',
+      allX ? 'exp(cbind(OR = coef(model), confint(model)))' : '',
+      '',
+      '## ---- 可视化 ----',
+      'ggplot(df, aes(x = ' + (xs[0] || 'age') + ', fill = factor(' + y + '))) +',
+      '  geom_histogram(position = "dodge", bins = 30) +',
+      '  theme_minimal() +',
+      '  labs(title = "' + title + '", x = "' + (xs[0] || 'X') + '", y = "频数")',
+      ''
+    ].join('\n');
+  },
+
+  cohort_survival: function (vars, title) {
+    var y = (vars.find(function (v) { return v.roleCode === 'Y' }) || {}).varName || 'event';
+    var t = (vars.find(function (v) { return v.roleCode === 'T' }) || {}).varName || 'time';
+    var xs = vars.filter(function (v) { return v.roleCode === 'X' }).map(function (v) { return v.varName });
+    var cs = vars.filter(function (v) { return v.roleCode === 'C' }).map(function (v) { return v.varName });
+    var allX = xs.concat(cs).join(' + ');
+    return [
+      '# ==========================================',
+      '# 研究题目: ' + title,
+      '# 分析方法: 队列研究 + Kaplan-Meier + Cox回归',
+      '# 生成时间: ' + new Date().toLocaleString('zh-CN'),
+      '# ==========================================',
+      '',
+      '## ---- 加载包 ----',
+      'if (!require("survival")) install.packages("survival")',
+      'if (!require("survminer")) install.packages("survminer")',
+      'library(survival)',
+      'library(survminer)',
+      '',
+      '## ---- 读取数据 ----',
+      '# df <- read.csv("your_data.csv")',
+      '# 需要变量: 事件(' + y + ') 时间(' + t + ') 协变量',
+      '',
+      '## ---- Kaplan-Meier 生存曲线 ----',
+      'cat("==== Kaplan-Meier 生存分析 ====\n")',
+      'km_fit <- survfit(Surv(' + t + ', ' + y + ') ~ 1, data = df)',
+      'print(km_fit)',
+      'ggsurvplot(km_fit, data = df, conf.int = TRUE,',
+      '  title = "' + title + ' - 生存曲线",',
+      '  xlab = "随访时间", ylab = "生存概率")',
+      '',
+      '## ---- 分组比较 ----',
+      xs[0] ? 'km_group <- survfit(Surv(' + t + ', ' + y + ') ~ ' + xs[0] + ', data = df)' : '',
+      xs[0] ? 'ggsurvplot(km_group, data = df, pval = TRUE, conf.int = TRUE,' : '',
+      xs[0] ? '  title = "分组生存曲线", xlab = "时间", ylab = "生存概率")' : '',
+      '',
+      '## ---- Log-rank 检验 ----',
+      xs[0] ? 'sd <- survdiff(Surv(' + t + ', ' + y + ') ~ ' + xs[0] + ', data = df)' : '',
+      xs[0] ? 'print(sd)' : '',
+      '',
+      '## ---- Cox 比例风险模型 ----',
+      'cat("\n==== Cox 回归 ====\n")',
+      allX ? 'cox_model <- coxph(Surv(' + t + ', ' + y + ') ~ ' + allX + ', data = df)' : '',
+      allX ? 'print(summary(cox_model))' : '',
+      allX ? '' : 'cox_model <- coxph(Surv(' + t + ', ' + y + ') ~ 1, data = df)',
+      '',
+      '## ---- PH假定检验 ----',
+      'cat("\n==== 比例风险假定检验 ====\n")',
+      'print(cox.zph(cox_model))',
+      '',
+      '## ---- 森林图 ----',
+      'ggforest(cox_model, data = df, main = "Cox回归森林图")',
+      ''
+    ].join('\n');
+  },
+
+  case_control: function (vars, title) {
+    var y = (vars.find(function (v) { return v.roleCode === 'Y' }) || {}).varName || 'group';
+    var xs = vars.filter(function (v) { return v.roleCode === 'X' }).map(function (v) { return v.varName });
+    var ms = vars.filter(function (v) { return v.roleCode === 'M' }).map(function (v) { return v.varName });
+    var cs = vars.filter(function (v) { return v.roleCode === 'C' }).map(function (v) { return v.varName });
+    var allX = xs.concat(cs).join(' + ');
+    var strata = ms.join(' + ');
+    return [
+      '# ==========================================',
+      '# 研究题目: ' + title,
+      '# 分析方法: 病例对照 + 条件Logistic回归',
+      '# 生成时间: ' + new Date().toLocaleString('zh-CN'),
+      '# ==========================================',
+      '',
+      '## ---- 加载包 ----',
+      'if (!require("survival")) install.packages("survival")',
+      'library(survival)',
+      '',
+      '## ---- 读取数据 ----',
+      '# df <- read.csv("your_data.csv")',
+      '# 需要匹配集ID变量(如 match_id)和组别(' + y + ': 0=对照 1=病例)',
+      '',
+      '## ---- 描述性统计 ----',
+      'cat("==== 基线特征比较 ====\n")',
+      '# print(TableOne(..., strata = "' + y + '"))',
+      '',
+      '## ---- 单因素分析 ----',
+      'cat("\n==== 单因素 OR 计算 ====\n")',
+      xs[0] ? 'for (x in c("' + xs.join('", "') + '")) {' : '',
+      xs[0] ? '  tab <- table(df[["' + y + '"]], df[[x]])' : '',
+      xs[0] ? '  cat("\n---", x, "---\n")' : '',
+      xs[0] ? '  print(tab)' : '',
+      xs[0] ? '  if (all(dim(tab) > 1)) print(fisher.test(tab))' : '',
+      xs[0] ? '}' : '',
+      '',
+      '## ---- 条件Logistic回归 ----',
+      'cat("\n==== 条件Logistic回归 ====\n")',
+      '# 使用 clogit: 需要匹配集变量 match_id',
+      strata && allX ? 'clogit_model <- clogit(' + y + ' ~ ' + allX + ' + strata(match_id), data = df)' : '# clogit_model <- clogit(' + y + ' ~ ' + (allX || 'exposure') + ' + strata(match_id), data = df)',
+      strata && allX ? 'print(summary(clogit_model))' : '',
+      strata && allX ? 'exp(cbind(OR = coef(clogit_model), confint(clogit_model)))' : '',
+      '',
+      '## ---- 无条件Logistic回归（如无匹配） ----',
+      'cat("\n==== 无条件Logistic回归 ====\n")',
+      allX ? 'logit_model <- glm(' + y + ' ~ ' + allX + ', data = df, family = binomial)' : '',
+      allX ? 'print(summary(logit_model))' : '',
+      allX ? 'exp(cbind(OR = coef(logit_model), confint(logit_model)))' : '',
+      ''
+    ].join('\n');
+  },
+
+  did: function (vars, title) {
+    var y = (vars.find(function (v) { return v.roleCode === 'Y' }) || {}).varName || 'Y';
+    var d = (vars.find(function (v) { return v.roleCode === 'D' }) || {}).varName || 'treat';
+    var t = (vars.find(function (v) { return v.roleCode === 'T' }) || {}).varName || 'post';
+    var cs = vars.filter(function (v) { return v.roleCode === 'C' }).map(function (v) { return v.varName });
+    var panelId = (vars.find(function (v) { return /panel|id|地区|省/i.test(v.varName) }) || {}).varName || 'province_id';
+    var covs = cs.join(' + ');
+    return [
+      '# ==========================================',
+      '# 研究题目: ' + title,
+      '# 分析方法: 双重差分（DID）',
+      '# 生成时间: ' + new Date().toLocaleString('zh-CN'),
+      '# ==========================================',
+      '',
+      '## ---- 加载包 ----',
+      'if (!require("fixest")) install.packages("fixest")',
+      'if (!require("ggplot2")) install.packages("ggplot2")',
+      'library(fixest)',
+      'library(ggplot2)',
+      '',
+      '## ---- 读取数据 ----',
+      '# df <- read.csv("your_panel_data.csv")',
+      '# 需要面板ID(' + panelId + ') 时间(' + t + ') 处理(' + d + ') 结局(' + y + ')',
+      '',
+      '## ---- 基本DID模型 ----',
+      'cat("==== 基本DID模型 ====\n")',
+      'did_basic <- feols(' + y + ' ~ ' + d + ':' + t + ' | ' + panelId + ' + ' + t + ', data = df)',
+      'print(summary(did_basic))',
+      '',
+      '## ---- 加入协变量 ----',
+      covs ? 'did_cov <- feols(' + y + ' ~ ' + d + ':' + t + ' + ' + covs + ' | ' + panelId + ' + ' + t + ', data = df)' : '',
+      covs ? 'print(summary(did_cov))' : '',
+      '',
+      '## ---- 动态DID（事件研究法） ----',
+      'cat("\n==== 动态效应（事件研究） ====\n")',
+      '# 需要相对处理时间变量(rel_time)',
+      '# did_dynamic <- feols(' + y + ' ~ i(rel_time, ref = -1) | ' + panelId + ' + ' + t + ', data = df)',
+      '# summary(did_dynamic)',
+      '# iplot(did_dynamic, main = "动态DID效应")',
+      '',
+      '## ---- 平行趋势检验 ----',
+      'cat("\n==== 平行趋势检验 ====\n")',
+      '# 使用事件研究法系数检验 pre-trend',
+      '# 如所有 pre 期系数不显著 → 平行趋势成立',
+      '',
+      '## ---- 稳健性检验 ----',
+      'cat("\n==== 稳健性检验 ====\n")',
+      '# 1. 安慰剂检验（随机伪造处理时间）',
+      '# 2. 更换样本期间',
+      '# 3. PSM-DID',
+      'if (!require("MatchIt")) install.packages("MatchIt")',
+      '# m <- matchit(' + d + ' ~ ' + (covs || 'covariates') + ', data = df[df$' + t + ' == 0, ])',
+      '# df_matched <- match.data(m)',
+      '# did_psm <- feols(' + y + ' ~ ' + d + ':' + t + ' | ' + panelId + ' + ' + t + ', data = df_matched)',
+      '# summary(did_psm)',
+      ''
+    ].join('\n');
+  },
+
+  mediation: function (vars, title) {
+    var y = (vars.find(function (v) { return v.roleCode === 'Y' }) || {}).varName || 'Y';
+    var xs = vars.filter(function (v) { return v.roleCode === 'X' }).map(function (v) { return v.varName });
+    var x = xs[0] || 'X';
+    var cs = vars.filter(function (v) { return v.roleCode === 'C' }).map(function (v) { return v.varName });
+    var covs = cs.join(' + ');
+    return [
+      '# ==========================================',
+      '# 研究题目: ' + title,
+      '# 分析方法: 中介效应分析（causal mediation）',
+      '# 生成时间: ' + new Date().toLocaleString('zh-CN'),
+      '# ==========================================',
+      '',
+      '## ---- 加载包 ----',
+      'if (!require("mediation")) install.packages("mediation")',
+      'library(mediation)',
+      '',
+      '## ---- 读取数据 ----',
+      '# df <- read.csv("your_data.csv")',
+      '# 需要自变量(' + x + ') 中介变量(mediator) 因变量(' + y + ')',
+      '# 请将 mediator 替换为实际中介变量名',
+      '',
+      '## ---- 步骤1: 中介变量模型（M ~ X） ----',
+      'cat("==== 中介变量模型 ====\n")',
+      covs ? 'med_model <- lm(mediator ~ ' + x + ' + ' + covs + ', data = df)' : 'med_model <- lm(mediator ~ ' + x + ', data = df)',
+      'print(summary(med_model))',
+      '',
+      '## ---- 步骤2: 因变量模型（Y ~ X + M） ----',
+      'cat("\n==== 因变量模型 ====\n")',
+      covs ? 'out_model <- lm(' + y + ' ~ ' + x + ' + mediator + ' + covs + ', data = df)' : 'out_model <- lm(' + y + ' ~ ' + x + ' + mediator, data = df)',
+      'print(summary(out_model))',
+      '',
+      '## ---- 步骤3: 中介效应分解 ----',
+      'cat("\n==== 中介效应分析 ====\n")',
+      'med_result <- mediate(med_model, out_model, treat = "' + x + '", mediator = "mediator",',
+      '  sims = 1000, boot = TRUE)',
+      'print(summary(med_result))',
+      '',
+      '## ---- 效应分解 ----',
+      'cat("\n==== 效应分解 ====\n")',
+      'cat("总效应 (Total Effect) =", med_result$d.avg, "\n")',
+      'cat("直接效应 (ACDE) =", med_result$d.avg, "\n")',
+      'cat("间接效应 (ACME) =", med_result$z.avg, "\n")',
+      'cat("中介比例 =", med_result$z.avg / med_result$d.avg, "\n")',
+      '',
+      '## ---- 敏感性分析 ----',
+      'cat("\n==== 敏感性分析（rho） ====\n")',
+      'medsens_result <- medsens(med_result)',
+      'print(summary(medsens_result))',
+      ''
+    ].join('\n');
+  },
+
+  xgboost: function (vars, title) {
+    var y = (vars.find(function (v) { return v.roleCode === 'Y' }) || {}).varName || 'Y';
+    var xs = vars.filter(function (v) { return v.roleCode === 'X' }).map(function (v) { return v.varName });
+    var cs = vars.filter(function (v) { return v.roleCode === 'C' }).map(function (v) { return v.varName });
+    var allVars = xs.concat(cs);
+    var varList = allVars.join('", "');
+    return [
+      '# ==========================================',
+      '# 研究题目: ' + title,
+      '# 分析方法: XGBoost 预测模型',
+      '# 生成时间: ' + new Date().toLocaleString('zh-CN'),
+      '# ==========================================',
+      '',
+      '## ---- 加载包 ----',
+      'if (!require("xgboost")) install.packages("xgboost")',
+      'if (!require("caret")) install.packages("caret")',
+      'if (!require("pROC")) install.packages("pROC")',
+      'library(xgboost)',
+      'library(caret)',
+      'library(pROC)',
+      '',
+      '## ---- 读取数据 ----',
+      '# df <- read.csv("your_data.csv")',
+      '# 因变量: ' + y + ' 特征变量: ' + allVars.join(', '),
+      '',
+      '## ---- 数据准备 ----',
+      'set.seed(42)',
+      'features <- c("' + varList + '")',
+      'df_clean <- df[complete.cases(df[, c("' + y + '", features)]), ]',
+      '',
+      '## ---- 训练/测试分割 ----',
+      'train_idx <- createDataPartition(df_clean[["' + y + '"]], p = 0.7, list = FALSE)',
+      'train_data <- df_clean[train_idx, ]',
+      'test_data <- df_clean[-train_idx, ]',
+      '',
+      'cat("训练集:", nrow(train_data), "测试集:", nrow(test_data), "\n")',
+      '',
+      '## ---- XGBoost 矩阵 ----',
+      'dtrain <- xgb.DMatrix(',
+      '  data = as.matrix(train_data[, features]),',
+      '  label = train_data[["' + y + '"]]',
+      ')',
+      'dtest <- xgb.DMatrix(',
+      '  data = as.matrix(test_data[, features]),',
+      '  label = test_data[["' + y + '"]]',
+      ')',
+      '',
+      '## ---- 模型训练 ----',
+      'cat("\n==== XGBoost 模型训练 ====\n")',
+      'params <- list(',
+      '  objective = "binary:logistic",',
+      '  eval_metric = "auc",',
+      '  max_depth = 6,',
+      '  eta = 0.1,',
+      '  subsample = 0.8,',
+      '  colsample_bytree = 0.8',
+      ')',
+      '',
+      'xgb_model <- xgb.train(',
+      '  params = params,',
+      '  data = dtrain,',
+      '  nrounds = 200,',
+      '  watchlist = list(train = dtrain, test = dtest),',
+      '  early_stopping_rounds = 20,',
+      '  verbose = 1',
+      ')',
+      '',
+      '## ---- 预测与评估 ----',
+      'cat("\n==== 模型评估 ====\n")',
+      'pred_prob <- predict(xgb_model, dtest)',
+      'pred_class <- ifelse(pred_prob > 0.5, 1, 0)',
+      '',
+      'cat("AUC:", auc(test_data[["' + y + '"]], pred_prob), "\n")',
+      'print(confusionMatrix(factor(pred_class), factor(test_data[["' + y + '"]])))',
+      '',
+      '## ---- 特征重要性 ----',
+      'cat("\n==== 特征重要性 ====\n")',
+      'importance <- xgb.importance(feature_names = features, model = xgb_model)',
+      'print(importance)',
+      'xgb.plot.importance(importance_matrix = importance, top_n = 15)',
+      '',
+      '## ---- 交叉验证 ----',
+      'cat("\n==== 5折交叉验证 ====\n")',
+      'cv_model <- xgb.cv(',
+      '  params = params,',
+      '  data = dtrain,',
+      '  nrounds = 200,',
+      '  nfold = 5,',
+      '  early_stopping_rounds = 20,',
+      '  verbose = FALSE',
+      ')',
+      'print(tail(cv_model$evaluation_log))',
+      ''
+    ].join('\n');
+  },
+
+  panel_fe: function (vars, title) {
+    var y = (vars.find(function (v) { return v.roleCode === 'Y' }) || {}).varName || 'Y';
+    var xs = vars.filter(function (v) { return v.roleCode === 'X' }).map(function (v) { return v.varName });
+    var cs = vars.filter(function (v) { return v.roleCode === 'C' }).map(function (v) { return v.varName });
+    var allX = xs.concat(cs).join(' + ');
+    var panelId = (vars.find(function (v) { return /panel|id|地区|省/i.test(v.varName) }) || {}).varName || 'entity_id';
+    var timeVar = (vars.find(function (v) { return v.roleCode === 'T' }) || {}).varName || 'year';
+    return [
+      '# ==========================================',
+      '# 研究题目: ' + title,
+      '# 分析方法: 面板固定效应回归',
+      '# 生成时间: ' + new Date().toLocaleString('zh-CN'),
+      '# ==========================================',
+      '',
+      '## ---- 加载包 ----',
+      'if (!require("plm")) install.packages("plm")',
+      'if (!require("fixest")) install.packages("fixest")',
+      'library(plm)',
+      'library(fixest)',
+      '',
+      '## ---- 读取面板数据 ----',
+      '# df <- read.csv("your_panel.csv")',
+      '# 需要面板ID(' + panelId + ') 时间(' + timeVar + ') 因变量(' + y + ')',
+      '',
+      '## ---- 转换为面板数据格式 ----',
+      'pdf <- pdata.frame(df, index = c("' + panelId + '", "' + timeVar + '"))',
+      '',
+      '## ---- 固定效应模型 ----',
+      'cat("==== 固定效应模型 ====\n")',
+      allX ? 'fe_model <- plm(' + y + ' ~ ' + allX + ' | factor(' + panelId + '), data = pdf, model = "within")' : '',
+      allX ? 'print(summary(fe_model))' : '',
+      '',
+      '## ---- 使用 fixest（更快） ----',
+      'cat("\n==== fixest 固定效应 ====\n")',
+      allX ? 'fe_fast <- feols(' + y + ' ~ ' + allX + ' | ' + panelId + ', data = df)' : '',
+      allX ? 'print(summary(fe_fast))' : '',
+      '',
+      '## ---- 双向固定效应（个体+时间） ----',
+      'cat("\n==== 双向固定效应 ====\n")',
+      allX ? 'twfe <- feols(' + y + ' ~ ' + allX + ' | ' + panelId + ' + ' + timeVar + ', data = df)' : '',
+      allX ? 'print(summary(twfe))' : '',
+      '',
+      '## ---- 聚类稳健标准误 ----',
+      'cat("\n==== 聚类稳健标准误 ====\n")',
+      allX ? 'fe_cluster <- feols(' + y + ' ~ ' + allX + ' | ' + panelId + ', data = df, cluster = "' + panelId + '")' : '',
+      allX ? 'print(summary(fe_cluster))' : '',
+      '',
+      '## ---- Hausman 检验（FE vs RE） ----',
+      'cat("\n==== Hausman 检验 ====\n")',
+      allX ? 're_model <- plm(' + y + ' ~ ' + allX + ', data = pdf, model = "random")' : '',
+      allX ? 'print(phtest(fe_model, re_model))' : '',
+      ''
+    ].join('\n');
+  }
+};
+
+/* --- 生成R脚本（按钮入口） --- */
+function studyGenerateScript(planIdx) {
+  /* 如果从方案卡片点击，自动选择方法 */
+  var sel = document.getElementById('st-method-select');
+  if (planIdx !== undefined && planIdx !== null) {
+    var plans = STUDY_STATE._lastPlans || [];
+    var plan = plans[planIdx];
+    if (plan) {
+      var methodMap = { t1: 'descriptive', t2: 'cohort_survival', t3: 'case_control', t4: 'descriptive', t5: 'did', t6: 'descriptive' };
+      var method = methodMap[plan.id] || 'descriptive';
+      if (sel) sel.value = method;
+    }
+  }
+
+  var method = sel ? sel.value : '';
+  if (!method) return;
+
+  /* 获取映射的变量 */
+  var mappedVars = [];
+  if (STUDY_STATE.uploadedDatasets && STUDY_STATE.uploadedDatasets.length > 0 && STUDY_STATE._lastPlans) {
+    var allVars = [];
+    STUDY_STATE.uploadedDatasets.forEach(function (ds) {
+      ds.variables.forEach(function (v) {
+        allVars.push({ name: v.name, type: v.type, label: v.label, values: v.values });
+      });
+    });
+    var plans = STUDY_STATE._lastPlans || [];
+    if (plans.length > 0) {
+      var planVars = studyExtractPlanVars(plans[0]);
+      var mapped = studyMapVars(allVars, planVars);
+      mappedVars = mapped.matches.map(function (m) {
+        return { roleCode: m.roleCode, varName: m.varName, varType: m.varType, varLabel: m.varLabel };
+      });
+    }
+  }
+
+  var template = STUDY_R_TEMPLATES[method];
+  if (!template) return;
+  var script = template(mappedVars, STUDY_STATE.title || '研究项目');
+
+  var area = document.getElementById('st-script-area');
+  if (area) area.value = script;
+
+  /* 显示脚本区 */
+  var wrap = document.getElementById('st-script-wrap');
+  if (wrap) wrap.style.display = 'block';
+
+  /* 同时显示创新方法库 */
+  var mw = document.getElementById('st-methods-wrap');
+  if (mw) { mw.style.display = 'block'; studyRenderMethods(); }
+
+  /* 显示导出区 */
+  var ew = document.getElementById('st-export-wrap');
+  if (ew) ew.style.display = 'block';
+}
+
+/* --- 复制脚本 --- */
+function studyCopyScript() {
+  var area = document.getElementById('st-script-area');
+  if (!area || !area.value) { alert('请先生成脚本'); return; }
+  navigator.clipboard.writeText(area.value).then(function () { alert('脚本已复制 ✅') });
+}
+
+/* --- 下载脚本 --- */
+function studyDownloadScript() {
+  var area = document.getElementById('st-script-area');
+  if (!area || !area.value) { alert('请先生成脚本'); return; }
+  var blob = new Blob([area.value], { type: 'text/plain;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'analysis.R';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* --- 执行脚本 --- */
+function studyExecuteScript() {
+  var area = document.getElementById('st-script-area');
+  if (!area || !area.value) { alert('请先生成脚本'); return; }
+
+  var statusEl = document.getElementById('st-exec-status');
+  var resultEl = document.getElementById('st-exec-result');
+  var outputEl = document.getElementById('st-exec-output');
+  var plotsEl = document.getElementById('st-exec-plots');
+
+  if (!STUDY_AGENT_CONNECTED) {
+    if (statusEl) statusEl.textContent = '⚠ 未连接 Agent，正在尝试连接...';
+    studyConnectAgent();
+    setTimeout(function () {
+      if (STUDY_AGENT_CONNECTED) studyExecuteScript();
+      else if (statusEl) statusEl.textContent = '❌ 连接失败，请先启动 companion_agent.py';
+    }, 3000);
+    return;
+  }
+
+  if (statusEl) statusEl.textContent = '⏳ 执行中...';
+  if (resultEl) resultEl.style.display = 'block';
+  if (outputEl) outputEl.textContent = '正在执行 R 脚本，请稍候...';
+  if (plotsEl) plotsEl.innerHTML = '';
+
+  fetch(STUDY_AGENT_URL + '/execute', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ script: area.value, language: 'R' }),
+    signal: AbortSignal.timeout(300000)
+  })
+    .then(function (r) { return r.json() })
+    .then(function (data) {
+      if (data.success) {
+        if (statusEl) statusEl.textContent = '✅ 执行完成';
+        if (outputEl) outputEl.textContent = data.output || '(无输出)';
+        if (data.plots && data.plots.length > 0 && plotsEl) {
+          data.plots.forEach(function (p) {
+            var img = document.createElement('img');
+            img.src = p;
+            img.style.cssText = 'max-width:100%;border:1px solid var(--line);border-radius:6px';
+            plotsEl.appendChild(img);
+          });
+        }
+      } else {
+        if (statusEl) statusEl.textContent = '❌ 执行出错';
+        if (outputEl) outputEl.textContent = data.error || data.output || '未知错误';
+      }
+    })
+    .catch(function (err) {
+      if (statusEl) statusEl.textContent = '❌ 连接失败';
+      if (outputEl) outputEl.textContent = '执行请求失败: ' + err.message + '\n\n请确认 companion_agent.py 正在运行（端口 7878）';
+    });
+}
+
+/* ============ P5: 创新方法模块库 ============ */
+
+var STUDY_METHOD_LIBRARY = [
+  {
+    id: 'did', name: '双重差分（DID）', icon: '📊',
+    desc: '利用面板数据评估政策干预的因果效应，是政策评估的金标准方法。支持动态效应和平行趋势检验。',
+    methods: ['双向固定效应', '事件研究法', 'PSM-DID', '安慰剂检验', '合成控制法'],
+    packages: 'fixest, rdrobust, MatchIt, Synth',
+    difficulty: '进阶',
+    generate: function () { studySelectMethod('did'); }
+  },
+  {
+    id: 'mediation', name: '中介效应分析', icon: '🔀',
+    desc: '分解总效应为直接效应和间接效应，揭示暴露→中介→结局的机制路径。支持因果中介分析和敏感性分析。',
+    methods: ['Baron & Kenny', 'causal mediation', 'Bootstrap CI', '敏感性分析(rho)'],
+    packages: 'mediation, lavaan',
+    difficulty: '进阶',
+    generate: function () { studySelectMethod('mediation'); }
+  },
+  {
+    id: 'cohort_survival', name: '生存分析', icon: '⏱',
+    desc: '分析时间-事件数据，包括Kaplan-Meier曲线、Cox回归、竞争风险模型。适合队列和随访研究。',
+    methods: ['Kaplan-Meier', 'Cox PH', '竞争风险(Fine-Gray)', '时变协变量', 'PH假定检验'],
+    packages: 'survival, survminer, cmprsk',
+    difficulty: '进阶',
+    generate: function () { studySelectMethod('cohort_survival'); }
+  },
+  {
+    id: 'xgboost', name: 'XGBoost 机器学习', icon: '🤖',
+    desc: '梯度提升树模型，支持特征重要性、交叉验证、超参数调优。适合预测建模和风险因素筛选。',
+    methods: ['XGBoost', '交叉验证', '特征重要性', 'AUC评估', 'SHAP值'],
+    packages: 'xgboost, caret, pROC, SHAPforxgboost',
+    difficulty: '高级',
+    generate: function () { studySelectMethod('xgboost'); }
+  },
+  {
+    id: 'panel_fe', name: '面板固定效应', icon: '📈',
+    desc: '利用面板数据的组内变异消除不可观测混杂，是经济学和流行病学中因果推断的核心工具。',
+    methods: ['固定效应', '随机效应', '双向固定效应', 'Hausman检验', '聚类标准误'],
+    packages: 'plm, fixest, sandwich',
+    difficulty: '进阶',
+    generate: function () { studySelectMethod('panel_fe'); }
+  },
+  {
+    id: 'case_control', name: '条件Logistic回归', icon: '🔬',
+    desc: '匹配设计的病例对照分析，通过条件似然估计OR值。支持1:1和1:n匹配。',
+    methods: ['条件Logistic', 'McNemar检验', 'RERI交互', '剂量-反应'],
+    packages: 'survival, Epi',
+    difficulty: '进阶',
+    generate: function () { studySelectMethod('case_control'); }
+  }
+];
+
+function studyRenderMethods() {
+  var el = document.getElementById('st-methods-grid');
+  if (!el) return;
+  var html = '';
+  STUDY_METHOD_LIBRARY.forEach(function (m) {
+    var diffColor = m.difficulty === '高级' ? '#f59e0b' : '#3b82f6';
+    html += '<div style="border:1px solid var(--line);border-radius:6px;padding:16px;background:#fff;cursor:pointer;transition:border-color .2s" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--line)\'" onclick="studySelectMethod(\'' + m.id + '\')">';
+    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">';
+    html += '<span style="font-size:24px">' + m.icon + '</span>';
+    html += '<div><b style="font-size:14px">' + m.name + '</b><br><span style="font-size:11px;color:' + diffColor + ';font-weight:600">' + m.difficulty + '</span></div>';
+    html += '</div>';
+    html += '<div style="font-size:12px;color:var(--ink2);line-height:1.6;margin-bottom:8px">' + m.desc + '</div>';
+    html += '<div style="font-size:11px;color:var(--muted);margin-bottom:6px"><b>方法:</b> ' + m.methods.join(', ') + '</div>';
+    html += '<div style="font-size:11px;color:var(--muted);margin-bottom:10px"><b>R包:</b> ' + m.packages + '</div>';
+    html += '<button class="btn sm primary" style="width:100%;padding:6px;font-size:12px" onclick="event.stopPropagation();studySelectMethod(\'' + m.id + '\')">生成 R 脚本</button>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function studySelectMethod(methodId) {
+  var sel = document.getElementById('st-method-select');
+  if (sel) sel.value = methodId;
+  studyGenerateScript();
+  var wrap = document.getElementById('st-script-wrap');
+  if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ============ P6: 文档导出与项目工作台 ============ */
+
+/* --- 导出研究方案 --- */
+function studyExportProject(format) {
+  var title = STUDY_STATE.title || '研究项目';
+  var purpose = STUDY_STATE.purpose || '';
+  var plans = STUDY_STATE._lastPlans || [];
+  var lit = STUDY_STATE._lastLit || [];
+  var matches = STUDY_STATE._lastMatches || [];
+  var uploaded = STUDY_STATE.uploadedDatasets || [];
+
+  var md = '# ' + title + '\n\n';
+  md += '**生成时间:** ' + new Date().toLocaleString('zh-CN') + '\n\n';
+  md += '## 研究目的\n\n' + purpose + '\n\n';
+
+  /* 匹配数据集 */
+  if (matches.length > 0) {
+    md += '## 匹配数据集\n\n';
+    matches.forEach(function (m) {
+      md += '- **' + (m.name || m.title || '') + '**';
+      if (m.year) md += ' (' + m.year + ')';
+      if (m.source) md += ' - ' + m.source;
+      md += '\n';
+    });
+    md += '\n';
+  }
+
+  /* 上传数据集变量 */
+  if (uploaded.length > 0) {
+    md += '## 数据集变量字典\n\n';
+    uploaded.forEach(function (ds, i) {
+      var dsName = ds.info['数据集名称'] || ds.filename;
+      md += '### 数据集 ' + (i + 1) + ': ' + dsName + '\n\n';
+      if (ds.variables.length > 0) {
+        md += '| 变量名 | 类型 | 标签 | 取值/编码 | 缺失率 |\n';
+        md += '|--------|------|------|-----------|--------|\n';
+        ds.variables.forEach(function (v) {
+          md += '| ' + v.name + ' | ' + v.type + ' | ' + v.label + ' | ' + v.values + ' | ' + v.missing + ' |\n';
+        });
+        md += '\n';
+      }
+    });
+  }
+
+  /* 文献列表 */
+  if (lit.length > 0) {
+    md += '## 相关文献\n\n';
+    lit.forEach(function (p, i) {
+      md += (i + 1) + '. ' + (p.authors || '') + ' (' + (p.year || '') + '). ' + (p.title || '') + '.';
+      if (p.journal) md += ' *' + p.journal + '*.';
+      if (p.doi) md += ' doi:' + p.doi;
+      md += '\n';
+    });
+    md += '\n';
+  }
+
+  /* 推荐方案 */
+  if (plans.length > 0) {
+    md += '## 推荐研究方案\n\n';
+    plans.forEach(function (p, i) {
+      md += '### 方案 ' + (i + 1) + ': ' + p.name + ' (' + (p.en || '') + ')\n\n';
+      md += '**描述:** ' + p.desc + '\n\n';
+      md += '**研究设计:**\n' + p.design + '\n\n';
+      md += '**变量搭配:**\n' + p.vars + '\n\n';
+      md += '**方法学:** ' + p.methods + '\n\n';
+      md += '**预期产出:** ' + p.output + '\n\n';
+      if (p.sample_size) md += '**样本量估算:** ' + p.sample_size + '\n\n';
+      if (p.power) md += '**统计效力:** ' + p.power + '\n\n';
+      if (p.ethics) md += '**伦理考量:** ' + p.ethics + '\n\n';
+      if (p.timeline) md += '**时间线:** ' + p.timeline + '\n\n';
+      if (p.r_packages) md += '**推荐R包:** ' + p.r_packages + '\n\n';
+    });
+  }
+
+  /* 脚本 */
+  var area = document.getElementById('st-script-area');
+  if (area && area.value) {
+    md += '## 分析脚本（R）\n\n```r\n' + area.value + '\n```\n\n';
+  }
+
+  md += '---\n*由研究助手自动生成 | https://haiyan-codes.github.io/research-data-hub-v2/*\n';
+
+  /* 下载 */
+  var ext = format === 'md' ? '.md' : '.txt';
+  var blob = new Blob([md], { type: 'text/plain;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = '研究方案_' + title.substring(0, 20).replace(/[^\w\u4e00-\u9fa5]/g, '_') + ext;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* --- 保存项目快照 --- */
+function studySaveProject() {
+  var snapshot = {
+    title: STUDY_STATE.title,
+    purpose: STUDY_STATE.purpose,
+    uploadedDatasets: STUDY_STATE.uploadedDatasets,
+    _lastLit: (STUDY_STATE._lastLit || []).slice(0, 20),
+    _lastMatches: STUDY_STATE._lastMatches,
+    _lastPlans: STUDY_STATE._lastPlans,
+    savedAt: new Date().toISOString()
+  };
+  try {
+    localStorage.setItem('STUDY_PROJECT_SNAPSHOT', JSON.stringify(snapshot));
+    var el = document.getElementById('st-project-saved');
+    if (el) el.textContent = '✅ 项目快照已保存到浏览器（' + new Date().toLocaleString('zh-CN') + '）';
+  } catch (e) {
+    alert('保存失败: ' + e.message);
+  }
+}
+
+/* --- 加载项目快照 --- */
+function studyLoadProject() {
+  try {
+    var s = localStorage.getItem('STUDY_PROJECT_SNAPSHOT');
+    if (!s) { alert('未找到项目快照'); return; }
+    var snap = JSON.parse(s);
+    STUDY_STATE.title = snap.title || '';
+    STUDY_STATE.purpose = snap.purpose || '';
+    STUDY_STATE.uploadedDatasets = snap.uploadedDatasets || [];
+    STUDY_STATE._lastLit = snap._lastLit || [];
+    STUDY_STATE._lastMatches = snap._lastMatches || [];
+    STUDY_STATE._lastPlans = snap._lastPlans || [];
+    studySave();
+
+    /* 恢复 UI */
+    var t = document.getElementById('st-title'); if (t) t.value = STUDY_STATE.title;
+    var p = document.getElementById('st-purpose'); if (p) p.value = STUDY_STATE.purpose;
+    studyRenderUploaded();
+
+    /* 恢复结果 */
+    if (STUDY_STATE._lastMatches) {
+      var wrap = document.getElementById('st-results');
+      if (wrap) wrap.style.display = 'block';
+      studyRenderMatches(STUDY_STATE._lastMatches);
+      studyRenderLit(STUDY_STATE._lastLit);
+      studyRunP1(STUDY_STATE.title, STUDY_STATE.purpose, STUDY_STATE._lastLit, STUDY_STATE._lastMatches);
+    }
+
+    var el = document.getElementById('st-project-saved');
+    if (el) el.textContent = '✅ 已加载项目快照（保存于 ' + (snap.savedAt || '') + '）';
+  } catch (e) {
+    alert('加载失败: ' + e.message);
+  }
+}
+
+/* --- 新建项目 --- */
+function studyNewProject() {
+  if (!confirm('确定要新建项目吗？当前数据将被清除。')) return;
+  STUDY_STATE = {
+    title: '', purpose: '',
+    datasets: [], uploadedDatasets: [],
+    _lastLit: null, _lastMatches: null, _lastPlans: null
+  };
+  studySave();
+  localStorage.removeItem('STUDY_PROJECT_SNAPSHOT');
+
+  var t = document.getElementById('st-title'); if (t) t.value = '';
+  var p = document.getElementById('st-purpose'); if (p) p.value = '';
+  studyRenderUploaded();
+
+  var results = document.getElementById('st-results');
+  if (results) results.style.display = 'none';
+
+  ['st-script-wrap', 'st-methods-wrap', 'st-export-wrap'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+
+  var area = document.getElementById('st-script-area');
+  if (area) area.value = '';
+
+  var el = document.getElementById('st-project-saved');
+  if (el) el.textContent = '✅ 已新建项目';
 }
 
 </script>
