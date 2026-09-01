@@ -4259,7 +4259,9 @@ section.page.active{display:block;opacity:1}
       </style>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0"></head>
+<meta http-equiv="Expires" content="0">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
 <body>
 <!-- ============ password gate ============ -->
 <div id="pw-gate" class="pw-gate">
@@ -4720,10 +4722,30 @@ else:
           <b style="font-size:15px">数据集列表</b>
           <span style="font-size:12px;color:var(--muted)">支持多个数据集，填信息后平台会自动匹配现有资源</span>
         </div>
-        <button class="btn sm teal" onclick="studyAddDataset()" style="padding:5px 12px;font-size:12.5px">+ 添加数据集</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn sm" onclick="studyDownloadTemplate()" style="padding:5px 12px;font-size:12.5px">下载规范化模板</button>
+          <button class="btn sm teal" onclick="studyAddDataset()" style="padding:5px 12px;font-size:12.5px">+ 手动添加</button>
+        </div>
       </div>
+
+      <!-- 文件上传区 -->
+      <div style="border:2px dashed var(--line);border-radius:6px;padding:18px;text-align:center;margin-bottom:14px;transition:border-color .2s" id="st-upload-zone" ondragover="this.style.borderColor='var(--accent)';event.preventDefault()" ondragleave="this.style.borderColor='var(--line)'" ondrop="studyHandleDrop(event)">
+        <div style="font-size:13px;color:var(--ink2);margin-bottom:8px">上传规范化数据集描述文档（.xlsx）</div>
+        <div style="font-size:11.5px;color:var(--muted);margin-bottom:10px">下载模板 → 填写数据集基本信息 + 变量字典 → 上传后自动解析并映射到推荐方案</div>
+        <input type="file" id="st-file-input" accept=".xlsx,.xls" style="display:none" onchange="studyHandleFile(this.files[0])">
+        <button class="btn sm primary" onclick="document.getElementById('st-file-input').click()" style="padding:6px 16px;font-size:12.5px">选择文件上传</button>
+        <span style="margin-left:8px;font-size:11.5px;color:var(--muted)">或拖拽 .xlsx 到此区域</span>
+      </div>
+
+      <!-- 已上传数据集的变量字典展示区 -->
+      <div id="st-uploaded-datasets" style="display:none;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--ink2)">已上传的数据集描述：</div>
+        <div id="st-uploaded-list" style="display:flex;flex-direction:column;gap:14px"></div>
+      </div>
+
+      <!-- 手动输入区 -->
+      <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px;border-top:1px dashed var(--line);padding-top:10px">或手动填写数据集信息：</div>
       <div id="st-datasets" style="display:flex;flex-direction:column;gap:12px"></div>
-      <div style="margin-top:10px;font-size:11.5px;color:var(--muted)">P1 阶段将支持上传标准化 Excel 模板自动解析，当前先用表单填写</div>
     </div>
 
     <!-- === Phase 3: 开始分析按钮 === -->
@@ -4773,6 +4795,16 @@ else:
           <span style="font-size:11.5px;color:var(--muted)">点击方案可编辑改进，支持复制/下载</span>
         </div>
         <div id="st-plans-grid" style="display:flex;flex-direction:column;gap:14px"></div>
+      </div>
+
+      <!-- === Phase 7: 变量-方案映射（P2） === -->
+      <div id="st-varmap-wrap" style="margin-top:32px;display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">7</span>
+          <b style="font-size:15px">变量-方案映射</b>
+          <span style="font-size:11.5px;color:var(--muted)">将上传数据集的变量自动映射到推荐方案的变量建议，为后续生成分析脚本做准备</span>
+        </div>
+        <div id="st-varmap-grid" style="display:flex;flex-direction:column;gap:16px"></div>
       </div>
 
     </div>
@@ -7910,9 +7942,11 @@ function studyInit() {
   if (!STUDY_STATE.datasets || STUDY_STATE.datasets.length === 0) {
     STUDY_STATE.datasets = [{idx: 1, name: '', source: '', year: '', file_path: ''}];
   }
+  if (!STUDY_STATE.uploadedDatasets) STUDY_STATE.uploadedDatasets = [];
   var t = document.getElementById('st-title'); if (t) t.value = STUDY_STATE.title || '';
   var p2 = document.getElementById('st-purpose'); if (p2) p2.value = STUDY_STATE.purpose || '';
   studyRenderDatasets();
+  studyRenderUploaded();
 }
 
 function studySave() {
@@ -8582,7 +8616,414 @@ function studyRunP1(title, purpose, literature, matches) {
     plansWrap.style.display = 'block';
     var plans = studyRecommendPlans(title, purpose, literature, matches);
     studyRenderPlans(plans);
+    STUDY_STATE._lastPlans = plans;
+    studySave();
   }
+
+  // === 触发 P2：变量-方案映射 ===
+  if (STUDY_STATE.uploadedDatasets && STUDY_STATE.uploadedDatasets.length > 0) {
+    studyRunP2(STUDY_STATE._lastPlans || []);
+  }
+}
+
+/* ============ STUDY ASSISTANT P2: 规范化数据集模板 ============ */
+
+/* --- 上传数据集存储 --- */
+if (!STUDY_STATE.uploadedDatasets) STUDY_STATE.uploadedDatasets = [];
+
+/* --- 1. 下载规范化模板 --- */
+function studyDownloadTemplate() {
+  if (typeof XLSX === 'undefined') { alert('SheetJS 未加载，请刷新页面'); return; }
+
+  var wb = XLSX.utils.book_new();
+
+  /* Sheet 1: 数据集基本信息 */
+  var infoData = [
+    ['字段', '填写说明', '示例'],
+    ['数据集名称', '数据集的完整名称', '中国卫生健康统计年鉴2023'],
+    ['数据来源', '数据的生产/发布机构', '国家卫生健康委员会'],
+    ['采集年份', '数据采集或出版的年份', '2023'],
+    ['时间跨度', '数据覆盖的起止年份', '2003-2023'],
+    ['样本量', '观测值总数（行数）', '50000'],
+    ['数据类型', '横断面/纵向/面板/时间序列', '面板'],
+    ['地理覆盖', '覆盖的地理范围', '全国31省'],
+    ['采集方式', '调查/登记/行政记录/传感器', '行政记录'],
+    ['数据访问方式', '公开/受限/申请', '公开'],
+    ['数据文件路径', '本地文件路径或网盘链接', 'D:/data/health2023.xlsx'],
+    ['伦理审批', '是否通过伦理审查（如适用）', '豁免'],
+    ['权重变量', '抽样权重变量名（如有）', ''],
+    ['备注', '其他需要说明的信息', '']
+  ];
+  var ws1 = XLSX.utils.aoa_to_sheet(infoData);
+  ws1['!cols'] = [{wch:16}, {wch:40}, {wch:30}];
+  XLSX.utils.book_append_sheet(wb, ws1, '基本信息');
+
+  /* Sheet 2: 变量字典 */
+  var varData = [
+    ['变量名', '变量类型', '变量标签', '取值范围/编码', '单位', '缺失率(%)', '备注'],
+    ['age', '连续', '年龄', '0-120', '岁', '0.5', ''],
+    ['gender', '分类', '性别', '1=男 2=女', '', '0.1', ''],
+    ['edu', '有序', '教育程度', '1=小学 2=初中 3=高中 4=大学', '', '2.3', ''],
+    ['income', '连续', '年收入', '0-1000000', '元', '15.2', '高缺失'],
+    ['province', '分类', '省份', '11=北京 12=天津 ... 65=新疆', '', '0.0', ''],
+    ['health_status', '有序', '自评健康', '1=很差 2=差 3=一般 4=好 5=很好', '', '1.1', ''],
+    ['chronic_disease', '二分', '慢性病', '0=无 1=有', '', '0.8', ''],
+    ['survey_year', '日期', '调查年份', '2003-2023', '年', '0.0', '面板时间变量'],
+    ['', '', '', '', '', '', '（继续添加你的变量...）']
+  ];
+  var ws2 = XLSX.utils.aoa_to_sheet(varData);
+  ws2['!cols'] = [{wch:18}, {wch:10}, {wch:16}, {wch:30}, {wch:8}, {wch:10}, {wch:20}];
+  XLSX.utils.book_append_sheet(wb, ws2, '变量字典');
+
+  /* Sheet 3: 数据质量 */
+  var qualData = [
+    ['维度', '说明', '填写'],
+    ['抽样方法', '数据采样的统计方法', '分层多阶段整群抽样'],
+    ['代表性', '样本对目标人群的代表性评估', '全国代表性'],
+    ['权重信息', '是否包含抽样权重及使用方法', '包含个体权重'],
+    ['缺失值处理', '缺失值的编码与处理建议', '-1=不适用 -8=缺失'],
+    ['变量一致性', '跨年份/跨批次变量定义一致性', '核心变量一致'],
+    ['已知局限', '数据集的已知偏差或局限', '农村样本偏少'],
+    ['数据质量评级', 'A/B/C/D', 'B']
+  ];
+  var ws3 = XLSX.utils.aoa_to_sheet(qualData);
+  ws3['!cols'] = [{wch:16}, {wch:36}, {wch:30}];
+  XLSX.utils.book_append_sheet(wb, ws3, '数据质量');
+
+  /* Sheet 4: 填写指南 */
+  var guideData = [
+    ['步骤', '操作说明'],
+    ['1', '下载本模板后，在「基本信息」sheet 填写数据集概况'],
+    ['2', '在「变量字典」sheet 逐行填写每个变量的元信息（最重要！）'],
+    ['3', '在「数据质量」sheet 填写质量评估信息（可选）'],
+    ['4', '保存为 .xlsx 文件，上传到研究助手的上传区域'],
+    ['5', '系统自动解析变量字典，在「变量-方案映射」中展示匹配结果'],
+    ['', ''],
+    ['变量类型说明', ''],
+    ['连续', '数值型变量，如年龄、收入、BMI'],
+    ['分类', '无序多分类，如省份、民族、职业'],
+    ['有序', '有序多分类，如教育程度、健康自评'],
+    ['二分', '二值变量，如性别、是否患病'],
+    ['字符', '文本型变量，如姓名、地址（一般不参与分析）'],
+    ['日期', '时间型变量，如调查日期、出生日期']
+  ];
+  var ws4 = XLSX.utils.aoa_to_sheet(guideData);
+  ws4['!cols'] = [{wch:14}, {wch:60}];
+  XLSX.utils.book_append_sheet(wb, ws4, '填写指南');
+
+  XLSX.writeFile(wb, '数据集描述模板_规范化.xlsx');
+}
+
+/* --- 2. 处理拖拽上传 --- */
+function studyHandleDrop(ev) {
+  ev.preventDefault();
+  document.getElementById('st-upload-zone').style.borderColor = 'var(--line)';
+  var f = ev.dataTransfer.files[0];
+  if (f) studyHandleFile(f);
+}
+
+/* --- 3. 处理上传文件 --- */
+function studyHandleFile(file) {
+  if (!file) return;
+  if (typeof XLSX === 'undefined') { alert('SheetJS 未加载，请刷新页面重试'); return; }
+  if (!/\.(xlsx|xls)$/i.test(file.name)) { alert('请上传 .xlsx 或 .xls 格式文件'); return; }
+
+  var reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      var data = new Uint8Array(e.target.result);
+      var wb = XLSX.read(data, { type: 'array' });
+      var ds = studyParseWorkbook(wb, file.name);
+      if (!ds) { alert('解析失败：未找到「变量字典」sheet'); return; }
+      STUDY_STATE.uploadedDatasets.push(ds);
+      studySave();
+      studyRenderUploaded();
+    } catch (err) {
+      alert('文件解析失败: ' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* --- 4. 解析 Workbook → 数据集对象 --- */
+function studyParseWorkbook(wb, filename) {
+  var ds = { filename: filename, info: {}, variables: [], quality: {} };
+
+  /* 基本信息 */
+  var infoSheet = wb.Sheets['基本信息'] || wb.Sheets[wb.SheetNames[0]];
+  if (infoSheet) {
+    var rows = XLSX.utils.sheet_to_json(infoSheet, { header: 1 });
+    for (var i = 1; i < rows.length; i++) {
+      if (rows[i][0]) ds.info[rows[i][0]] = rows[i][2] || '';
+    }
+  }
+
+  /* 变量字典 */
+  var varSheet = wb.Sheets['变量字典'] || wb.Sheets[wb.SheetNames[1]];
+  if (varSheet) {
+    var vrows = XLSX.utils.sheet_to_json(varSheet, { header: 1 });
+    for (var j = 1; j < vrows.length; j++) {
+      if (vrows[j] && vrows[j][0] && vrows[j][0].trim()) {
+        ds.variables.push({
+          name: (vrows[j][0] || '').trim(),
+          type: (vrows[j][1] || '').trim(),
+          label: (vrows[j][2] || '').trim(),
+          values: (vrows[j][3] || '').trim(),
+          unit: (vrows[j][4] || '').trim(),
+          missing: (vrows[j][5] || '').trim(),
+          note: (vrows[j][6] || '').trim()
+        });
+      }
+    }
+  }
+
+  if (ds.variables.length === 0) return null;
+
+  /* 数据质量 */
+  var qualSheet = wb.Sheets['数据质量'];
+  if (qualSheet) {
+    var qrows = XLSX.utils.sheet_to_json(qualSheet, { header: 1 });
+    for (var k = 1; k < qrows.length; k++) {
+      if (qrows[k][0]) ds.quality[qrows[k][0]] = qrows[k][2] || '';
+    }
+  }
+
+  return ds;
+}
+
+/* --- 5. 渲染已上传数据集列表 --- */
+function studyRenderUploaded() {
+  var wrap = document.getElementById('st-uploaded-datasets');
+  var list = document.getElementById('st-uploaded-list');
+  if (!wrap || !list) return;
+  if (!STUDY_STATE.uploadedDatasets || STUDY_STATE.uploadedDatasets.length === 0) {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'block';
+  var html = '';
+  STUDY_STATE.uploadedDatasets.forEach(function (ds, idx) {
+    var name = ds.info['数据集名称'] || ds.filename;
+    var nvars = ds.variables.length;
+    var n = ds.info['样本量'] || '?';
+    var yr = ds.info['采集年份'] || ds.info['时间跨度'] || '';
+    html += '<div style="border:1px solid var(--line);border-radius:6px;overflow:hidden">';
+    html += '<div style="padding:10px 16px;background:#f8fafc;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)">';
+    html += '<span style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">数据集 #' + (idx + 1) + '</span>';
+    html += '<b style="font-size:14px">' + studyEsc(name) + '</b>';
+    html += '<span style="font-size:12px;color:var(--muted)">' + nvars + ' 个变量 · 样本量 ' + studyEsc(n) + (yr ? ' · ' + studyEsc(yr) : '') + '</span>';
+    html += '<div style="flex:1"></div>';
+    html += '<button class="btn sm" onclick="studyToggleVars(' + idx + ')" style="padding:3px 10px;font-size:11.5px;margin-right:4px">展开变量</button>';
+    html += '<button class="btn sm" onclick="studyRemoveUploaded(' + idx + ')" style="padding:3px 10px;font-size:11.5px;color:var(--danger)">删除</button>';
+    html += '</div>';
+    html += '<div id="st-ds-vars-' + idx + '" style="display:none;padding:14px 16px;overflow-x:auto">';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:12.5px">';
+    html += '<thead><tr style="background:#f1f5f9">';
+    ['变量名','类型','标签','取值/编码','单位','缺失率','备注'].forEach(function (h) {
+      html += '<th style="padding:6px 10px;text-align:left;border:1px solid var(--line);white-space:nowrap">' + h + '</th>';
+    });
+    html += '</tr></thead><tbody>';
+    ds.variables.forEach(function (v) {
+      html += '<tr>';
+      html += '<td style="padding:5px 10px;border:1px solid var(--line);font-family:monospace;font-weight:600">' + studyEsc(v.name) + '</td>';
+      html += '<td style="padding:5px 10px;border:1px solid var(--line)"><span style="background:#e0e7ff;padding:1px 6px;border-radius:3px;font-size:11px">' + studyEsc(v.type) + '</span></td>';
+      html += '<td style="padding:5px 10px;border:1px solid var(--line)">' + studyEsc(v.label) + '</td>';
+      html += '<td style="padding:5px 10px;border:1px solid var(--line);font-size:11.5px;color:var(--muted)">' + studyEsc(v.values) + '</td>';
+      html += '<td style="padding:5px 10px;border:1px solid var(--line)">' + studyEsc(v.unit) + '</td>';
+      html += '<td style="padding:5px 10px;border:1px solid var(--line);color:' + (parseFloat(v.missing) > 10 ? 'var(--danger)' : 'var(--muted)') + '">' + studyEsc(v.missing) + '</td>';
+      html += '<td style="padding:5px 10px;border:1px solid var(--line);font-size:11px;color:var(--muted)">' + studyEsc(v.note) + '</td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    html += '</div>';
+    html += '</div>';
+  });
+  list.innerHTML = html;
+}
+
+function studyToggleVars(idx) {
+  var d = document.getElementById('st-ds-vars-' + idx);
+  if (d) d.style.display = d.style.display === 'none' ? 'block' : 'none';
+}
+
+function studyRemoveUploaded(idx) {
+  STUDY_STATE.uploadedDatasets.splice(idx, 1);
+  studySave();
+  studyRenderUploaded();
+}
+
+/* --- 6. HTML 转义 --- */
+function studyEsc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/* --- 7. P2 主入口：变量-方案映射 --- */
+function studyRunP2(plans) {
+  var wrap = document.getElementById('st-varmap-wrap');
+  var grid = document.getElementById('st-varmap-grid');
+  if (!wrap || !grid) return;
+  if (!STUDY_STATE.uploadedDatasets || STUDY_STATE.uploadedDatasets.length === 0) {
+    wrap.style.display = 'none';
+    return;
+  }
+  if (!plans || plans.length === 0) {
+    wrap.style.display = 'none';
+    return;
+  }
+
+  wrap.style.display = 'block';
+  var allVars = [];
+  STUDY_STATE.uploadedDatasets.forEach(function (ds) {
+    ds.variables.forEach(function (v) {
+      allVars.push({ name: v.name, type: v.type, label: v.label, values: v.values, dsName: ds.info['数据集名称'] || ds.filename });
+    });
+  });
+
+  var html = '';
+  plans.forEach(function (plan, pi) {
+    var planVars = studyExtractPlanVars(plan);
+    var mapped = studyMapVars(allVars, planVars);
+
+    html += '<div style="border:1px solid var(--line);border-radius:6px;overflow:hidden">';
+    html += '<div style="padding:12px 18px;background:linear-gradient(135deg,#f0f5ff,#fff);border-bottom:1px solid var(--line)">';
+    html += '<span style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">方案 #' + (pi + 1) + '</span>';
+    html += '<b style="font-size:14px;margin-left:8px">' + studyEsc(plan.name) + '</b>';
+    html += '<span style="font-size:11.5px;color:var(--muted);margin-left:8px">匹配 ' + mapped.matched + '/' + mapped.total + ' 个方案变量</span>';
+    html += '</div>';
+
+    html += '<div style="padding:14px 18px">';
+
+    /* 展示方案需要的变量角色 */
+    html += '<div style="margin-bottom:14px">';
+    html += '<div style="font-size:12.5px;font-weight:600;margin-bottom:6px;color:var(--ink2)">方案变量角色：</div>';
+    planVars.forEach(function (pv) {
+      var matchVar = mapped.matches.find(function (m) { return m.role === pv.role });
+      var badge = matchVar ? '<span style="background:#dcfce7;color:#16a34a;padding:1px 6px;border-radius:3px;font-size:11px;margin-left:6px">已匹配: ' + studyEsc(matchVar.varName) + '</span>' : '<span style="background:#fee2e2;color:#dc2626;padding:1px 6px;border-radius:3px;font-size:11px;margin-left:6px">未匹配</span>';
+      html += '<div style="font-size:12px;margin-bottom:4px;padding:4px 0">';
+      html += '<span style="color:var(--muted)">[' + pv.role + ']</span> ';
+      html += '<b>' + studyEsc(pv.desc) + '</b>';
+      html += ' <span style="font-size:11px;color:var(--muted)">期望类型: ' + studyEsc(pv.expectType || '任意') + '</span>';
+      html += badge;
+      html += '</div>';
+    });
+    html += '</div>';
+
+    /* 展示所有上传变量概览 */
+    html += '<details style="margin-top:8px">';
+    html += '<summary style="font-size:12px;cursor:pointer;color:var(--muted)">查看全部 ' + allVars.length + ' 个上传变量</summary>';
+    html += '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">';
+    allVars.forEach(function (v) {
+      var isMatched = mapped.matches.some(function (m) { return m.varName === v.name });
+      var bg = isMatched ? '#dcfce7' : '#f1f5f9';
+      var border = isMatched ? '#86efac' : 'var(--line)';
+      html += '<span style="background:' + bg + ';border:1px solid ' + border + ';padding:2px 8px;border-radius:3px;font-size:11.5px;font-family:monospace">' + studyEsc(v.name) + '<span style="color:var(--muted);margin-left:4px">(' + studyEsc(v.type) + ')</span></span>';
+    });
+    html += '</div>';
+    html += '</details>';
+
+    html += '</div>';
+    html += '</div>';
+  });
+
+  grid.innerHTML = html;
+}
+
+/* --- 8. 从方案模板提取变量角色 --- */
+function studyExtractPlanVars(plan) {
+  /* 从 plan.vars 文本解析变量角色 */
+  var raw = plan.vars || '';
+  var roles = [];
+  var lines = raw.split('\n');
+  lines.forEach(function (line) {
+    line = line.trim();
+    if (!line) return;
+    /* 匹配格式如 "因变量（Y）：疾病..." 或 "自变量（X）：..." */
+    var m = line.match(/^(.+?)[（(]([^)）]+)[)）]\s*[：:]\s*(.+)/);
+    if (m) {
+      roles.push({
+        role: m[1].trim(),
+        code: m[2].trim(),
+        desc: m[3].trim(),
+        expectType: studyGuessType(m[3])
+      });
+    }
+  });
+  if (roles.length === 0) {
+    /* 如果解析失败，回退到通用角色 */
+    roles = [
+      { role: '因变量', code: 'Y', desc: '主要结局变量', expectType: '连续/有序/二分' },
+      { role: '自变量', code: 'X', desc: '主要暴露/预测变量', expectType: '连续/分类' },
+      { role: '控制变量', code: 'C', desc: '混杂/协变量', expectType: '任意' }
+    ];
+  }
+  return roles;
+}
+
+/* --- 9. 根据描述猜测期望变量类型 --- */
+function studyGuessType(desc) {
+  var d = (desc || '').toLowerCase();
+  if (/(患病|有无|是否|发生|yes|no|binary|二分)/.test(d)) return '二分';
+  if (/(率|比例|百分比|比例)/.test(d)) return '连续';
+  if (/(等级|程度|自评|ordered|有序)/.test(d)) return '有序';
+  if (/(地区|省份|类型|分类|categorical)/.test(d)) return '分类';
+  if (/(年|月|日|时间|date|日期)/.test(d)) return '日期';
+  return '连续';
+}
+
+/* --- 10. 将上传变量匹配到方案角色 --- */
+function studyMapVars(allVars, planVars) {
+  var matches = [];
+  var usedVars = {};
+
+  planVars.forEach(function (pv) {
+    var best = null;
+    var bestScore = 0;
+    allVars.forEach(function (uv) {
+      if (usedVars[uv.name]) return;
+      var score = 0;
+
+      /* 类型匹配 */
+      if (pv.expectType && pv.expectType.indexOf(uv.type) >= 0) score += 3;
+      if (pv.expectType === '连续/有序/二分' && (uv.type === '连续' || uv.type === '有序' || uv.type === '二分')) score += 3;
+      if (pv.expectType === '连续/分类' && (uv.type === '连续' || uv.type === '分类')) score += 3;
+      if (pv.expectType === '任意') score += 1;
+
+      /* 名称/标签关键词匹配 */
+      var pvKeywords = (pv.desc || '').toLowerCase().split(/[\s,，、/]+/);
+      var uvBlob = (uv.name + ' ' + uv.label + ' ' + uv.values).toLowerCase();
+      pvKeywords.forEach(function (kw) {
+        if (kw.length > 2 && uvBlob.indexOf(kw) >= 0) score += 2;
+      });
+
+      /* 角色特定匹配 */
+      var roleLower = (pv.role || '').toLowerCase();
+      if (roleLower.indexOf('因变量') >= 0 || roleLower.indexOf('结局') >= 0 || pv.code === 'Y') {
+        if (/(health|病|死|病|outcome|结局|健康|depress|症状)/.test(uvBlob)) score += 2;
+      }
+      if (roleLower.indexOf('自变量') >= 0 || roleLower.indexOf('暴露') >= 0 || pv.code === 'X') {
+        if (/(income|educ|age|gender|exposure|暴露|收入|教育|年龄|性别)/.test(uvBlob)) score += 2;
+      }
+      if (roleLower.indexOf('控制') >= 0 || pv.code === 'C') {
+        if (/(age|gender|edu|income|年龄|性别|教育|收入|地区)/.test(uvBlob)) score += 1;
+      }
+      if (roleLower.indexOf('时间') >= 0 || pv.code === 'T') {
+        if (/(year|date|time|年|日期|时间)/.test(uvBlob)) score += 3;
+      }
+
+      if (score > bestScore) { bestScore = score; best = uv; }
+    });
+
+    if (best && bestScore > 0) {
+      usedVars[best.name] = true;
+      matches.push({ role: pv.role, roleCode: pv.code, varName: best.name, varType: best.type, varLabel: best.label, score: bestScore });
+    }
+  });
+
+  return {
+    matches: matches,
+    matched: matches.length,
+    total: planVars.length
+  };
 }
 
 </script>
