@@ -4736,32 +4736,28 @@ else:
           <div style="display:flex;align-items:center;gap:10px">
             <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">4</span>
             <b style="font-size:15px">上传已下载数据集的描述文档</b>
-            <span style="font-size:12px;color:var(--muted)">下载匹配的数据集 → 填写模板 → 上传变量字典</span>
+            <span style="font-size:12px;color:var(--muted)">可上传多个数据集（如 2023 年、2024 年），系统自动整合变量字典</span>
           </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn sm" onclick="studyDownloadTemplate()" style="padding:5px 12px;font-size:12.5px">下载规范化模板</button>
-            <button class="btn sm teal" onclick="studyAddDataset()" style="padding:5px 12px;font-size:12.5px">+ 手动添加</button>
-          </div>
+          <button class="btn sm" onclick="studyDownloadTemplate()" style="padding:5px 12px;font-size:12.5px">下载规范化模板</button>
         </div>
 
         <!-- 文件上传区 -->
         <div style="border:2px dashed var(--line);border-radius:6px;padding:18px;text-align:center;margin-bottom:14px;transition:border-color .2s" id="st-upload-zone" ondragover="this.style.borderColor='var(--accent)';event.preventDefault()" ondragleave="this.style.borderColor='var(--line)'" ondrop="studyHandleDrop(event)">
-          <div style="font-size:13px;color:var(--ink2);margin-bottom:8px">上传规范化数据集描述文档（.xlsx）</div>
-          <div style="font-size:11.5px;color:var(--muted);margin-bottom:10px">下载模板 → 填写数据集基本信息 + 变量字典 → 上传后自动解析并映射到推荐方案</div>
-          <input type="file" id="st-file-input" accept=".xlsx,.xls" style="display:none" onchange="studyHandleFile(this.files[0])">
+          <div style="font-size:13px;color:var(--ink2);margin-bottom:8px">上传规范化数据集描述文档（.xlsx），支持多文件</div>
+          <div style="font-size:11.5px;color:var(--muted);margin-bottom:10px">每个 .xlsx 对应一个数据集，可反复上传多个文件，系统自动整合所有变量</div>
+          <input type="file" id="st-file-input" accept=".xlsx,.xls" multiple style="display:none" onchange="studyHandleFiles(this.files)">
           <button class="btn sm primary" onclick="document.getElementById('st-file-input').click()" style="padding:6px 16px;font-size:12.5px">选择文件上传</button>
-          <span style="margin-left:8px;font-size:11.5px;color:var(--muted)">或拖拽 .xlsx 到此区域</span>
+          <span style="margin-left:8px;font-size:11.5px;color:var(--muted)">或拖拽 .xlsx 到此区域（支持多文件）</span>
         </div>
 
         <!-- 已上传数据集的变量字典展示区 -->
         <div id="st-uploaded-datasets" style="display:none;margin-bottom:14px">
-          <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--ink2)">已上传的数据集描述：</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <span style="font-size:13px;font-weight:600;color:var(--ink2)">已上传的数据集描述：</span>
+            <span id="st-uploaded-summary" style="font-size:12px;color:var(--muted)"></span>
+          </div>
           <div id="st-uploaded-list" style="display:flex;flex-direction:column;gap:14px"></div>
         </div>
-
-        <!-- 手动输入区 -->
-        <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px;border-top:1px dashed var(--line);padding-top:10px">或手动填写数据集信息：</div>
-        <div id="st-datasets" style="display:flex;flex-direction:column;gap:12px"></div>
 
         <!-- 上传后重新分析按钮 -->
         <div style="margin-top:14px;display:flex;justify-content:center">
@@ -7950,7 +7946,6 @@ function studyInit() {
   if (!STUDY_STATE.uploadedDatasets) STUDY_STATE.uploadedDatasets = [];
   var t = document.getElementById('st-title'); if (t) t.value = STUDY_STATE.title || '';
   var p2 = document.getElementById('st-purpose'); if (p2) p2.value = STUDY_STATE.purpose || '';
-  studyRenderDatasets();
   studyRenderUploaded();
 }
 
@@ -7958,42 +7953,6 @@ function studySave() {
   STUDY_STATE.title = (document.getElementById('st-title') || {}).value || '';
   STUDY_STATE.purpose = (document.getElementById('st-purpose') || {}).value || '';
   try { localStorage.setItem('STUDY_STATE', JSON.stringify(STUDY_STATE)) } catch (e) {}
-}
-
-function studyAddDataset() {
-  var max = 0;
-  STUDY_STATE.datasets.forEach(function (d) { if (d.idx > max) max = d.idx });
-  STUDY_STATE.datasets.push({idx: max + 1, name: '', source: '', year: '', file_path: ''});
-  studySave(); studyRenderDatasets();
-}
-
-function studyRemoveDataset(idx) {
-  STUDY_STATE.datasets = STUDY_STATE.datasets.filter(function (d) { return d.idx !== idx });
-  if (STUDY_STATE.datasets.length === 0) STUDY_STATE.datasets.push({idx: 1, name: '', source: '', year: '', file_path: ''});
-  studySave(); studyRenderDatasets();
-}
-
-function studyRenderDatasets() {
-  var el = document.getElementById('st-datasets'); if (!el) return;
-  var html = '';
-  STUDY_STATE.datasets.forEach(function (d, i) {
-    html += '<div style="border:1px solid var(--line);border-radius:4px;padding:14px 16px;background:#fafbfd">';
-    html += '<div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">';
-    html += '<b style="font-size:13.5px;color:var(--accent)">数据集 #' + d.idx + '</b>';
-    html += '<div style="flex:1"></div>';
-    html += '<button class="btn sm" onclick="studyRemoveDataset(' + d.idx + ')" style="color:var(--danger);border-color:#fecaca;padding:3px 10px;font-size:11.5px;background:#fff;cursor:pointer">删除</button>';
-    html += '</div>';
-    html += '<div style="display:grid;grid-template-columns:2fr 1fr 1.5fr;gap:10px">';
-    html += '<input placeholder="数据集名称" value="' + d.name + '" oninput="STUDY_STATE.datasets[' + i + '].name=this.value;studySave()" style="padding:7px 10px;border:1px solid var(--line);border-radius:3px;font-size:13px;outline:none;font-family:inherit">';
-    html += '<input placeholder="来源" value="' + d.source + '" oninput="STUDY_STATE.datasets[' + i + '].source=this.value;studySave()" style="padding:7px 10px;border:1px solid var(--line);border-radius:3px;font-size:13px;outline:none;font-family:inherit">';
-    html += '<input placeholder="采集年份" value="' + (d.year || '') + '" oninput="STUDY_STATE.datasets[' + i + '].year=this.value;studySave()" style="padding:7px 10px;border:1px solid var(--line);border-radius:3px;font-size:13px;outline:none;font-family:inherit">';
-    html += '</div>';
-    html += '<div style="margin-top:10px">';
-    html += '<input placeholder="数据文件路径 或 百度网盘链接" value="' + (d.file_path || '') + '" oninput="STUDY_STATE.datasets[' + i + '].file_path=this.value;studySave()" style="width:100%;padding:7px 10px;border:1px solid var(--line);border-radius:3px;font-size:13px;outline:none;font-family:inherit">';
-    html += '</div>';
-    html += '</div>';
-  });
-  el.innerHTML = html;
 }
 
 /* ---- 匹配现有数据集 ---- */
@@ -8762,31 +8721,50 @@ function studyDownloadTemplate() {
 function studyHandleDrop(ev) {
   ev.preventDefault();
   document.getElementById('st-upload-zone').style.borderColor = 'var(--line)';
-  var f = ev.dataTransfer.files[0];
-  if (f) studyHandleFile(f);
+  var files = ev.dataTransfer.files;
+  if (files && files.length > 0) studyHandleFiles(files);
 }
 
-/* --- 3. 处理上传文件 --- */
-function studyHandleFile(file) {
-  if (!file) return;
+/* --- 3. 处理多文件上传 --- */
+function studyHandleFiles(files) {
+  if (!files || files.length === 0) return;
   if (typeof XLSX === 'undefined') { alert('SheetJS 未加载，请刷新页面重试'); return; }
-  if (!/\.(xlsx|xls)$/i.test(file.name)) { alert('请上传 .xlsx 或 .xls 格式文件'); return; }
+  var validFiles = [];
+  for (var i = 0; i < files.length; i++) {
+    if (/\.(xlsx|xls)$/i.test(files[i].name)) validFiles.push(files[i]);
+  }
+  if (validFiles.length === 0) { alert('请上传 .xlsx 或 .xls 格式文件'); return; }
 
-  var reader = new FileReader();
-  reader.onload = function (e) {
-    try {
-      var data = new Uint8Array(e.target.result);
-      var wb = XLSX.read(data, { type: 'array' });
-      var ds = studyParseWorkbook(wb, file.name);
-      if (!ds) { alert('解析失败：未找到「变量字典」sheet'); return; }
-      STUDY_STATE.uploadedDatasets.push(ds);
-      studySave();
-      studyRenderUploaded();
-    } catch (err) {
-      alert('文件解析失败: ' + err.message);
-    }
-  };
-  reader.readAsArrayBuffer(file);
+  var processed = 0;
+  var errors = [];
+  validFiles.forEach(function (file) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      try {
+        var data = new Uint8Array(e.target.result);
+        var wb = XLSX.read(data, { type: 'array' });
+        var ds = studyParseWorkbook(wb, file.name);
+        if (!ds) { errors.push(file.name + ': 未找到变量字典'); }
+        else {
+          STUDY_STATE.uploadedDatasets.push(ds);
+        }
+      } catch (err) {
+        errors.push(file.name + ': ' + err.message);
+      }
+      processed++;
+      if (processed === validFiles.length) {
+        studySave();
+        studyRenderUploaded();
+        if (errors.length > 0) alert('部分文件解析失败：\n' + errors.join('\n'));
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+/* --- 3b. 单文件兼容 --- */
+function studyHandleFile(file) {
+  if (file) studyHandleFiles([file]);
 }
 
 /* --- 4. 解析 Workbook → 数据集对象 --- */
@@ -8845,6 +8823,20 @@ function studyRenderUploaded() {
     return;
   }
   wrap.style.display = 'block';
+
+  /* 汇总信息 */
+  var totalVars = 0;
+  var varNames = {};
+  STUDY_STATE.uploadedDatasets.forEach(function (ds) {
+    ds.variables.forEach(function (v) {
+      totalVars++;
+      varNames[v.name] = true;
+    });
+  });
+  var uniqVars = Object.keys(varNames).length;
+  var summary = document.getElementById('st-uploaded-summary');
+  if (summary) summary.textContent = STUDY_STATE.uploadedDatasets.length + ' 个数据集 · ' + totalVars + ' 个变量（去重 ' + uniqVars + '）';
+
   var html = '';
   STUDY_STATE.uploadedDatasets.forEach(function (ds, idx) {
     var name = ds.info['数据集名称'] || ds.filename;
