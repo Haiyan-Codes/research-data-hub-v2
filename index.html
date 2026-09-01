@@ -7934,14 +7934,25 @@ function studyMatchDatasets(query) {
   var qs = query.toLowerCase().split(/[\s,，、。;；]+/).filter(function (x) { return x.length >= 2 });
   var out = [];
   var seen = {};
-  if (typeof DATASETS !== 'undefined') {
-    DATASETS.forEach(function (d) {
-      var blob = ((d.title || '') + ' ' + (d.description || '') + ' ' + (d.keywords || []).join(' ')).toLowerCase();
+  var kds = window.KNOWN_DATASETS;
+  if (Array.isArray(kds)) {
+    kds.forEach(function (d) {
+      // 从 basic 数组里提取官方 URL
+      var url = '#';
+      if (Array.isArray(d.basic)) {
+        for (var bi = 0; bi < d.basic.length; bi++) {
+          var bv = (d.basic[bi].v || '');
+          if (bv.indexOf('http') === 0) { url = bv; break }
+        }
+      } else if (d.footR && d.footR.indexOf('PMID') === 0) {
+        url = 'https://pubmed.ncbi.nlm.nih.gov/' + d.footR.replace(/PMID:?\s*/i, '');
+      }
+      var blob = ((d.title || '') + ' ' + (d.en || '') + ' ' + (d.summary || '') + ' ' + (d.tag || '') + ' ' + (d.tc || '') + ' ' + (d.cat || '')).toLowerCase();
       var score = 0;
       qs.forEach(function (t) { if (blob.indexOf(t) >= 0) score += 2 });
       if (score >= 2) {
-        var key = 'ds:' + d.title;
-        if (!seen[key]) { seen[key] = true; out.push({score: score, type: '公开数据集', title: d.title, desc: d.description || '', url: d.url || '#'}) }
+        var key = 'ds:' + (d.title || d.id);
+        if (!seen[key]) { seen[key] = true; out.push({score: score, type: '公开数据集', title: d.title + (d.en ? ' (' + d.en + ')' : ''), desc: d.summary || '', url: url}) }
       }
     });
   }
