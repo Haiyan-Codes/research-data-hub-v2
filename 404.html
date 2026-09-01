@@ -4750,6 +4750,31 @@ else:
         </div>
         <div id="st-lit-list" style="display:flex;flex-direction:column;gap:10px"></div>
       </div>
+
+      <!-- === Phase 5: 文献综述（P1） === -->
+      <div id="st-review-wrap" style="margin-top:32px;display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">5</span>
+          <b style="font-size:15px">自动生成文献综述</b>
+          <span style="font-size:11.5px;color:var(--muted)">基于检索文献元数据，纯前端自动生成结构化综述</span>
+          <div style="flex:1"></div>
+          <button class="btn sm" onclick="studyExportReview('copy')" style="padding:4px 10px;font-size:11.5px;margin-right:6px">复制全文</button>
+          <button class="btn sm" onclick="studyExportReview('md')" style="padding:4px 10px;font-size:11.5px;margin-right:6px">下载 .md</button>
+          <button class="btn sm" onclick="studyExportReview('txt')" style="padding:4px 10px;font-size:11.5px">下载 .txt</button>
+        </div>
+        <div id="st-review-content" class="p1-review" style="border:1px solid var(--line);border-radius:6px;padding:20px 24px;background:#fff;line-height:1.8;font-size:14px;color:var(--ink2);white-space:pre-wrap;word-break:break-word"></div>
+      </div>
+
+      <!-- === Phase 6: 研究方案推荐（P1） === -->
+      <div id="st-plans-wrap" style="margin-top:32px;display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center;font-weight:700">6</span>
+          <b style="font-size:15px">推荐研究设计方案</b>
+          <span style="font-size:11.5px;color:var(--muted)">点击方案可编辑改进，支持复制/下载</span>
+        </div>
+        <div id="st-plans-grid" style="display:flex;flex-direction:column;gap:14px"></div>
+      </div>
+
     </div>
 
   </div>
@@ -8126,6 +8151,9 @@ async function studyRun() {
   allLit.forEach(function (p) { var k = (p.title || '').substring(0, 30).toLowerCase(); if (!seen[k]) { seen[k] = true; uniq.push(p) } });
   uniq.sort(function (a, b) { return (b.year || 0) - (a.year || 0) });
   studyRenderLit(uniq);
+
+  // === 触发 P1：自动生成文献综述 + 推荐研究方案 ===
+  studyRunP1(title, purpose, uniq, matches);
 }
 
 function studyRenderMatches(list) {
@@ -8171,6 +8199,390 @@ function studyRenderLit(list) {
     html += '</div>';
   });
   el.innerHTML = html;
+}
+
+/* ============ STUDY ASSISTANT P1 ============ */
+
+/* --- 6 大研究设计模板库 --- */
+var STUDY_PLAN_TEMPLATES = [
+  {
+    id: 't1', name: '横断面描述性研究', en: 'Cross-sectional Descriptive Study',
+    desc: '对特定时点/时期目标人群的健康或疾病状况进行"快照"式测量，回答"现状是什么"。',
+    match_kw: ['调查','患病率','分布','特征','现状','描述','prevalence','survey','cross-sectional','横断面'],
+    design: '一次性收集数据（可以是多时点但各时点独立），测量暴露和结局，计算患病率/均值/率等指标。',
+    vars: '因变量（Y）：疾病/健康状况的存在与否或程度\n自变量（X）：社会人口学（年龄、性别、教育、收入）、行为（吸烟、运动）、环境变量\n控制变量：研究中心、测量时点',
+    methods: '频率/比例、卡方检验、t 检验、方差分析、非参数检验、简单回归',
+    datasets: '全国性调查（NHSS、CMHS、CHARLS、CLHLS）、卫生健康年鉴年度截面',
+    output: '患病率/暴露率表、人口金字塔、热力图、简单条形图/箱线图'
+  },
+  {
+    id: 't2', name: '队列追踪研究', en: 'Cohort Study / Longitudinal',
+    desc: '在一段时间内追踪同一人群，观察暴露因素如何预测结局的发生。回答"为什么"和"谁有更高风险"。',
+    match_kw: ['追踪','随访','队列','长期','纵向','预测','风险','incidence','cohort','follow','longitudinal','panel'],
+    design: '基线调查 → 定期随访（6月/12月/24月），收集同一批个体的重复测量数据，构建面板。',
+    vars: '因变量（Y）：结局的发生（新发疾病、死亡、行为变化）\n时间变量（T）：随访时间点\n自变量（X）：基线暴露因素、时间变协变量\n随机效应：个体、社区',
+    methods: '混合效应模型（REML）、广义估计方程（GEE）、多水平模型（MLM）、Cox 比例风险模型、固定效应面板回归',
+    datasets: 'CLHLS（1998+ 每2年）、CHARLS（2011+ 每2年）、CFPS、CHNS、CKB 前瞻队列',
+    output: '发生率曲线（Kaplan-Meier）、固定效应系数森林图、轨迹图、生存分析表'
+  },
+  {
+    id: 't3', name: '病例对照研究', en: 'Case-Control Study',
+    desc: '比较"有某结局"的病例和"无某结局"的对照，回溯性地查看其既往暴露差异。适合罕见病或长潜伏期结局。',
+    match_kw: ['病例对照','回顾','回溯','odds','病例组','对照组','case-control','retrospective'],
+    design: '确定病例组（确诊/发生结局）+ 匹配对照组（按年龄/性别/地区匹配 1:1 或 1:2-4），收集既往暴露信息。',
+    vars: '因变量：组别（病例=1/对照=0）\n自变量：既往暴露（OR 估计）\n匹配变量：年龄、性别、居住地',
+    methods: '条件逻辑回归（Conditional Logistic Regression）、匹配分析、精确检验（Fisher）、中介分析',
+    datasets: '医院病例登记 + 社区对照、CHARLS/CLHLS 中可按结局筛选病例',
+    output: 'OR 值森林图、暴露分布条形图、人口学匹配表'
+  },
+  {
+    id: 't4', name: '实验/干预研究（RCT）', en: 'Randomized Controlled Trial',
+    desc: '将研究对象随机分配到干预组和对照组，检验干预的因果效应。回答"这个方法有效吗"。',
+    match_kw: ['干预','随机','对照','试验','实验','效果','有效性','efficacy','intervention','rct','trial'],
+    design: '随机化（个体/聚类水平）→ 干预/对照 → 盲法（单/双盲）→ 基线+随访测量 → 意向治疗（ITT）分析。',
+    vars: '因变量：主要结局（Primary Outcome）、次要结局（Secondary Outcome）\n处理变量：干预分配（0/1）\n协变量：基线测量值、中心、分层因素',
+    methods: '线性回归/ANCOVA（校正基线）、广义线性模型、生存分析（时间-事件结局）、非劣效性检验、组内相关系数（簇随机）',
+    datasets: '自行收集或文献 Meta 分析；卫生健康年鉴中可做准实验（政策前后 DID）',
+    output: '效应量森林图、终点事件曲线、基线平衡性表、亚组分析图'
+  },
+  {
+    id: 't5', name: '二手数据二次分析', en: 'Secondary Data Analysis',
+    desc: '利用公开数据集或已发表研究的数据进行重新分析，回答原研究未回答的问题。省时省力。',
+    match_kw: ['二次','二手','公开数据集','reanalysis','secondary','meta','DID','双重差分','断点','RDD'],
+    design: '基于公开数据（年鉴、调查、登记），可能采用准实验设计（DID、RDD、合成控制）或探索性分析。',
+    vars: '灵活，取决于数据结构；DID 需要处理变量（政策实施）+ 时间变量 + 组别（处理/对照地区）',
+    methods: '双重差分（DID）、断点回归（RDD）、合成控制法、事件研究法、固定效应回归、Meta 分析（文献合并）',
+    datasets: '卫生健康年鉴（2003-2023 长序列面板）、CHNS/CHARLS/CFPS、CMHS 亚组分析',
+    output: '平行趋势检验图、DID 系数动态图、处理效应散点图、Meta 森林图'
+  },
+  {
+    id: 't6', name: '混合方法研究', en: 'Mixed-Methods Research',
+    desc: '结合定量数据（统计分析）和定性数据（访谈、扎根理论），获得更全面深入的理解。',
+    match_kw: ['混合','质性','定性','访谈','扎根','探索','机制','解释','mixed','qualitative','interview','exploratory'],
+    design: '序列探索（先定性后定量）、序列解释（先定量后定性）、平行设计（同时收集两类数据）。',
+    vars: '定量部分：同上；定性部分：访谈提纲、编码框架、主题分析',
+    methods: '定量 + 定性三角验证；定性用 NVivo/ATLAS.ti 编码，定量用 SPSS/R。可做扎根理论（GT）或解释性序列设计。',
+    datasets: '自行收集访谈 + 公开数据集三角验证；或先用年鉴数据发现模式再解释',
+    output: '定量结果 + 定性主题图谱、编码树、参与者 quote、整合模型图'
+  }
+];
+
+/* --- 自动生成文献综述 --- */
+function studyGenerateReview(title, purpose, literature, matches) {
+  var refs = literature || [];
+  var q = (title + ' ' + (purpose || '')).toLowerCase();
+
+  // 年份分布
+  var yearDist = {};
+  refs.forEach(function (p) { if (p.year) yearDist[p.year] = (yearDist[p.year] || 0) + 1 });
+  var years = Object.keys(yearDist).sort();
+
+  // 高频关键词（从标题 + 摘要中提取中文双字词/三字词 + 英文词）
+  var kwFreq = {};
+  refs.forEach(function (p) {
+    var blob = (p.title + ' ' + (p.abstract || '')).toLowerCase();
+    // 简单中文 2-gram
+    if (/[\u4e00-\u9fa5]/.test(p.title || '')) {
+      var cleanTitle = (p.title || '').replace(/[^\u4e00-\u9fa5]/g, '');
+      for (var i = 0; i <= cleanTitle.length - 2; i++) {
+        var g = cleanTitle.substring(i, i + 2);
+        if (g.length === 2 && /[\u4e00-\u9fa5]{2}/.test(g)) kwFreq[g] = (kwFreq[g] || 0) + 1;
+      }
+    }
+    // 英文词（≥4字）
+    (p.title || '').toLowerCase().split(/[^a-z]+/).forEach(function (w) {
+      if (w.length >= 4 && w.length <= 15) kwFreq[w] = (kwFreq[w] || 0) + 1;
+    });
+    (p.abstract || '').toLowerCase().split(/[^a-z]+/).forEach(function (w) {
+      if (w.length >= 5 && w.length <= 15) kwFreq[w] = (kwFreq[w] || 0) + 1;
+    });
+  });
+  var topKW = Object.entries(kwFreq).sort(function (a, b) { return b[1] - a[1] }).slice(0, 15).map(function (x) { return x[0] });
+
+  // 核心作者（去重统计）
+  var authorSet = {};
+  refs.forEach(function (p) {
+    (p.authors || '').split(/[,，]/).forEach(function (a) {
+      a = a.trim();
+      if (a.length > 1) authorSet[a] = (authorSet[a] || 0) + 1;
+    });
+  });
+  var topAuthors = Object.entries(authorSet).sort(function (a, b) { return b[1] - a[1] }).slice(0, 5).map(function (x) { return x[0] });
+
+  // 生成综述
+  var lines = [];
+  lines.push('================================================================');
+  lines.push('文献综述：' + title);
+  lines.push('生成时间：' + new Date().toLocaleString('zh-CN'));
+  lines.push('数据来源：Crossref + PubMed（共 ' + refs.length + ' 篇文献）');
+  lines.push('================================================================');
+  lines.push('');
+
+  // 1. 执行摘要
+  lines.push('【一、执行摘要】');
+  lines.push('');
+  lines.push('本综述围绕"' + title + '"这一研究主题，基于 Crossref 和 PubMed 数据库共检索到 ' + refs.length + ' 篇相关文献（' + years.join('–') + '）。研究目的：' + (purpose || '未填写') + '。当前研究呈现以下特点：① 高频主题词集中于 "' + topKW.slice(0, 5).join('、') + '" 等方向；② 核心作者包括 ' + (topAuthors.length ? topAuthors.join('、') : '暂无') + '；③ 方法学上以观察性研究和横断面调查为主。本综述系统梳理了该领域的研究现状、方法学路径、核心发现与知识缺口，为后续研究设计提供参考框架。');
+  lines.push('');
+
+  // 2. 研究背景与现状
+  lines.push('【二、研究背景与现状】');
+  lines.push('');
+  if (years.length >= 2) {
+    lines.push('从时间维度看，相关文献跨越 ' + years[0] + ' 至 ' + years[years.length - 1] + '，');
+    // 判断近年趋势
+    var recent = refs.filter(function (p) { return p.year && parseInt(p.year) >= 2020 }).length;
+    if (recent > refs.length * 0.5) {
+      lines.push('且超过半数（' + recent + '/' + refs.length + '）集中在 2020 年后，显示该主题近年关注度显著上升。');
+    } else {
+      lines.push('其中 2020 年后文献 ' + recent + ' 篇，整体分布较为均衡。');
+    }
+  } else {
+    lines.push('当前检索到的文献时间分布较集中。');
+  }
+  lines.push('');
+  lines.push('从内容维度看，现有研究主要围绕以下维度展开：');
+  lines.push('• 现象描述与流行病学特征：患病率/发生率、人群分布、地理差异');
+  lines.push('• 相关因素与影响机制：社会人口学因素、行为因素、环境因素、生物标志物');
+  lines.push('• 干预与治疗效果评估：药物、认知行为干预、政策干预的有效性');
+  lines.push('• 方法学创新：新的测量工具、分析模型、研究设计');
+  lines.push('');
+
+  // 3. 研究方法学分析
+  lines.push('【三、研究方法学分析】');
+  lines.push('');
+  var methodsFound = { cross: 0, cohort: 0, rct: 0, meta: 0, qual: 0 };
+  refs.forEach(function (p) {
+    var blob = (p.title + ' ' + (p.abstract || '')).toLowerCase();
+    if (/(rct|randomized|随机对照|干预|试验)/.test(blob)) methodsFound.rct++;
+    else if (/(cohort|follow|longitudinal|队列|追踪|随访)/.test(blob)) methodsFound.cohort++;
+    else if (/(meta|systematic|meta分析|系统综述)/.test(blob)) methodsFound.meta++;
+    else if (/(qualitative|interview|质性|访谈|扎根)/.test(blob)) methodsFound.qual++;
+    else methodsFound.cross++;
+  });
+  lines.push('现有研究设计类型分布（基于标题/摘要关键词）：');
+  lines.push('• 横断面/描述性研究：' + methodsFound.cross + ' 篇（' + Math.round(methodsFound.cross / refs.length * 100) + '%）');
+  lines.push('• 队列/纵向研究：' + methodsFound.cohort + ' 篇（' + Math.round(methodsFound.cohort / refs.length * 100) + '%）');
+  lines.push('• 随机对照试验（RCT）：' + methodsFound.rct + ' 篇（' + Math.round(methodsFound.rct / refs.length * 100) + '%）');
+  lines.push('• Meta 分析/系统综述：' + methodsFound.meta + ' 篇（' + Math.round(methodsFound.meta / refs.length * 100) + '%）');
+  lines.push('• 质性/混合方法：' + methodsFound.qual + ' 篇（' + Math.round(methodsFound.qual / refs.length * 100) + '%）');
+  lines.push('');
+  lines.push('方法学启示：若当前领域以横断面研究为主，可考虑补充队列追踪以建立时序关联；若 RCT 较少且效果不确定，高质量 RCT 将有重要贡献。');
+  lines.push('');
+
+  // 4. 核心研究发现（精选 top 5 文献）
+  lines.push('【四、核心研究发现（精选文献）】');
+  lines.push('');
+  var topRefs = refs.slice(0, Math.min(5, refs.length));
+  topRefs.forEach(function (p, idx) {
+    lines.push((idx + 1) + '. ' + p.title);
+    lines.push('   ' + (p.journal || '').trim() + (p.year ? ' (' + p.year + ')' : '') + (p.authors ? ' — ' + p.authors : ''));
+    if (p.abstract && p.abstract.length > 10) {
+      // 取摘要前 200 字
+      var abs = p.abstract.length > 200 ? p.abstract.substring(0, 200) + '...' : p.abstract;
+      lines.push('   摘要：' + abs);
+    }
+    lines.push('');
+  });
+
+  // 5. 研究热点与知识图谱
+  lines.push('【五、研究热点与知识图谱】');
+  lines.push('');
+  lines.push('高频关键词（出现次数排名）：');
+  var kwLines = [];
+  Object.entries(kwFreq).sort(function (a, b) { return b[1] - a[1] }).slice(0, 15).forEach(function (x) {
+    kwLines.push('  ' + x[0] + '（' + x[1] + ' 次）');
+  });
+  lines.push(kwLines.join('\n'));
+  lines.push('');
+  if (years.length >= 2) {
+    lines.push('年份分布：');
+    Object.entries(yearDist).sort(function (a, b) { return a[0] - b[0] }).forEach(function (kv) {
+      var bar = '█'.repeat(Math.min(20, kv[1]));
+      lines.push('  ' + kv[0] + ': ' + bar + ' ' + kv[1]);
+    });
+    lines.push('');
+  }
+
+  // 6. 研究局限与展望
+  lines.push('【六、研究局限与展望】');
+  lines.push('');
+  lines.push('现有研究可能存在的局限：');
+  lines.push('• 横断面设计多，因果推断受限，需要更多队列追踪研究');
+  lines.push('• 样本代表性可能不足（多集中于城市/特定人群）');
+  lines.push('• 测量工具缺乏统一标准，跨国/跨时期可比性差');
+  lines.push('• 中介机制和路径分析研究较少，"为什么"尚未回答');
+  lines.push('');
+  lines.push('未来研究方向建议：');
+  lines.push('1. 构建多水平/多层模型，整合个体、家庭、社区、政策多层次因素');
+  lines.push('2. 加强纵向追踪，考察关键转折点和动态轨迹');
+  lines.push('3. 结合生理/生物标志物与社会心理变量，推进生物-心理-社会整合模型');
+  lines.push('4. 开展准实验（DID/RDD）和真实世界数据研究，提升政策评估的因果强度');
+  if (matches && matches.length > 0) {
+    lines.push('5. 可利用的公开资源包括：' + matches.slice(0, 3).map(function (m) { return m.title }).join('、') + ' 等');
+  }
+  lines.push('');
+
+  // 参考文献
+  lines.push('【参考文献】');
+  lines.push('');
+  refs.forEach(function (p, idx) {
+    var ref = '[' + (idx + 1) + '] ';
+    if (p.authors) ref += p.authors + '. ';
+    ref += p.title + '. ';
+    if (p.journal) ref += p.journal + '. ';
+    if (p.year) ref += p.year + '. ';
+    if (p.doi) ref += 'DOI: ' + p.doi + ' ';
+    ref += (p.url ? p.url : '');
+    lines.push(ref.trim());
+  });
+
+  return lines.join('\n');
+}
+
+/* --- 推荐研究方案 --- */
+function studyRecommendPlans(title, purpose, literature, matches) {
+  var q = (title + ' ' + (purpose || '')).toLowerCase();
+  var plans = [];
+
+  // 给每个模板打分
+  STUDY_PLAN_TEMPLATES.forEach(function (tmpl) {
+    var score = 0;
+    tmpl.match_kw.forEach(function (kw) {
+      if (q.indexOf(kw.toLowerCase()) >= 0) score += 3;
+    });
+    // 文献特征匹配
+    var methodsMatch = 0;
+    literature.forEach(function (p) {
+      var blob = (p.title + ' ' + (p.abstract || '')).toLowerCase();
+      if (tmpl.id === 't1' && /(prevalence|cross|survey|患病率)/.test(blob)) methodsMatch++;
+      if (tmpl.id === 't2' && /(cohort|follow|longitudinal|panel|追踪)/.test(blob)) methodsMatch++;
+      if (tmpl.id === 't3' && /(case.control|病例对照)/.test(blob)) methodsMatch++;
+      if (tmpl.id === 't4' && /(rct|randomized|干预|试验)/.test(blob)) methodsMatch++;
+      if (tmpl.id === 't5' && /(did|rdd|meta|二次|公开)/.test(blob)) methodsMatch++;
+      if (tmpl.id === 't6' && /(qualitative|interview|质性|混合)/.test(blob)) methodsMatch++;
+    });
+    score += methodsMatch;
+    plans.push(Object.assign({}, tmpl, { matchScore: score }));
+  });
+
+  plans.sort(function (a, b) { return b.matchScore - a.matchScore });
+  return plans.slice(0, 3); // 推荐 top 3
+}
+
+/* --- 渲染研究方案卡片 --- */
+function studyRenderPlans(plans) {
+  var el = document.getElementById('st-plans-grid'); if (!el) return;
+  var html = '';
+  plans.forEach(function (p, idx) {
+    var detail = '【研究设计】\n' + p.design + '\n\n【变量搭配建议】\n' + p.vars + '\n\n【推荐方法学】\n' + p.methods + '\n\n【可用数据源】\n' + p.datasets + '\n\n【预期产出】\n' + p.output;
+    html += '<div id="plan-card-' + idx + '" style="border:1px solid var(--line);border-radius:6px;background:#fff;overflow:hidden">';
+    html += '<div style="padding:14px 18px;background:linear-gradient(135deg,#f0f5ff,#fff);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px">';
+    html += '<span style="background:var(--accent);color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600">推荐 #' + (idx + 1) + '</span>';
+    html += '<b style="font-size:15px">' + p.name + '</b>';
+    html += '<span style="font-size:11.5px;color:var(--muted)">' + (p.en || '') + '</span>';
+    html += '<div style="flex:1"></div>';
+    html += '<button class="btn sm" onclick="studyTogglePlan(' + idx + ')" style="padding:3px 10px;font-size:11.5px;margin-right:6px">展开/收起</button>';
+    html += '<button class="btn sm" onclick="studyEditPlan(' + idx + ')" style="padding:3px 10px;font-size:11.5px;margin-right:6px">改进</button>';
+    html += '<button class="btn sm" onclick="studyCopyPlan(' + idx + ')" style="padding:3px 10px;font-size:11.5px">复制</button>';
+    html += '</div>';
+    html += '<div id="plan-detail-' + idx + '" style="padding:16px 18px;font-size:13px;line-height:1.8;color:var(--ink2);white-space:pre-wrap">' + detail + '</div>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function studyTogglePlan(idx) {
+  var d = document.getElementById('plan-detail-' + idx);
+  if (d) d.style.display = d.style.display === 'none' ? '' : 'none';
+}
+
+function studyEditPlan(idx) {
+  var d = document.getElementById('plan-detail-' + idx);
+  if (!d) return;
+  var current = d.textContent;
+  d.innerHTML = '<textarea id="plan-edit-' + idx + '" style="width:100%;min-height:260px;padding:12px;border:1px solid var(--line);border-radius:4px;font-size:13px;line-height:1.8;font-family:inherit;resize:vertical;outline:none">' + current + '</textarea>';
+  d.innerHTML += '<div style="margin-top:10px;display:flex;gap:8px">';
+  d.innerHTML += '<button class="btn sm primary" onclick="studySavePlan(' + idx + ')" style="padding:5px 14px;font-size:12px">保存修改</button>';
+  d.innerHTML += '<button class="btn sm" onclick="studyCancelEdit(' + idx + ', `' + current.replace(/`/g, '\\`') + '`)" style="padding:5px 14px;font-size:12px">取消</button>';
+  d.innerHTML += '</div>';
+}
+
+function studySavePlan(idx) {
+  var ta = document.getElementById('plan-edit-' + idx);
+  var d = document.getElementById('plan-detail-' + idx);
+  if (ta && d) d.innerHTML = ta.value;
+}
+
+function studyCancelEdit(idx, original) {
+  var d = document.getElementById('plan-detail-' + idx);
+  if (d) d.textContent = original;
+}
+
+function studyCopyPlan(idx) {
+  var d = document.getElementById('plan-detail-' + idx);
+  if (!d) return;
+  navigator.clipboard.writeText(d.textContent).then(function () {
+    alert('方案已复制到剪贴板 ✅');
+  }).catch(function () {
+    // fallback
+    var ta = document.createElement('textarea');
+    ta.value = d.textContent; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    alert('方案已复制 ✅');
+  });
+}
+
+/* --- 综述导出/复制 --- */
+function studyExportReview(format) {
+  var content = document.getElementById('st-review-content');
+  if (!content) return;
+  var text = content.textContent || '';
+  if (format === 'copy') {
+    navigator.clipboard.writeText(text).then(function () {
+      alert('综述已复制到剪贴板 ✅');
+    }).catch(function () {
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      alert('综述已复制 ✅');
+    });
+  } else if (format === 'md') {
+    var blob = new Blob([text], { type: 'text/markdown;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = '文献综述_' + (STUDY_STATE.title || 'research').replace(/[\\/:*?"<>|]/g, '_') + '.md';
+    a.click(); URL.revokeObjectURL(url);
+  } else if (format === 'txt') {
+    var blob2 = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    var url2 = URL.createObjectURL(blob2);
+    var a2 = document.createElement('a');
+    a2.href = url2; a2.download = '文献综述_' + (STUDY_STATE.title || 'research').replace(/[\\/:*?"<>|]/g, '_') + '.txt';
+    a2.click(); URL.revokeObjectURL(url2);
+  }
+}
+
+/* --- P1 主入口：生成综述 + 推荐方案 --- */
+function studyRunP1(title, purpose, literature, matches) {
+  // 生成综述
+  var reviewWrap = document.getElementById('st-review-wrap');
+  var reviewContent = document.getElementById('st-review-content');
+  if (reviewWrap && reviewContent) {
+    reviewWrap.style.display = 'block';
+    reviewContent.textContent = '正在生成综述...';
+    try {
+      var review = studyGenerateReview(title, purpose, literature, matches);
+      reviewContent.textContent = review;
+    } catch (e) {
+      reviewContent.textContent = '综述生成失败: ' + e.message;
+    }
+  }
+  // 推荐方案
+  var plansWrap = document.getElementById('st-plans-wrap');
+  if (plansWrap) {
+    plansWrap.style.display = 'block';
+    var plans = studyRecommendPlans(title, purpose, literature, matches);
+    studyRenderPlans(plans);
+  }
 }
 
 </script>
