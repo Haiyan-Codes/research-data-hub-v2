@@ -13464,10 +13464,10 @@ document.getElementById('lit-modal-bg').addEventListener('click',function(e){if(
     try{
       const r = await STORM.generateQuestions();
       state.questions = (r.questions||[]).map(t=>({id:uid(), text:t, checked:true, editing:false, custom:false}));
-      stRenderQuestions();
       stMsg('assistant', (r.reply?r.reply+'\n\n':'') +
         '📋 已生成 '+state.questions.length+' 个核心问题。请勾选你想要系统检索与讨论的项目（默认全部），也可以点击每条问题末尾「✏ 编辑」改写；最后点击下方「确认进入第 3 轮」按钮。',
         {round:2});
+      stRenderQuestions();
     }catch(e){
       stMsg('err','生成问题清单失败：'+e.message);
     }finally{ setBusy(false); }
