@@ -323,6 +323,159 @@ section.page.active{display:block;opacity:1}
 /* code editor */
 .code-editor{width:100%;min-height:150px;border:1px solid var(--line);border-radius:3px;font-family:"Source Code Pro",monospace;font-size:12px;padding:10px;resize:vertical;outline:none;background:#fafbfc}
 .code-editor:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(30,64,175,.1)}
+
+/* =========================================================
+ * STORM 式研究助手（p-agent 内 #agent-storm）
+ * ========================================================= */
+/* 二级 Tab：经典/STORM 切换 */
+.st-subtabs{display:flex;gap:4px;margin:0 0 16px;padding:4px;background:var(--bg2);border:1px solid var(--line);border-radius:10px}
+.st-subtab{flex:1;padding:9px 14px;border:0;background:transparent;border-radius:7px;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--ink2);transition:all .15s}
+.st-subtab:hover{background:rgba(14,165,233,.06);color:var(--ink1)}
+.st-subtab.active{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);color:var(--accent);font-weight:600}
+.st-subtab .st-newtag{display:inline-block;margin-left:6px;background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px}
+
+/* 配置面板（Worker URL + Worker Key 混淆开关） */
+.st-config{display:flex;align-items:center;gap:8px;padding:10px 14px;margin-bottom:14px;border:1px dashed var(--line);border-radius:8px;background:#fcfcfd;font-size:12.5px;flex-wrap:wrap}
+.st-config label{color:var(--muted);font-size:12px}
+.st-config input{padding:6px 10px;border:1px solid var(--line);border-radius:5px;font-size:12.5px;outline:none;width:340px;max-width:100%}
+.st-config input:focus{border-color:var(--accent)}
+.st-config .btn{font-size:12px;padding:6px 10px}
+
+/* 轮次指示器 */
+.st-rounds{display:flex;align-items:center;gap:4px;padding:10px 12px;background:linear-gradient(135deg,#eff6ff,#f0f9ff);border:1px solid #bfdbfe;border-radius:10px;margin-bottom:14px;overflow-x:auto}
+.st-round{display:flex;align-items:center;gap:6px;white-space:nowrap;padding:5px 12px;border-radius:999px;font-size:12.5px;color:var(--muted);font-weight:500}
+.st-round .st-rnum{width:22px;height:22px;border-radius:50%;background:#e2e8f0;color:#475569;display:grid;place-items:center;font-weight:700;font-size:11.5px}
+.st-round.done{color:#166534;background:#dcfce7}
+.st-round.done .st-rnum{background:#16a34a;color:#fff}
+.st-round.active{color:var(--accent-dark);background:#dbeafe;box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.st-round.active .st-rnum{background:var(--accent);color:#fff}
+.st-round-arrow{color:#94a3b8;font-size:14px;flex:0 0 auto}
+
+/* 三栏主布局 */
+.st-grid{display:grid;grid-template-columns:40fr 30fr 30fr;gap:12px;align-items:start}
+@media(max-width:1280px){.st-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto auto} .st-col-review{grid-column:span 2}}
+@media(max-width:780px){.st-grid{grid-template-columns:1fr} .st-col-review{grid-column:auto}}
+
+.st-col{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-height:560px;max-height:82vh}
+.st-col-head{padding:10px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fff,#fafbfd);display:flex;align-items:center;justify-content:space-between;gap:8px;flex:0 0 auto}
+.st-col-head h3{font-size:13.5px;font-weight:600;margin:0;display:flex;align-items:center;gap:6px}
+.st-col-head .st-count{font-size:11.5px;background:#e0f2fe;color:#075985;padding:2px 8px;border-radius:999px;font-weight:600}
+.st-col-body{padding:12px 14px;overflow:auto;flex:1 1 auto;display:flex;flex-direction:column;gap:10px}
+
+/* ---- 对话列 ---- */
+.st-msg{display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:1.65}
+.st-msg-user{align-items:flex-end}
+.st-msg .st-mbubble{padding:9px 12px;border-radius:10px;max-width:92%;word-break:break-word}
+.st-msg-sys .st-mbubble{background:#f1f5f9;color:var(--ink1);border-bottom-left-radius:3px;border:1px solid #e2e8f0}
+.st-msg-user .st-mbubble{background:linear-gradient(135deg,var(--accent),#0284c7);color:#fff;border-bottom-right-radius:3px;box-shadow:0 1px 2px rgba(14,165,233,.25)}
+.st-msg-err .st-mbubble{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.st-msg-meta{font-size:11px;color:var(--muted);padding:0 4px}
+.st-msg .st-citation{font-size:11.5px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);color:var(--muted);line-height:1.55}
+.st-msg .st-citation a{color:var(--accent);text-decoration:none}
+.st-msg .st-citation a:hover{text-decoration:underline}
+/* markdown 渲染（轻量，避免引入外部库） */
+.st-md h1,.st-md h2,.st-md h3,.st-md h4{margin:10px 0 6px;font-weight:700;color:var(--ink1);line-height:1.35}
+.st-md h1{font-size:15px;border-bottom:1px solid var(--line);padding-bottom:4px}
+.st-md h2{font-size:14px}
+.st-md h3{font-size:13px}
+.st-md p{margin:5px 0}
+.st-md ul,.st-md ol{margin:5px 0 5px 20px}
+.st-md li{margin:2px 0}
+.st-md code{background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:11.5px;font-family:"Source Code Pro",monospace;color:#b45309}
+.st-md blockquote{margin:5px 0;padding:4px 10px;border-left:3px solid #93c5fd;background:#eff6ff;color:#1e3a8a;font-size:12.5px}
+.st-md table{border-collapse:collapse;width:100%;margin:6px 0;font-size:12px}
+.st-md th,.st-md td{border:1px solid var(--line);padding:4px 8px;text-align:left}
+.st-md th{background:#f1f5f9}
+.st-md a{color:var(--accent);text-decoration:none}
+.st-md hr{border:0;border-top:1px solid var(--line);margin:10px 0}
+
+/* 对话输入 */
+.st-chat-footer{padding:10px 12px;border-top:1px solid var(--line);background:#fcfcfd;flex:0 0 auto;display:flex;flex-direction:column;gap:8px}
+.st-actions{display:flex;gap:6px;flex-wrap:wrap}
+.st-input-wrap{display:flex;gap:6px;align-items:flex-end}
+.st-input-wrap textarea{flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:13px;resize:vertical;min-height:38px;max-height:160px;outline:none;font-family:inherit;line-height:1.5}
+.st-input-wrap textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(14,165,233,.12)}
+.st-input-wrap button{height:38px;flex:0 0 auto}
+.st-thinking{display:flex;align-items:center;gap:8px;padding:8px 12px;color:var(--muted);font-size:12.5px;font-style:italic}
+.st-thinking .st-dots{display:inline-flex;gap:2px}
+.st-thinking .st-dots span{width:5px;height:5px;background:var(--accent);border-radius:50%;animation:stBounce 1.1s infinite ease-in-out both}
+.st-thinking .st-dots span:nth-child(1){animation-delay:-.32s}
+.st-thinking .st-dots span:nth-child(2){animation-delay:-.16s}
+@keyframes stBounce{0%,80%,100%{transform:scale(.6);opacity:.5}40%{transform:scale(1);opacity:1}}
+
+/* ---- 文献列 ---- */
+.st-paper{border:1px solid var(--line);border-radius:7px;padding:10px 11px;background:#fff;display:flex;flex-direction:column;gap:5px}
+.st-paper-title{font-weight:600;font-size:12.8px;color:var(--ink1);line-height:1.45;text-decoration:none}
+.st-paper-title:hover{color:var(--accent)}
+.st-paper-meta{font-size:11px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap}
+.st-paper-meta .st-src-pill{background:#e0f2fe;color:#075985;padding:1px 6px;border-radius:4px;font-weight:600;font-size:10.5px}
+.st-paper-meta .st-src-pill.src-PubMed{background:#fef3c7;color:#92400e}
+.st-paper-meta .st-src-pill.src-OpenAlex{background:#ede9fe;color:#5b21b6}
+.st-paper-meta .st-src-pill.src-Semantic-Scholar{background:#fce7f3;color:#9d174d}
+.st-paper-meta .st-src-pill.src-Europe-PMC{background:#dcfce7;color:#166534}
+.st-paper-meta .st-src-pill.src-Crossref{background:#fee2e2;color:#991b1b}
+.st-paper-doi{font-size:11px;color:var(--accent);text-decoration:none}
+.st-paper-doi:hover{text-decoration:underline}
+.st-paper-abs{font-size:11.5px;color:var(--ink2);line-height:1.6;max-height:90px;overflow:hidden;position:relative}
+.st-paper-abs.expanded{max-height:none}
+.st-paper-abs::after{content:"";position:absolute;bottom:0;left:0;right:0;height:22px;background:linear-gradient(180deg,transparent,#fff);pointer-events:none}
+.st-paper-abs.expanded::after{display:none}
+.st-paper-toggle{font-size:11px;color:var(--accent);cursor:pointer;background:none;border:0;padding:0;text-align:left}
+.st-method-tags{display:flex;gap:3px;flex-wrap:wrap;margin-top:2px}
+.st-tag{font-size:10px;padding:1px 6px;border-radius:999px;background:#f1f5f9;color:#475569;font-weight:500}
+.st-tag.design{background:#fef3c7;color:#92400e}
+.st-tag.stat{background:#ede9fe;color:#5b21b6}
+.st-tag.tool{background:#e0f2fe;color:#075985}
+.st-tag.quality{background:#dcfce7;color:#166534}
+.st-tag.risk{background:#fee2e2;color:#991b1b}
+.st-methods-box{margin-top:4px;padding:6px 8px;background:#fafbfd;border:1px dashed var(--line);border-radius:5px;font-size:11px;color:var(--ink2)}
+.st-methods-row{display:flex;gap:4px;align-items:baseline;margin:2px 0}
+.st-methods-row b{font-weight:600;color:var(--ink1);flex:0 0 62px;font-size:10.5px}
+.st-empty{padding:24px;text-align:center;color:var(--muted);font-size:12.5px;background:#fafbfd;border-radius:6px;border:1px dashed var(--line)}
+.st-empty .st-emoji{font-size:28px;display:block;margin-bottom:6px}
+
+/* ---- 综述列 ---- */
+.st-review{font-size:12.8px;line-height:1.7;color:var(--ink1)}
+.st-review h1{font-size:18px;margin:0 0 4px;font-weight:800}
+.st-review h2{font-size:14.5px;margin:14px 0 6px;padding-bottom:3px;border-bottom:1px solid var(--line);font-weight:700}
+.st-review h3{font-size:13px;margin:10px 0 4px;font-weight:700}
+.st-review blockquote{margin:6px 0;padding:6px 10px;border-left:3px solid #93c5fd;background:#eff6ff;font-size:12px;color:#1e3a8a}
+.st-review .st-cite{color:var(--accent);font-weight:600}
+.st-review ref{color:var(--accent);font-weight:600}
+.st-review pre{background:#0f172a;color:#e2e8f0;padding:8px 10px;border-radius:5px;font-size:11px;overflow:auto}
+.st-review code{background:#f1f5f9;padding:1px 4px;border-radius:3px;font-size:11px;color:#b45309}
+.st-review-tools{padding:10px 12px;border-top:1px solid var(--line);background:#fcfcfd;flex:0 0 auto;display:flex;gap:6px;flex-wrap:wrap}
+.st-ch-status{padding:10px;background:linear-gradient(135deg,#ecfeff,#f0f9ff);border:1px solid #a5f3fc;border-radius:6px;font-size:12px;color:#0e7490}
+.st-ch-list{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.st-ch-item{display:flex;align-items:center;gap:6px;font-size:12px;padding:4px 8px;background:#fff;border-radius:5px;border:1px solid var(--line)}
+.st-ch-item.done{background:#f0fdf4;border-color:#bbf7d0;color:#166534}
+.st-ch-item.run{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.st-ch-item .st-dot{width:8px;height:8px;border-radius:50%;background:#cbd5e1}
+.st-ch-item.done .st-dot{background:#16a34a}
+.st-ch-item.run .st-dot{background:var(--accent);animation:stPulse 1.2s infinite}
+@keyframes stPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.5}}
+
+/* 问题勾选（第 2 轮） */
+.st-qpanel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.st-qpanel h4{margin:0;font-size:13px;font-weight:700;color:var(--ink1)}
+.st-qitem{display:flex;gap:8px;align-items:flex-start;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;transition:all .12s}
+.st-qitem:hover{border-color:var(--accent);background:#eff6ff}
+.st-qitem input[type=checkbox]{margin-top:3px;flex:0 0 auto}
+.st-qitem .st-qtext{font-size:12.5px;line-height:1.55;flex:1}
+.st-qitem.checked{background:#eff6ff;border-color:var(--accent)}
+.st-qitem .st-qview{font-size:10px;padding:1px 6px;border-radius:999px;background:#f1f5f9;color:#64748b;font-weight:600;flex:0 0 auto}
+.st-qitem.checked .st-qview{background:#dbeafe;color:#1e40af}
+.st-qitem textarea{width:100%;margin-top:4px;display:none;padding:5px 7px;font-size:12px;border:1px solid var(--line);border-radius:4px;font-family:inherit;resize:vertical;min-height:34px;outline:none}
+.st-qitem textarea:focus{border-color:var(--accent)}
+.st-qitem.editing textarea{display:block}
+.st-qbtnrow{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap}
+.st-qbtnrow .btn{font-size:12px;padding:5px 10px}
+
+/* 章节精修（第 5 轮） */
+.st-refine-row{display:flex;gap:6px;align-items:center;padding:5px 8px;background:#fafbfd;border:1px solid var(--line);border-radius:5px;font-size:12px;margin-bottom:4px}
+.st-refine-row span{flex:1;font-weight:600;color:var(--ink1)}
+.st-refine-row input{padding:4px 8px;font-size:12px;flex:2;border:1px solid var(--line);border-radius:4px;outline:none}
+.st-refine-row input:focus{border-color:var(--accent)}
 </style>
 <style>.trae-browser-inspect-overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:999997;pointer-events:auto;background:rgba(0,0,0,0)}.trae-browser-inspect-highlight-box{position:absolute;top:0;left:0;z-index:999998;display:none}.trae-browser-inspect-highlight-tag{position:absolute;left:0px;top:0px;height:18px;padding:0 6px;box-sizing:border-box;border-radius:4px;background-color:var(--vscode-icube-colorSuccessHover, "#2FB287");color:var(--vscode-icube-colorSnow, "#fff");font-size:12px;font-weight:400;display:none;align-items:center;z-index:999999}.trae-browser-inspect-highlight-box-show{display:flex}.trae-browser-inspect-select-button.trae-browser-inspect-highlight-box-show{display:flex !important}.trae-browser-inspect-select-button{position:absolute;top:0;left:0;background-color:var(--vscode-icube--bg-bg-base-secondary, "#222427");color:var(--vscode-icube--text-text-default-active, "#F5F9FE");font-size:11px;font-weight:500;border:1px solid var(--vscode-icube--border-neutral-l1, "#E0E2F217");border-radius:6px;padding:0 8px;height:32px;display:none;align-items:center;cursor:pointer;z-index:999999;gap:4px}.trae-browser-inspect-select-button svg,.trae-browser-inspect-select-button span{z-index:1}.trae-browser-inspect-select-highlight-box{background:rgba(0,0,0,0) !important}.trae-browser-inspect-select-highlight-box .trae-browser-inspect-highlight-tag{background-color:var(--vscode-icube--status-success-active, "#1E8B56")}.trae-browser-inspect-comment-card-container{position:fixed;top:0;left:0;z-index:9999999;pointer-events:auto}.trae-browser-inspect-comment-card-container .trae-browser-inspect-comment-card{display:flex;padding-top:0px !important;align-items:center;z-index:9999999 !important;background-color:var(--vscode-icube--bg-bg-menu)}*[contenteditable]{outline:none}.trae-browser-inspect-click-effect{position:fixed;width:40px;height:40px;margin-left:-20px;margin-top:-20px;border-radius:50%;background-color:var(--vscode-icube-colorSuccessHover, #2FB287);pointer-events:none;animation:trae-browser-inspect-ripple 500ms ease-out forwards;z-index:999999}@keyframes trae-browser-inspect-ripple{0%{transform:scale(0.3);opacity:.8}100%{transform:scale(2);opacity:0}}.trae-browser-inspect-ref-box{position:absolute;border:2px solid var(--vscode-icube-colorSuccessHover, "#2FB287");pointer-events:none;z-index:999998;animation:trae-browser-inspect-fadeInOut 2s ease-in-out forwards}.trae-browser-inspect-ref-label{position:absolute;top:-14px;left:0;height:14px;padding:0 4px;box-sizing:border-box;border-radius:2px;background-color:var(--vscode-icube-colorSuccessHover, "#2FB287");color:var(--vscode-icube-colorSnow, "#fff");font-size:9px;font-weight:500;display:flex;align-items:center;white-space:nowrap;z-index:999999}@keyframes trae-browser-inspect-fadeInOut{0%{opacity:0}10%{opacity:1}90%{opacity:1}100%{opacity:0}}.trae-browser-inspect-input-highlight{position:absolute;border:2px solid var(--vscode-icube-colorSuccessHover, "#2FB287");border-radius:4px;pointer-events:none;z-index:999998;box-shadow:0 0 8px var(--vscode-icube-colorSuccessHover, "#2FB287");animation:trae-browser-inspect-input-pulse 600ms ease-out forwards}@keyframes trae-browser-inspect-input-pulse{0%{opacity:0;box-shadow:0 0 0 var(--vscode-icube-colorSuccessHover, "#2FB287")}30%{opacity:1;box-shadow:0 0 12px var(--vscode-icube-colorSuccessHover, "#2FB287")}100%{opacity:0;box-shadow:0 0 0 var(--vscode-icube-colorSuccessHover, "#2FB287")}}.trae-browser-inspect-virtual-cursor{position:fixed;width:20px;height:20px;pointer-events:none;z-index:9999999;opacity:0;transition:opacity .2s ease}.trae-browser-inspect-virtual-cursor.trae-browser-inspect-cursor-visible{opacity:1}.trae-browser-inspect-virtual-cursor.trae-browser-inspect-cursor-idle{animation:trae-browser-inspect-cursor-breathe 2s ease-in-out infinite}.trae-browser-inspect-virtual-cursor svg{width:20px;height:20px;filter:drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))}@keyframes trae-browser-inspect-cursor-breathe{0%,100%{opacity:.7}50%{opacity:1}}.trae-browser-inspect-scroll-indicator{position:fixed;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:8px;background-color:rgba(0,0,0,.7);color:#fff;font-size:13px;font-weight:500;pointer-events:none;z-index:999999;animation:trae-browser-inspect-indicator-fade 800ms ease-out forwards;backdrop-filter:blur(4px)}.trae-browser-inspect-scroll-indicator svg{width:16px;height:16px;fill:#fff}.trae-browser-inspect-scroll-indicator.trae-scroll-up{top:12px;left:50%;transform:translateX(-50%)}.trae-browser-inspect-scroll-indicator.trae-scroll-down{bottom:12px;left:50%;transform:translateX(-50%)}.trae-browser-inspect-scroll-indicator.trae-scroll-left{left:12px;top:50%;transform:translateY(-50%)}.trae-browser-inspect-scroll-indicator.trae-scroll-right{right:12px;top:50%;transform:translateY(-50%)}@keyframes trae-browser-inspect-indicator-fade{0%{opacity:0;transform:translateX(-50%) scale(0.9)}15%{opacity:1;transform:translateX(-50%) scale(1)}85%{opacity:1}100%{opacity:0}}.trae-browser-inspect-scroll-indicator.trae-scroll-left,.trae-browser-inspect-scroll-indicator.trae-scroll-right{animation-name:trae-browser-inspect-indicator-fade-y}@keyframes trae-browser-inspect-indicator-fade-y{0%{opacity:0;transform:translateY(-50%) scale(0.9)}15%{opacity:1;transform:translateY(-50%) scale(1)}85%{opacity:1}100%{opacity:0}}.trae-browser-inspect-key-badge{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);padding:8px 20px;border-radius:8px;background-color:rgba(0,0,0,.8);color:#fff;font-size:18px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,monospace;pointer-events:none;z-index:999999;animation:trae-browser-inspect-key-pop 500ms ease-out forwards;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.15);box-shadow:0 4px 12px rgba(0,0,0,.3);letter-spacing:1px}@keyframes trae-browser-inspect-key-pop{0%{opacity:0;transform:translateX(-50%) translateY(10px) scale(0.9)}20%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}80%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(-10px)}}.trae-browser-inspect-step-badge{position:fixed;top:12px;left:12px;padding:6px 12px;border-radius:6px;background-color:var(--vscode-icube-colorSuccessHover, #2FB287);color:#fff;font-size:12px;font-weight:600;pointer-events:none;z-index:999999;animation:trae-browser-inspect-step-slide 600ms ease-out forwards;box-shadow:0 2px 8px rgba(47,178,135,.3);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.trae-browser-inspect-step-badge.trae-step-old{opacity:.4;transform:translateY(0)}@keyframes trae-browser-inspect-step-slide{0%{opacity:0;transform:translateX(-20px)}20%{opacity:1;transform:translateX(0)}100%{opacity:1;transform:translateX(0)}}.trae-browser-inspect-drag-trail{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999998}.trae-browser-inspect-drag-trail svg{width:100%;height:100%}.trae-browser-inspect-drag-trail .trae-drag-path{fill:none;stroke:var(--vscode-icube-colorSuccessHover, #2FB287);stroke-width:2;stroke-dasharray:8 4;opacity:.6;animation:trae-browser-inspect-dash 600ms linear forwards}.trae-browser-inspect-drag-trail .trae-drag-dot{fill:var(--vscode-icube-colorSuccessHover, #2FB287);filter:drop-shadow(0 0 4px rgba(47, 178, 135, 0.6))}.trae-browser-inspect-drag-trail .trae-drag-endpoint{fill:none;stroke:var(--vscode-icube-colorSuccessHover, #2FB287);stroke-width:2;opacity:.5}@keyframes trae-browser-inspect-dash{0%{stroke-dashoffset:200}100%{stroke-dashoffset:0}}.trae-browser-inspect-drag-trail.trae-drag-fade{animation:trae-browser-inspect-trail-fade 400ms ease-out forwards}@keyframes trae-browser-inspect-trail-fade{0%{opacity:1}100%{opacity:0}}</style><script type="module">(async () => {
   try {
@@ -4461,8 +4614,16 @@ else:
 
 <!-- ============ PAGE: AGENT ============ -->
 <section id="p-agent" class="page">
-  <div class="page-title"><h2> 文献研究智能体</h2><div class="meta">关键词驱动：自动爬取文献 → 结构化中文摘要 → 计量分析 → 主题聚类 → 研究洞察 → 综合报告</div></div>
+  <div class="page-title"><h2> 文献研究智能体</h2><div class="meta">经典模式：关键词驱动爬取分析；🤖 STORM 模式：多轮对话 → 真实文献检索 → 自动写出 8 章综述</div></div>
 
+  <!-- STORM / 经典 二级 Tab -->
+  <div class="st-subtabs" id="st-subtabs">
+    <button class="st-subtab active" data-subtab="classic" onclick="stSwitchSubtab('classic')"> 经典模式</button>
+    <button class="st-subtab" data-subtab="storm" onclick="stSwitchSubtab('storm')">🤖 STORM 式研究助手 <span class="st-newtag">NEW</span></button>
+  </div>
+
+  <!-- ============ 经典模式（原 agent UI 整体移入） ============ -->
+  <div id="agent-classic">
   <div class="toolbar">
     <input class="input wide" id="agent-q" placeholder="输入研究关键词，例如：adolescent depression / 老年认知衰退 / suicide prevention cohort / 青少年非自杀性自伤">
     <select id="agent-year"><option value="">所有年份</option><option value="2024">近 2 年</option><option value="2020">近 5 年</option><option value="2015">近 10 年</option></select>
@@ -4566,7 +4727,6 @@ else:
       </div>
     </div>
   </div>
-</section>
 
 <style>
 .agent-flow{display:flex;gap:8px;margin:14px 0;flex-wrap:wrap}
@@ -4632,6 +4792,77 @@ else:
 .rec-card b{color:var(--accent);display:block;margin-bottom:4px}
 </style>
 
+  </div><!-- / agent-classic -->
+
+  <!-- ============ STORM 式研究助手 ============ -->
+  <div id="agent-storm" style="display:none">
+
+    <!-- 后端代理配置 -->
+    <div class="st-config" id="st-config">
+      <label>🛰 后端代理 (Cloudflare Worker)：</label>
+      <input id="st-worker-url" type="url" placeholder="例如：https://storm.mentalhealthresearch.top  （不需要加 /api）" value="https://storm.mentalhealthresearch.top">
+      <label style="margin-left:4px">🔑 Worker Key：</label>
+      <input id="st-worker-key" type="password" placeholder="管理员密码 或 你自己的 SiliconFlow Key (sk-开头)。留空则每天每IP享3次免费额度" value="">
+      <button class="btn sm teal" onclick="stSaveConfig()"> 保存到浏览器</button>
+      <button class="btn sm" onclick="stPingWorker()"> 测试连通性</button>
+      <span id="st-ping" style="font-size:12px;color:var(--muted)"></span>
+    </div>
+
+    <!-- 轮次指示器 -->
+    <div class="st-rounds" id="st-rounds">
+      <div class="st-round active" data-r="1"><div class="st-rnum">1</div><div>澄清主题</div></div><div class="st-round-arrow">→</div>
+      <div class="st-round" data-r="2"><div class="st-rnum">2</div><div>核心问题清单</div></div><div class="st-round-arrow">→</div>
+      <div class="st-round" data-r="3"><div class="st-rnum">3</div><div>检索与对话</div></div><div class="st-round-arrow">→</div>
+      <div class="st-round" data-r="4"><div class="st-rnum">4</div><div>生成综述 8 章</div></div><div class="st-round-arrow">→</div>
+      <div class="st-round" data-r="5"><div class="st-rnum">5</div><div>精修与导出</div></div>
+    </div>
+
+    <!-- 三栏主布局 -->
+    <div class="st-grid">
+
+      <!-- 左：对话列 -->
+      <div class="st-col st-col-chat">
+        <div class="st-col-head"><h3>💬 对话与决策</h3><span class="st-count" id="st-chat-count">0 条</span></div>
+        <div class="st-col-body" id="st-chat"><!-- 动态消息流 --><div class="st-empty"><span class="st-emoji">🧑‍🔬</span>请先在上方设置你的 Cloudflare Worker 地址并保存，然后输入你想研究的主题（比如「青少年非自杀性自伤的心理干预」），我会先帮你澄清研究范围。</div></div>
+        <div class="st-chat-footer">
+          <div class="st-actions" id="st-actions"></div>
+          <div class="st-input-wrap">
+            <textarea id="st-input" rows="2" placeholder="第 1 轮：输入你的研究主题 / 第 2 轮：补充问题 / 第 3 轮：追问 / 第 5 轮：精修指令..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();stSend()}"></textarea>
+            <button class="btn primary" id="st-send" onclick="stSend()">发送 ▶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 中：文献列 -->
+      <div class="st-col st-col-papers">
+        <div class="st-col-head"><h3>📚 已检索文献</h3><span class="st-count" id="st-paper-count">0 篇</span></div>
+        <div class="st-col-body" id="st-papers"><div class="st-empty"><span class="st-emoji">📄</span>进入第 3 轮后，系统会根据对话内容实时检索 PubMed / Crossref / Semantic Scholar / OpenAlex / Europe PMC 的真实文献，并显示方法学标注与 DOI 链接。</div></div>
+      </div>
+
+      <!-- 右：综述列 -->
+      <div class="st-col st-col-review">
+        <div class="st-col-head"><h3>📝 系统综述</h3><span class="st-count" id="st-review-count">0 章</span></div>
+        <div class="st-col-body" id="st-review" style="gap:12px">
+          <div class="st-empty"><span class="st-emoji">📖</span>第 4 轮将基于前面检索到的全部真实文献，用 8 章结构写出中文系统综述。当前尚未生成。</div>
+          <div id="st-chapters-status" style="display:none" class="st-ch-status">
+            <b>章节生成进度：</b>
+            <div class="st-ch-list" id="st-ch-list"></div>
+          </div>
+          <div id="st-review-body" class="st-review" style="display:none"></div>
+        </div>
+        <div class="st-review-tools" id="st-review-tools">
+          <button class="btn sm" onclick="stExportReview('md')" disabled>⬇ 导出 Markdown</button>
+          <button class="btn sm" onclick="stExportReview('docx')" disabled>⬇ 导出 Word (.docx)</button>
+          <button class="btn sm teal" onclick="stCopyReview()" disabled>📋 复制全文</button>
+          <span style="font-size:11.5px;color:var(--muted);margin-left:auto" id="st-review-meta"></span>
+        </div>
+      </div>
+
+    </div><!-- /st-grid -->
+
+  </div><!-- / agent-storm -->
+</section><!-- /p-agent -->
+
 <!-- ============ PAGE 4: LIBRARY ============ -->
 <section id="p-library" class="page">
   <div class="page-title"><h2>⭐ 我的收藏</h2><div class="meta">检索结果 / 分析报告 · 本地浏览器保存</div></div>
@@ -4683,10 +4914,9 @@ else:
       </div>
     </div>
   </div>
+</section><!-- /p-health -->
 
 <!-- ============ PAGE: STUDY ASSISTANT ============ -->
-
-</section>
 
 <section id="p-study" class="page">
   <div class="page-title">
@@ -12570,8 +12800,1001 @@ document.getElementById('lit-modal-bg').addEventListener('click',function(e){if(
     renderLits();
     initLitTabs();
     try{initHealthHub();}catch(e){console.warn('initHealthHub fail:',e);}
+    /* STORM 研究助手 初始化 */
+    try{stInit();}catch(e){console.warn('stInit fail:',e);}
   };
 })();
+
+/* =========================================================
+ * STORM 式研究助手 —— 全部前端逻辑（单脚本 IIFE，无外部依赖）
+ * ========================================================= */
+(function(){
+  /* ======== 8 章结构 ======== */
+  const ST_CHAPTERS = [
+    {id:'ch1',title:'第 1 章 · 标题',role:'generate_title'},
+    {id:'ch2',title:'第 2 章 · 摘要',role:'generate_abstract'},
+    {id:'ch3',title:'第 3 章 · 引言 / 研究背景',role:'generate_introduction'},
+    {id:'ch4',title:'第 4 章 · 文献检索策略',role:'generate_search_methods'},
+    {id:'ch5',title:'第 5 章 · 研究方法学综合评估',role:'generate_methodology'},
+    {id:'ch6',title:'第 6 章 · 核心发现与主题综合',role:'generate_findings'},
+    {id:'ch7',title:'第 7 章 · 局限与争论',role:'generate_limitations'},
+    {id:'ch8',title:'第 8 章 · 未来研究方向与建议',role:'generate_future'}
+  ];
+  const ST_LS_CFG = 'st_config_v1';
+  const ST_LS_STATE = 'st_state_v1';
+
+  /* ======== 全局状态 ======== */
+  const state = {
+    round:1,                 // 1..5
+    chat:[],                 // {role:'user'|'sys'|'assistant'|'err',text,time,...}
+    papers:[],               // {doi,pmid,title,authors,year,journal,abstract,source,link,methods?,cited_count?}
+    questions:[],            // {id,text,editing,custom,checked}
+    chapters:{},             // id -> {title,content,role,status:'idle'|'run'|'done'|'err',error}
+    topicSummary:'',         // 第 1 轮澄清后生成的 concise 主题摘要
+    searchQueries:[],        // 第 2 轮后确定的检索关键词数组
+    refineFocuses:{
+      ch3:'',ch4:'',ch5:'',ch6:'',ch7:'',ch8:''
+    },
+    isBusy:false,
+    sessionId:null
+  };
+
+  /* ======== 工具：DOM 快捷 ======== */
+  const $ = id => document.getElementById(id);
+  const el = (t,cls,html) => { const d=document.createElement(t); if(cls) d.className=cls; if(html!=null) d.innerHTML=html; return d; };
+  const esc = s => (s==null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const now = () => new Date().toLocaleTimeString('zh-CN',{hour12:false});
+  const uid = () => 'id'+Math.random().toString(36).slice(2,9);
+  const debounce = (fn,ms=300) => {let t; return (...a)=>{clearTimeout(t); t=setTimeout(()=>fn(...a),ms);};};
+
+  /* ======== 轻量 Markdown 渲染 ======== */
+  function md(text){
+    if(!text) return '';
+    let s = String(text).replace(/\r\n/g,'\n');
+    // escape 尖括号
+    s = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    // code block ```
+    s = s.replace(/```([a-zA-Z]*)\n([\s\S]*?)```/g,(m,_,c)=>`<pre><code>${c.replace(/\n$/,'')}</code></pre>\n`);
+    // inline code
+    s = s.replace(/`([^`]+)`/g,(m,c)=>`<code>${c}</code>`);
+    // table: |a|b|\n|---|---|\n|x|y|
+    s = s.replace(/(?:^|\n)((?:\|[^|\n]+\|)[\s\S]*?)(?=\n\n|\n*$)/g,(m,tb)=>{
+      if(!/^\|.+\|\n\|:?-+\|/m.test(tb)) return m;
+      const rows = tb.trim().split('\n').filter(r=>/^\|/.test(r));
+      const sepIdx = rows.findIndex(r=>/^\|[\s:|\-]+\|$/.test(r));
+      if(sepIdx<0) return m;
+      const hd = rows[0].split('|').slice(1,-1).map(x=>`<th>${x.trim()}</th>`).join('');
+      const bd = rows.slice(sepIdx+1).map(r=>'<tr>'+r.split('|').slice(1,-1).map(x=>`<td>${x.trim()}</td>`).join('')+'</tr>').join('');
+      return `\n<table><thead><tr>${hd}</tr></thead><tbody>${bd}</tbody></table>\n`;
+    });
+    // bold/italic: **x**, __x__, *x*, _x_
+    s = s.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/__([^_]+)__/g,'<b>$1</b>');
+    s = s.replace(/(^|[^*])\*([^*\n]+)\*(?=[^*]|$)/g,'$1<i>$2</i>').replace(/(^|[^_])_([^_\n]+)_(?=[^_]|$)/g,'$1<i>$2</i>');
+    // link [x](y)
+    s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+    // blockquote > at line start
+    const lines = s.split('\n');
+    let i=0, out=[], bq=[];
+    while(i<lines.length){
+      const L = lines[i];
+      if(/^&gt;\s?/.test(L)){ bq.push(L.replace(/^&gt;\s?/,'')); i++; continue; }
+      if(bq.length){ out.push(`<blockquote>${bq.join('<br>')}</blockquote>`); bq=[]; }
+      out.push(L); i++;
+    }
+    if(bq.length) out.push(`<blockquote>${bq.join('<br>')}</blockquote>`);
+    s = out.join('\n');
+    // heading #
+    s = s.replace(/^###### (.+)$/gm,'<h6>$1</h6>').replace(/^##### (.+)$/gm,'<h5>$1</h5>').replace(/^#### (.+)$/gm,'<h4>$1</h4>').replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^# (.+)$/gm,'<h1>$1</h1>');
+    // hr: ---
+    s = s.replace(/^---+$/gm,'<hr>');
+    // ul: -* (non-blockquote mode)
+    s = s.replace(/(^|\n)\s*[-\*]\s+([^\n]+)/g,'$1<ul><li>$2</li></ul>');
+    s = s.replace(/(^|\n)\s*\d+\.\s+([^\n]+)/g,'$1<ol><li>$2</li></ol>');
+    // merge adjacent ul/ol tags
+    while(/<\/ul>\n<ul>/.test(s)) s = s.replace(/<\/ul>\n<ul>/g,'');
+    while(/<\/ol>\n<ol>/.test(s)) s = s.replace(/<\/ol>\n<ol>/g,'');
+    // paragraphs
+    s = s.split(/\n{2,}/).map(p=>{
+      if(/^<(?:h[1-6]|ul|ol|pre|blockquote|hr|table)/.test(p.trim())) return p;
+      return p.trim()?`<p>${p.replace(/\n/g,'<br>')}</p>`:'';
+    }).join('\n');
+    return s;
+  }
+
+  /* ======== 对外 API：子 Tab 切换 ======== */
+  window.stSwitchSubtab = function(which){
+    document.querySelectorAll('#st-subtabs .st-subtab').forEach(b=>b.classList.toggle('active',b.dataset.subtab===which));
+    $('agent-classic').style.display = which==='classic'?'':'none';
+    $('agent-storm').style.display = which==='storm'?'':'none';
+    if(which==='storm'){
+      setTimeout(()=>{ stLoadConfig(); stRenderAll(); },30);
+    }
+  };
+
+  /* ======== 后端代理对接层 ======== */
+  function cfg(){
+    return {
+      url: (localStorage.getItem(ST_LS_CFG) ? JSON.parse(localStorage.getItem(ST_LS_CFG)).url : '') || '',
+      key: (localStorage.getItem(ST_LS_CFG) ? JSON.parse(localStorage.getItem(ST_LS_CFG)).key : '') || ''
+    };
+  }
+  window.stSaveConfig = function(){
+    const u = $('st-worker-url').value.trim().replace(/\/+$/,'');
+    const k = $('st-worker-key').value.trim();
+    localStorage.setItem(ST_LS_CFG, JSON.stringify({url:u,key:k}));
+    stMsg('sys','✅ 配置已保存到浏览器 localStorage。');
+    try{ $('st-ping').textContent = '已保存'; }catch(e){}
+  };
+  function stLoadConfig(){
+    const c = cfg();
+    try{ $('st-worker-url').value = c.url; $('st-worker-key').value = c.key; }catch(e){}
+  }
+  async function stFetch(path, body, {timeoutMs=120000}={}){
+    const c = cfg();
+    if(!c.url) throw new Error('❌ 未配置 Cloudflare Worker 地址。请在上方粘贴 Worker 部署 URL 并保存。');
+    const fullUrl = c.url.replace(/\/+$/,'') + '/api' + path;
+    const headers = {'Content-Type':'application/json'};
+    if(c.key) headers['X-Worker-Key'] = c.key;
+    // session
+    if(body && state.sessionId) body.sessionId = state.sessionId;
+    const ctrl = new AbortController();
+    const tm = setTimeout(()=>ctrl.abort(), timeoutMs);
+    let resp;
+    try{
+      resp = await fetch(fullUrl,{method:'POST',headers,body:body?JSON.stringify(body):null,signal:ctrl.signal});
+    }finally{ clearTimeout(tm); }
+    if(resp.status===204) return null;
+    let data;
+    try{ data = await resp.json(); }catch(e){
+      const t = await resp.text().catch(()=>'');
+      throw new Error('服务端返回非 JSON：HTTP '+resp.status+' '+ (t.slice(0,200)));
+    }
+    if(!resp.ok){
+      throw new Error('HTTP '+resp.status+': '+(data.error||data.message||data.err||JSON.stringify(data).slice(0,180)));
+    }
+    if(data && data.sessionId) state.sessionId = data.sessionId;
+    return data;
+  }
+  window.stPingWorker = async function(){
+    $('st-ping').textContent = '⏳';
+    try{
+      const c = cfg();
+      if(!c.url) throw new Error('❌ 请先填写并保存 Worker 地址。');
+      const t0 = Date.now();
+      const fullUrl = c.url.replace(/\/+$/,'') + '/api/health';
+      const headers = {'Content-Type':'application/json'};
+      if(c.key) headers['X-Worker-Key'] = c.key;
+      const ac = new AbortController(); const tm = setTimeout(()=>ac.abort(), 15000);
+      let resp;
+      try{ resp = await fetch(fullUrl,{method:'POST',headers,body:'{}',signal:ac.signal}); }
+      finally{ clearTimeout(tm); }
+      const ms = Date.now()-t0;
+      const d = await resp.json().catch(()=>({}));
+      $('st-ping').textContent = `✅ 连通性 OK (${ms}ms) · Provider=${d.provider||'?'} · Dial=${d.dialogueModel||'?'}`;
+      $('st-ping').style.color = '#16a34a';
+    }catch(e){
+      $('st-ping').textContent = '❌ '+e.message;
+      $('st-ping').style.color = '#dc2626';
+    }
+  };
+
+  /* =========================================================
+   * 后端契约适配层
+   * 把前端 5 个高层调用，翻译成当前 Cloudflare Worker 的实际字段：
+   *   /chat        → phase(clarify/questions/dialogue) + topic/purpose/clarifyAnswers/subquestion/papers
+   *   /synthesize  → 一次性返回 {review, chapters[]}
+   *   /extract-methods → {extracted: [studyExtractMethods(paper)]}
+   * ========================================================= */
+  // 辅助：从 chat 历史中抽取 purpose/clarifyAnswers（简单取前 2 轮 user）
+  function historyPurpose(){
+    return state.chat.filter(m=>m.role==='user').map(m=>m.text).slice(0,3).join('\n\n');
+  }
+  function historyClarify(){
+    const ass = state.chat.filter(m=>m.role==='assistant' || m.role==='sys').slice(-4).map(m=>m.text).join('\n');
+    const usr = state.chat.filter(m=>m.role==='user').map(m=>m.text).join('\n');
+    return '【助手澄清问题】\n'+ass+'\n【用户回答】\n'+usr;
+  }
+  // 把后端 citations [{index,...}] 或纯 reply 里的 [N] 形式，转为 citation_indexes 数组
+  function respToCitationIndexes(resp, papers){
+    if(resp && Array.isArray(resp.citation_indexes)) return resp.citation_indexes;
+    if(resp && resp.citations){
+      // 后端返回 [{index, title, ...}]
+      return (resp.citations||[]).map(c=>c.index).filter(Boolean);
+    }
+    // 否则从 reply 解析 [1], [2-3]
+    if(!resp || !resp.reply) return [];
+    const idxs = new Set();
+    const re = /\[(\d{1,3})(?:\s*[-\u2013~]\s*(\d{1,3}))?\]/g;
+    let m;
+    while((m=re.exec(resp.reply))){
+      const a=parseInt(m[1],10), b=parseInt(m[2]||m[1],10);
+      for(let i=Math.min(a,b);i<=Math.max(a,b);i++) idxs.add(i);
+    }
+    return [...idxs];
+  }
+
+  const STORM = {
+    async clarify(userText){
+      const topic = state.topicSummary || userText;
+      const purpose = historyPurpose();
+      const resp = await stFetch('/chat',{
+        phase:'clarify', topic, purpose,
+        clarifyAnswers: historyClarify(),
+        messages: state.chat.map(m=>({role:m.role==='user'?'user':'assistant',content:m.text})).concat([{role:'user',content:userText}])
+      },{timeoutMs:120000});
+      // 顺带尝试把回复解析为 topic_summary（规则：如果回复里有 主题/研究范围/摘要 等字样取后一句，否则取回复前 120 字）
+      let topic_summary = state.topicSummary;
+      if(!topic_summary){
+        topic_summary = (resp && resp.reply ? resp.reply.replace(/[\s\n]+/g,' ').slice(0,140) : topic) + '...';
+        state.topicSummary = topic_summary;
+      }
+      return { reply: (resp&&resp.reply) || '（无返回）', topic_summary };
+    },
+
+    async generateQuestions(){
+      const topic = state.topicSummary || historyPurpose();
+      const resp = await stFetch('/chat',{
+        phase:'questions',
+        topic, purpose: historyPurpose(),
+        clarifyAnswers: historyClarify(),
+        count: 8
+      },{timeoutMs:120000});
+      const reply = (resp&&resp.reply) || '';
+      // 解析问题清单：优先看回复中的行首数字
+      let qs = [];
+      if(reply){
+        const lines = reply.split(/\n/).map(s=>s.trim()).filter(Boolean);
+        for(const l of lines){
+          const m = l.match(/^\s*(?:\d+[\.\)、]|[（(]\d+[)）])\s*(.+)$/);
+          if(m) qs.push(m[1]);
+          else if(/^[Qq][:\d]/.test(l)) qs.push(l.replace(/^[Qq][:\d]+\s*/,''));
+          else if(/^(问题|核心问题|研究问题)[:：]/.test(l)) qs.push(l.replace(/^(问题|核心问题|研究问题)[:：]\s*/,''));
+        }
+      }
+      // 如没解析出，按句号/问号拆分取前 8
+      if(qs.length<4){
+        const alt = (reply||'').split(/(?<=[。？!?\n])/).map(s=>s.trim()).filter(s=>s.length>10 && s.length<220).slice(0,8);
+        if(alt.length) qs = alt;
+      }
+      if(!qs.length) qs = [
+        '该主题的当前研究现状如何？有哪些代表性工作？',
+        '核心概念的操作定义与测量工具是什么？',
+        '影响因素/相关变量有哪些？',
+        '常用的研究设计与统计方法有哪些？',
+        '有哪些干预或治疗方案？效果如何？',
+        '存在哪些研究局限、争议或文化/人群差异？',
+        '近年研究的热点趋势与方法论演进是怎样的？',
+        '未来值得重点探索的方向和数据缺口有哪些？'
+      ];
+      return { questions: qs.slice(0,10), reply };
+    },
+
+    async round3Ask({questions, followup, papers, history}){
+      const q = followup || (questions && questions[0]) || state.topicSummary || '';
+      const resp = await stFetch('/chat',{
+        phase:'dialogue',
+        topic: state.topicSummary,
+        purpose: historyPurpose(),
+        clarifyAnswers: historyClarify(),
+        subquestion: q,
+        papers: papers.slice(0,20),
+        messages: (history||[]).slice(-8).map(m=>({role:m.role==='user'?'user':'assistant',content:m.text}))
+      },{timeoutMs:120000});
+      const idx = respToCitationIndexes(resp, papers);
+      // 如果后端自动补检索，把追加的 papers 带回去
+      const extraPapers = (resp && resp.papers && Array.isArray(resp.papers)) ? resp.papers : [];
+      return { reply: (resp&&resp.reply)||'（无返回）', citation_indexes: idx, extraPapers };
+    },
+
+    async extractMethods(papers){
+      const resp = await stFetch('/extract-methods',{papers:papers.slice(0,10)},{timeoutMs:120000});
+      const arr = (resp && resp.extracted) || [];
+      return { methods: arr.map((m,i)=>({ paper_index: i, ...(m||{}) })) };
+    },
+
+    async synthesizeAll({questions, papers, refine_focus_by_id, existing}){
+      const topic = state.topicSummary || '';
+      const purpose = historyPurpose();
+      const clarifyAnswers = historyClarify();
+      // 如果有精修要求，拼到 purpose 末尾
+      const extras = [];
+      if(refine_focus_by_id){
+        for(const [k,v] of Object.entries(refine_focus_by_id)){
+          if(v && typeof v==='string' && v.trim()) extras.push(`【${k}】${v.trim()}`);
+        }
+      }
+      const resp = await stFetch('/synthesize',{
+        topic,
+        purpose: purpose + (extras.length ? '\n\n'+extras.join('\n') : ''),
+        clarifyAnswers,
+        confirmedQuestions: questions,
+        papers: papers,
+        planRecommendations: extras.length?'精修要求：'+extras.join('；'):''
+      },{timeoutMs:600000}); // 8 章串行 LLM 调用，允许长超时
+      const rawChapters = (resp && resp.chapters && Array.isArray(resp.chapters)) ? resp.chapters : [];
+      // 章节顺序与前端 8 章 id 对齐：后端返回 1 执行摘要、2 背景、3 方法学、4 核心发现、5 热点图谱、6 数据资源、7 局限、8 未来方向
+      // 映射：后端数组 index 0..7 → 前端 ch1..ch8
+      const mapped = {};
+      for(let i=0;i<8;i++){
+        const chId = 'ch'+(i+1);
+        const raw = rawChapters[i] || '';
+        // 尝试把 "## 标题\n\n内容..." 拆成 title/content
+        const m = /^\s*#+\s*([^\n]+)\n([\s\S]*)$/.exec(raw||'');
+        let title = ST_CHAPTERS[i]?.title || ('第 '+(i+1)+' 章');
+        let content = raw||'';
+        if(m){ title = m[1].trim(); content = m[2].trim(); }
+        mapped[chId] = { id:chId, title, content: content||'（本章节未生成）', backendIndex:i };
+      }
+      // 如果 rawChapters 解析不出任何 title/content 但是 review 字段有值，尝试按 ## 拆分
+      if(Object.values(mapped).every(c=>c.content==='（本章节未生成）') && resp && resp.review){
+        const rv = String(resp.review);
+        const sections = rv.split(/^##\s+/m).slice(1);
+        sections.forEach((blk,i)=>{
+          const nl = blk.indexOf('\n');
+          const title = nl>0?blk.slice(0,nl).trim():blk.trim();
+          const content = nl>0?blk.slice(nl).trim():'';
+          if(i<8 && content){
+            mapped['ch'+(i+1)] = { id:'ch'+(i+1), title, content, backendIndex:i };
+          }
+        });
+      }
+      return { chapters: mapped, fullMarkdown: resp?.review, failures: resp?.failures };
+    }
+  };
+
+  /* ======== 消息：push + render ======== */
+  function stMsg(role, text, extra={}){
+    state.chat.push({role,text,time:now(),...extra});
+    stRenderChat();
+    // scroll to bottom
+    const body = $('st-chat');
+    if(body) setTimeout(()=>body.scrollTop = body.scrollHeight, 20);
+  }
+  function stRenderChat(){
+    const host = $('st-chat'); if(!host) return;
+    if(!state.chat.length){
+      host.innerHTML = `<div class="st-empty"><span class="st-emoji">🧑‍🔬</span>请先在上方设置你的 Cloudflare Worker 地址并保存，然后输入你想研究的主题（比如「青少年非自杀性自伤的心理干预」），我会先帮你澄清研究范围。</div>`;
+    } else {
+      host.innerHTML = state.chat.map(m=>renderOneMsg(m)).join('');
+    }
+    $('st-chat-count') && ($('st-chat-count').textContent = state.chat.length+' 条');
+  }
+  function renderOneMsg(m){
+    const wrap = el('div','st-msg st-msg-'+(m.role==='user'?'user':m.role==='err'?'err':'sys'));
+    const bubble = el('div','st-mbubble st-md');
+    bubble.innerHTML = md(m.text||'');
+    wrap.appendChild(bubble);
+    const meta = el('div','st-msg-meta');
+    meta.textContent = (m.role==='user'?'用户':(m.role==='err'?'错误':'助手'))+' · '+ (m.time||now()) + (m.round?(' · 第 '+m.round+' 轮'):'');
+    wrap.appendChild(meta);
+    if(m.citations && m.citations.length){
+      const c = el('div','st-citation');
+      c.innerHTML = '<b>引用文献：</b> '+ m.citations.map((p,i)=>{
+        const idx = (i+1);
+        const link = p.link || (p.doi?('https://doi.org/'+p.doi):'#');
+        return `<a href="${esc(link)}" target="_blank" rel="noopener">[${idx}] ${esc(p.title||'无题')}${p.doi?' · '+esc(p.doi):''}</a>`;
+      }).join('<br>');
+      wrap.appendChild(c);
+    }
+    return wrap.outerHTML;
+  }
+
+  /* ======== 轮次指示器 ======== */
+  function setRound(r){
+    state.round = r;
+    document.querySelectorAll('#st-rounds .st-round').forEach(n=>{
+      const i = Number(n.dataset.r);
+      n.classList.toggle('active', i===r);
+      n.classList.toggle('done', i<r);
+    });
+    // 输入框 placeholder
+    const ph = {
+      1:'在这里输入你想研究的心理健康主题，例如：青少年非自杀性自伤的 CBT 干预效果？',
+      2:'请勾选或编辑下方问题清单，然后点击「确认进入第 3 轮」。也可以在这补充额外问题...',
+      3:'在这里输入你的追问 / 想深入的子问题 / 新的关键词方向',
+      4:'第 4 轮正在自动生成 8 章综述，请等待或在此输入中途想补充的要求...',
+      5:'在这里输入章节精修要求（或点击各章节右侧输入框填入重点），完成后可导出 MD / Word'
+    };
+    $('st-input').placeholder = ph[r] || '';
+    stRenderActions();
+  }
+
+  /* ======== 文献面板 ======== */
+  function stAddPapers(list){
+    if(!list || !list.length) return;
+    const seen = new Set(state.papers.map(p=>(p.doi||p.pmid||(p.title+'|'+(p.authors||[]).join(',')))));
+    for(const p of list){
+      const key = p.doi||p.pmid||(p.title+'|'+(p.authors||[]).join(','));
+      if(!key || seen.has(key)) continue;
+      seen.add(key); state.papers.push(p);
+    }
+    stRenderPapers();
+  }
+  function stRenderPapers(){
+    const host = $('st-papers'); if(!host) return;
+    if(!state.papers.length){
+      host.innerHTML = `<div class="st-empty"><span class="st-emoji">📄</span>进入第 3 轮后，系统会根据对话内容实时检索 PubMed / Crossref / Semantic Scholar / OpenAlex / Europe PMC 的真实文献，并显示方法学标注与 DOI 链接。</div>`;
+    } else {
+      host.innerHTML = state.papers.map((p,i)=>renderPaperCard(p,i)).join('');
+    }
+    $('st-paper-count') && ($('st-paper-count').textContent = state.papers.length+' 篇');
+  }
+  function renderPaperCard(p,idx){
+    const id = 'stp'+idx;
+    const src = (p.source||'Unknown').replace(/\s+/g,'-');
+    const authors = Array.isArray(p.authors)?(p.authors.slice(0,3).join(', ')+(p.authors.length>3?', et al':'')):(p.authors||'');
+    const metaYear = p.year||'--';
+    const metaJournal = p.journal||p.venue||'';
+    const link = p.link || (p.doi?('https://doi.org/'+p.doi):(p.pmid?('https://pubmed.ncbi.nlm.nih.gov/'+p.pmid+'/'):'#'));
+    const doiLine = p.doi?`<a class="st-paper-doi" href="https://doi.org/${esc(p.doi)}" target="_blank" rel="noopener">DOI: ${esc(p.doi)}</a>`:'';
+    const cited = (p.cited_count!=null && p.cited_count!=='')?`<span>被引 ${esc(String(p.cited_count))}</span>`:'';
+    // methods tags
+    let methodsHTML = '';
+    if(p.methods){
+      const mt = p.methods || {};
+      const tags = [];
+      if(mt.design) tags.push(`<span class="st-tag design">🎯 设计·${esc(mt.design.slice(0,14))}</span>`);
+      if(mt.sample_size) tags.push(`<span class="st-tag quality">👥 N≈${esc(String(mt.sample_size).slice(0,10))}</span>`);
+      if(mt.statistical) tags.push(`<span class="st-tag stat">📊 ${esc(mt.statistical.slice(0,18))}</span>`);
+      if(mt.measures) tags.push(`<span class="st-tag tool">📐 ${esc(mt.measures.slice(0,22))}</span>`);
+      if(mt.quality_rating) tags.push(`<span class="st-tag risk">🛡 质量·${esc(mt.quality_rating.slice(0,10))}</span>`);
+      if(tags.length) methodsHTML += `<div class="st-method-tags">${tags.join('')}</div>`;
+      const rows = [];
+      const pushRow=(k,v)=>{if(v) rows.push(`<div class="st-methods-row"><b>${esc(k)}</b><div>${esc(String(v))}</div></div>`);};
+      pushRow('研究设计', mt.design);
+      pushRow('样本量', mt.sample_size);
+      pushRow('人群/国家', mt.population||mt.country);
+      pushRow('统计方法', mt.statistical);
+      pushRow('测量工具', mt.measures);
+      pushRow('干预方式', mt.intervention_type);
+      pushRow('偏倚风险', mt.bias_risk);
+      pushRow('质量评级', mt.quality_rating);
+      pushRow('工具', mt.theory_or_framework);
+      if(rows.length) methodsHTML += `<div class="st-methods-box">${rows.join('')}</div>`;
+    }
+    const abs = p.abstract ? `<div class="st-paper-abs" id="${id}-abs">${esc(p.abstract).slice(0,700)}${p.abstract.length>700?'…':''}</div>`
+      + (p.abstract.length>700?`<button class="st-paper-toggle" onclick="const d=document.getElementById('${id}-abs');d.classList.toggle('expanded');this.textContent=d.classList.contains('expanded')?'收起 ▲':'展开全文 ▼'">展开全文 ▼</button>`:'') : '';
+    return `<div class="st-paper">
+      <a class="st-paper-title" href="${esc(link)}" target="_blank" rel="noopener">${idx+1}. ${esc(p.title||'无题')}</a>
+      <div class="st-paper-meta">
+        <span class="st-src-pill src-${esc(src)}">${esc(p.source||'Unknown')}</span>
+        ${metaYear?`<span>📅 ${esc(String(metaYear))}</span>`:''}
+        ${metaJournal?`<span>📰 ${esc(String(metaJournal).slice(0,40))}</span>`:''}
+        ${cited}
+      </div>
+      <div class="st-paper-meta">👥 ${esc(String(authors).slice(0,160))}</div>
+      ${abs}
+      ${methodsHTML}
+      ${doiLine?`<div>${doiLine}</div>`:''}
+    </div>`;
+  }
+
+  /* ======== 综述面板 ======== */
+  function stRenderReview(){
+    const rv = $('st-review-body'), st=$('st-chapters-status'), list=$('st-ch-list');
+    const keys = Object.keys(state.chapters).filter(k=>state.chapters[k] && state.chapters[k].content && state.chapters[k].content.trim().length>0);
+    $('st-review-count') && ($('st-review-count').textContent = keys.length+' / 8 章');
+    // 进度
+    if(list){
+      list.innerHTML = ST_CHAPTERS.map(ch=>{
+        const st2 = state.chapters[ch.id]?.status || 'idle';
+        const cls = st2==='done'?'done':(st2==='run'?'run':'');
+        return `<div class="st-ch-item ${cls}"><span class="st-dot"></span><span>${esc(ch.title)}</span><span style="margin-left:auto;font-size:10.5px">${st2==='done'?'✅':(st2==='run'?'生成中…':(st2==='err'?'❌':'待生成'))}</span></div>`;
+      }).join('');
+      st.style.display = (ST_CHAPTERS.some(ch=>(state.chapters[ch.id]?.status==='run'||state.chapters[ch.id]?.status==='done')))?'':'';
+    }
+    // 正文
+    if(rv){
+      let body='';
+      for(const ch of ST_CHAPTERS){
+        const c = state.chapters[ch.id];
+        if(!c || !c.content) continue;
+        const title = c.title || ch.title;
+        body += `<div id="${ch.id}"><h2>${esc(title)}</h2><div class="st-md">${md(c.content)}</div></div>`;
+      }
+      if(body){
+        $('st-review').querySelector('.st-empty') && ($('st-review').querySelector('.st-empty').style.display='none');
+        rv.innerHTML = body;
+        rv.style.display = '';
+      }
+    }
+    // 导出按钮可用性
+    const ready = keys.length>=7;
+    ['md','docx'].forEach(fmt=>{
+      const b = document.querySelector(`.st-review-tools [onclick*="'${fmt}'"]`);
+      if(b) b.disabled = !ready;
+    });
+    const cb = document.querySelector('.st-review-tools [onclick="stCopyReview()"]');
+    if(cb) cb.disabled = keys.length<3;
+    $('st-review-meta') && ($('st-review-meta').textContent = ready?'🎉 生成完毕，可导出。':(keys.length?`已生成 ${keys.length} 章...`:''));
+  }
+
+  /* ======== 导出：Markdown + Word（.doc/.docx 简化版） ======== */
+  function stChaptersToMD(){
+    const parts = [];
+    const c = state.chapters.ch1;
+    if(c && c.title) parts.push(`# ${c.title.replace(/^#+\s*/,'')}`);
+    else parts.push(`# 系统综述：${state.topicSummary||''}`);
+    parts.push('');
+    parts.push(`> 生成时间：${new Date().toLocaleString('zh-CN')}  · 检索文献数：${state.papers.length}`);
+    if(state.topicSummary) parts.push(`> 主题摘要：${state.topicSummary}`);
+    parts.push('');
+    for(const ch of ST_CHAPTERS.slice(1)){
+      const d = state.chapters[ch.id];
+      if(!d || !d.content) continue;
+      parts.push(`## ${d.title||ch.title}`);
+      parts.push('');
+      parts.push(d.content);
+      parts.push('');
+    }
+    // 参考文献
+    if(state.papers.length){
+      parts.push('## 参考文献');
+      parts.push('');
+      state.papers.forEach((p,i)=>{
+        const link = p.link || (p.doi?('https://doi.org/'+p.doi):(p.pmid?('https://pubmed.ncbi.nlm.nih.gov/'+p.pmid+'/'):''));
+        parts.push(`${i+1}. ${(p.authors||[]).slice(0,3).join(', ')+((p.authors||[]).length>3?', et al.':'')}. "${p.title||''}" ${p.journal||''}${p.year?', '+p.year:''}${p.doi?'. https://doi.org/'+p.doi:(link?' . '+link:'')}.`);
+      });
+    }
+    return parts.join('\n');
+  }
+  function download(filename, mime, content){
+    const blob = content instanceof Blob ? content : new Blob([content],{type:mime});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{try{URL.revokeObjectURL(a.href);}catch(e){} a.remove();},150);
+  }
+  window.stExportReview = function(fmt){
+    if(fmt==='md'){
+      download('系统综述_'+(state.topicSummary||'review').slice(0,24).replace(/[\/\\\s*?"'<>|]/g,'_')+'.md',
+        'text/markdown;charset=utf-8', stChaptersToMD());
+      return;
+    }
+    if(fmt==='docx'||fmt==='doc'){
+      const md = stChaptersToMD();
+      const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8"><title>Review</title>
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+<style>body{font-family:"Calibri","Microsoft YaHei",sans-serif;line-height:1.7}h1{font-size:22px;color:#0e7490}h2{font-size:17px;color:#0c4a6e;border-bottom:1px solid #cbd5e1;padding-bottom:3px}blockquote{border-left:3px solid #93c5fd;padding:4px 10px;color:#1e3a8a;background:#eff6ff}table{border-collapse:collapse}th,td{border:1px solid #cbd5e1;padding:4px 8px}code{background:#f1f5f9;padding:1px 5px;border-radius:3px}</style>
+</head><body>${mdToSimpleHTML(md)}</body></html>`;
+      download('系统综述_'+(state.topicSummary||'review').slice(0,24).replace(/[\/\\\s*?"'<>|]/g,'_')+'.doc',
+        'application/msword', '\ufeff'+html);
+      return;
+    }
+  };
+  function mdToSimpleHTML(mdText){
+    // 在 stExport 场景下的简化：复用 md 函数，再把 <p><br></p> 也接受
+    return md(mdText);
+  }
+  window.stCopyReview = async function(){
+    try{
+      const t = stChaptersToMD();
+      if(navigator.clipboard) await navigator.clipboard.writeText(t);
+      else{ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+      stMsg('sys','✅ 综述全文已复制到剪贴板（Markdown）。');
+    }catch(e){ stMsg('err','复制失败：'+e.message); }
+  };
+
+  /* ======== 动作按钮行 ======== */
+  function stRenderActions(){
+    const host = $('st-actions'); if(!host) return;
+    host.innerHTML = '';
+    const mkBtn=(label,cls,fn,extra='')=>{
+      const b=el('button',cls||'btn sm');
+      b.innerHTML=label;
+      b.onclick=fn;
+      if(extra) b.setAttribute('style',extra);
+      host.appendChild(b);
+    };
+    if(state.round<=2){
+      mkBtn('🗑 清空重来','btn sm', ()=>confirm('确定要清空当前所有会话、文献和综述吗？')&&stReset(),'');
+    }else{
+      mkBtn('↩ 回到第 1 轮','btn sm', ()=>{ if(confirm('回到第 1 轮将清空当前问题清单、文献与综述。确定？')){ stReset(true); } },'');
+      mkBtn('🗑 全部清空','btn sm', ()=>confirm('确定要清空当前所有会话、文献和综述吗？')&&stReset(),'');
+    }
+    if(state.round===2 && state.questions.length){
+      mkBtn('✅ 确认勾选并进入第 3 轮（自动检索文献）','btn sm teal', stGotoRound3, '');
+      mkBtn('🔄 重新生成问题清单','btn sm', stGenQuestions, '');
+    }
+    if(state.round===3){
+      mkBtn('📚 再检索一轮文献','btn sm', ()=>stSearchMore(),'');
+      mkBtn('⏩ 进入第 4 轮 · 生成 8 章综述','btn sm primary', stGotoRound4, '');
+    }
+    if(state.round===5){
+      mkBtn('🔧 按精修要点重建章节','btn sm teal', stRefineRun,'');
+      mkBtn('🔄 重新生成 8 章','btn sm', stGotoRound4,'');
+    }
+  }
+
+  /* ======== 重置 ======== */
+  function stReset(justRound=false){
+    if(justRound){
+      state.round=1; state.chat=[]; state.papers=[]; state.questions=[]; state.chapters={};
+      state.searchQueries=[]; state.topicSummary=''; state.sessionId=null;
+    }else{
+      state.round=1; state.chat=[]; state.papers=[]; state.questions=[]; state.chapters={};
+      state.topicSummary=''; state.searchQueries=[]; state.sessionId=null;
+      Object.keys(state.refineFocuses).forEach(k=>state.refineFocuses[k]='');
+    }
+    setRound(1); stRenderAll();
+    stMsg('sys','🧭 已清空。请输入一个心理健康研究主题，开始第 1 轮澄清。示例：「青少年校园欺凌受害与抑郁症状之间的纵向关联」。');
+  }
+  window.stResetAllUI = stReset;
+
+  /* ======== 核心：第 1 轮 → 澄清主题 ======== */
+  async function stRound1Clarify(userText){
+    setBusy(true);
+    // 先输出系统开场
+    if(state.chat.length===0){
+      stMsg('sys','👋 你好！我是你的「STORM 式研究助手」。第 1 轮我会帮你把主题澄清为可以做综述的问题。先把我当作你同行，用一段话把你目前想研究的主题告诉我：人群、核心变量、是否有初步想法的干预方式、期望覆盖的年限或地域。\n\n例如：\n> 我想研究中国大学生群体的社交媒体使用与睡眠质量之间的关系，关注调节变量（例如孤独感、学业压力），语言限定中英文，近 10 年。');
+    }
+    try{
+      const r = await STORM.clarify(userText);
+      state.topicSummary = r.topic_summary || state.topicSummary;
+      stMsg('assistant', r.reply, {round:1});
+      // 追问按钮
+      setTimeout(()=>{
+        if(state.round===1){
+          const host = $('st-actions');
+          const b = el('button','btn sm primary');
+          b.innerHTML = '✔ 主题已澄清 · 进入第 2 轮生成核心问题';
+          b.onclick = stReadyRound2;
+          host.appendChild(b);
+        }
+      },200);
+    }catch(e){
+      stMsg('err','第 1 轮澄清失败：'+e.message);
+    }finally{ setBusy(false); }
+  }
+
+  /* ======== 第 2 轮：生成问题清单 ======== */
+  async function stReadyRound2(){
+    setRound(2);
+    if(!state.questions.length){
+      await stGenQuestions();
+    } else {
+      stRenderQuestions();
+    }
+  }
+  async function stGenQuestions(){
+    setBusy(true);
+    stMsg('sys','🔬 正在根据你的主题生成 6–8 个可研究的核心问题…',{round:2});
+    try{
+      const r = await STORM.generateQuestions();
+      state.questions = (r.questions||[]).map(t=>({id:uid(), text:t, checked:true, editing:false, custom:false}));
+      stRenderQuestions();
+      stMsg('assistant', (r.reply?r.reply+'\n\n':'') +
+        '📋 已生成 '+state.questions.length+' 个核心问题。请勾选你想要系统检索与讨论的项目（默认全部），也可以点击每条问题末尾「✏ 编辑」改写；最后点击下方「确认进入第 3 轮」按钮。',
+        {round:2});
+    }catch(e){
+      stMsg('err','生成问题清单失败：'+e.message);
+    }finally{ setBusy(false); }
+  }
+  function stRenderQuestions(){
+    // 在 chat 区追加一个问题面板
+    // 先删除旧的 qpanel
+    document.querySelectorAll('#st-chat .st-qpanel').forEach(n=>n.remove());
+    const host = $('st-chat');
+    const panel = el('div','st-qpanel');
+    panel.innerHTML = `<h4>📋 核心问题清单（第 2 轮）：勾选你想要展开的条目，可编辑文本</h4>`;
+    state.questions.forEach(q=>{
+      const it = el('div','st-qitem '+(q.checked?'checked ':'')+(q.editing?'editing':''));
+      it.innerHTML = `<input type="checkbox" ${q.checked?'checked':''}>
+        <div class="st-qtext" style="white-space:pre-wrap">${esc(q.text)}</div>
+        <textarea rows="2"></textarea>
+        <button class="st-qview">✏ 编辑</button>`;
+      const cb = it.querySelector('input');
+      cb.onchange = ()=>{ q.checked = cb.checked; it.classList.toggle('checked',cb.checked); };
+      const ta = it.querySelector('textarea');
+      ta.value = q.text;
+      ta.oninput = ()=>{ q.text = ta.value; it.querySelector('.st-qtext').textContent = ta.value; };
+      const editBtn = it.querySelector('.st-qview');
+      editBtn.onclick = (e)=>{ e.stopPropagation(); q.editing = !q.editing; it.classList.toggle('editing',q.editing); editBtn.textContent = q.editing?'✔ 完成':'✏ 编辑'; };
+      panel.appendChild(it);
+    });
+    const btnrow = el('div','st-qbtnrow');
+    btnrow.innerHTML = `<button class="btn sm">➕ 追加一个自定义问题</button>
+      <button class="btn sm">🗑 删除未勾选</button>`;
+    const btns = btnrow.querySelectorAll('button');
+    btns[0].onclick = ()=>{
+      state.questions.push({id:uid(),text:'（在这里编辑你的问题）',checked:true,editing:true,custom:true});
+      stRenderQuestions();
+    };
+    btns[1].onclick = ()=>{
+      state.questions = state.questions.filter(q=>q.checked);
+      stRenderQuestions();
+    };
+    panel.appendChild(btnrow);
+    host.appendChild(panel);
+    setTimeout(()=>host.scrollTop = host.scrollHeight, 20);
+  }
+
+  /* ======== 第 3 轮：确认问题 → 检索文献 → 对话追问 ======== */
+  async function stGotoRound3(){
+    const picked = state.questions.filter(q=>q.checked).map(q=>q.text);
+    if(!picked.length){ alert('请至少勾选一个核心问题。'); return; }
+    setRound(3);
+    setBusy(true);
+    stMsg('assistant','📥 第 3 轮开始！正在基于你勾选的 '+picked.length+' 个问题构造检索关键词，并从 5 个公开数据源拉取真实文献…这一步会较费时（15–40 秒）。',{round:3});
+    try{
+      const queries = [state.topicSummary].concat(picked).filter(Boolean);
+      let idx = 0;
+      for(const q of queries.slice(0,5)){
+        stMsg('sys',`🔍 检索 ${idx+1}/${Math.min(queries.length,5)}："${q.slice(0,60)}"`);
+        try{
+          const resp = await stFetch('/search',{query:q,limit:10,year_min:2015},{timeoutMs:50000});
+          const arr = resp && Array.isArray(resp.papers) ? resp.papers : [];
+          if(arr.length){
+            stAddPapers(arr);
+            // 顺带提取方法学
+            try{
+              const mResp = await STORM.extractMethods(arr);
+              const map = {}; (Array.isArray(mResp.methods)?mResp.methods:[]).forEach(m=>{
+                const k = (m.paper_index!=null)?arr[m.paper_index]?.doi:null;
+                if(k) map[k] = Object.assign({},m); delete map[k].paper_index;
+              });
+              if(Object.keys(map).length){
+                state.papers.forEach(p=>{ if(p.doi && map[p.doi]) p.methods = map[p.doi]; });
+                stRenderPapers();
+              }
+            }catch(ee){ /* 方法学非关键 */ }
+          }
+        }catch(e){
+          stMsg('err','检索失败（' + q.slice(0,20) + '…）：' + e.message);
+        }
+        idx++;
+      }
+      state.searchQueries = queries;
+      // RAG 总结
+      try{
+        const synResp = await STORM.round3Ask({
+          questions: picked,
+          followup: '请基于当前检索到的 '+state.papers.length+' 篇文献，给我一份简短的综述摘要：研究现状、核心结论、关键方法学、主要争议，按 3–5 个要点列出，并标注引用编号 [1] [2]。',
+          papers: state.papers,
+          history: state.chat
+        });
+        if(synResp && synResp.extraPapers && synResp.extraPapers.length) stAddPapers(synResp.extraPapers);
+        const cited = (synResp.citation_indexes||[]).map(i=>state.papers[i-1]).filter(Boolean);
+        stMsg('assistant', synResp.reply || 'ℹ 完成初步检索。目前共 '+state.papers.length+' 篇文献。', {round:3, citations:cited});
+      }catch(e){
+        stMsg('sys','ℹ 完成初步检索。目前共 '+state.papers.length+' 篇文献。你可以：\n• 继续在下方输入框追问子方向\n• 点击「📚 再检索一轮文献」用新关键词补充检索\n• 满意后点击「⏩ 进入第 4 轮」开始写 8 章综述');
+      }
+    }catch(e){
+      stMsg('err','第 3 轮出错：'+e.message);
+    }finally{ setBusy(false); }
+  }
+  async function stSearchMore(){
+    const input = $('st-input').value.trim();
+    if(!input){ alert('请在输入框先输入你想补充检索的关键词（比如「青少年 网络欺凌 横断研究」）。'); return; }
+    setBusy(true);
+    stMsg('user', input, {round:3});
+    $('st-input').value='';
+    try{
+      stMsg('sys','🔍 补充检索：'+input);
+      const resp = await stFetch('/search',{query:input,limit:15,year_min:2015},{timeoutMs:60000});
+      const arr = resp && Array.isArray(resp.papers) ? resp.papers : [];
+      if(arr.length){
+        stAddPapers(arr);
+        try{
+          const mResp = await STORM.extractMethods(arr);
+          const map={}; (Array.isArray(mResp.methods)?mResp.methods:[]).forEach(m=>{
+            const k = (m.paper_index!=null)?arr[m.paper_index]?.doi:null;
+            if(k){ const cp=Object.assign({},m); delete cp.paper_index; map[k]=cp; }
+          });
+          state.papers.forEach(p=>{ if(p.doi && map[p.doi]) p.methods=map[p.doi]; });
+          stRenderPapers();
+        }catch(_){}
+        stMsg('assistant','📚 新增 '+arr.length+' 篇。当前共 '+state.papers.length+' 篇。你可以继续追问，或点击「⏩ 进入第 4 轮」。',{round:3});
+      } else {
+        stMsg('assistant','⚠ 本轮未检索到新文献，建议换更一般的关键词（英文更易搜到），例如 "adolescent depression prevalence cohort"。',{round:3});
+      }
+    }catch(e){ stMsg('err','补充检索失败：'+e.message); }
+    finally{ setBusy(false); }
+  }
+
+  /* ======== 第 3 轮对话：追问 ======== */
+  async function stRound3Chat(userText){
+    stMsg('user', userText, {round:3});
+    setBusy(true);
+    try{
+      const r = await STORM.round3Ask({
+        questions: state.questions.filter(q=>q.checked).map(q=>q.text),
+        followup: userText,
+        papers: state.papers,
+        history: state.chat
+      });
+      if(r.extraPapers && r.extraPapers.length) stAddPapers(r.extraPapers);
+      const cited = (r.citation_indexes||[]).map(i=>state.papers[i-1]).filter(Boolean);
+      stMsg('assistant', r.reply, {round:3, citations:cited});
+    }catch(e){ stMsg('err','追问失败：'+e.message); }
+    finally{ setBusy(false); }
+  }
+
+  /* ======== 第 4 轮：生成 8 章综述 ======== */
+  async function stGotoRound4(){
+    if(state.papers.length<3){
+      if(!confirm('当前仅 '+state.papers.length+' 篇文献，生成的综述会偏空。是否仍要进入第 4 轮？')) return;
+    }
+    setRound(4);
+    ST_CHAPTERS.forEach(ch=>{ state.chapters[ch.id] = state.chapters[ch.id] || {}; Object.assign(state.chapters[ch.id],{status:'run',content:'',error:''}); });
+    stRenderReview();
+    setBusy(true);
+    stMsg('sys','✍ 正在一次性生成 8 章综述（后端串行调用 LLM，预计 2–8 分钟）…',{round:4});
+    try{
+      const r = await STORM.synthesizeAll({
+        questions: state.questions.filter(q=>q.checked).map(q=>q.text),
+        papers: state.papers,
+        refine_focus_by_id: null,
+        existing: state.chapters
+      });
+      // 全部标记为 done
+      let ok=0, fail=0;
+      for(const ch of ST_CHAPTERS){
+        const got = r.chapters && r.chapters[ch.id];
+        if(got && got.content && got.content!=='（本章节未生成）'){
+          state.chapters[ch.id] = { title: got.title || ch.title, content: got.content, role: ch.role, status: 'done', updatedAt: now()};
+          ok++;
+        } else {
+          state.chapters[ch.id] = { title: ch.title, content: '', role: ch.role, status: 'err', error: (r.failures&&r.failures[ch.id])||'后端未返回该章节'};
+          fail++;
+        }
+      }
+      stRenderReview();
+      if(r.failures && r.failures.length){
+        stMsg('err','⚠ 后端报告 '+r.failures.length+' 个章节失败：'+r.failures.join('；'));
+      }
+    }catch(e){
+      ST_CHAPTERS.forEach(ch=>{ if(state.chapters[ch.id]?.status==='run') state.chapters[ch.id].status='err'; });
+      stMsg('err','综述生成失败：'+e.message + '（可在第 5 轮单独重写）');
+      stRenderReview();
+    }finally{ setBusy(false); }
+    setRound(5);
+    stMsg('sys','🎉 8 章综述流程完成！已进入第 5 轮：你可以：\n• 在输入框输入整体精修要点，或在下方逐章填入针对性修改要求\n• 点击「🔧 按精修要点重建章节」重写相应章节（会重新调用 /synthesize 生成所有被标记或要求的章节）\n• 点击右上角导出 Markdown / Word（.doc）文件');
+    stRenderRefineInputs();
+  }
+
+  /* ======== 第 5 轮：精修 ======== */
+  function stRenderRefineInputs(){
+    // 在综述面板下方（st-review-tools 之前）追加精修行（如无）
+    if($('st-refine-box')) return;
+    const tools = $('st-review-tools'); if(!tools) return;
+    const box = el('div','st-ch-status');
+    box.id = 'st-refine-box';
+    box.style.marginTop = '10px';
+    box.innerHTML = `<b>🎯 章节精修要点（留空则不重写该章；若某章生成失败也会在这里自动重写）：</b>`;
+    for(const ch of ST_CHAPTERS.slice(2)){ // 标题/摘要一般不需要
+      const row = el('div','st-refine-row');
+      row.innerHTML = `<span>${esc(ch.title)}</span><input type="text" placeholder="例如：加入中国人群的亚组分析；引用更多 meta 分析…">`;
+      const input = row.querySelector('input');
+      input.value = state.refineFocuses[ch.id] || '';
+      input.oninput = ()=>{ state.refineFocuses[ch.id] = input.value.trim(); };
+      box.appendChild(row);
+    }
+    tools.parentNode.insertBefore(box, tools);
+  }
+  async function stRefineRun(){
+    const toDoIds = ST_CHAPTERS.filter(c => (state.refineFocuses[c.id] && state.refineFocuses[c.id].trim().length>0) || state.chapters[c.id]?.status==='err').map(c=>c.id);
+    if(!toDoIds.length){ alert('请先在「章节精修要点」输入框中，为至少一个章节填入精修要点。'); return; }
+    setRound(5); setBusy(true);
+    toDoIds.forEach(id=>{ if(state.chapters[id]) state.chapters[id].status='run'; });
+    stRenderReview();
+    stMsg('sys','🔧 正在按要点重写 '+toDoIds.length+' 个章节…',{round:5});
+    try{
+      const refine_obj = {};
+      toDoIds.forEach(id=>{ refine_obj[id] = state.refineFocuses[id] || state.chapters[id]?.error || '修正并重写'; });
+      const r = await STORM.synthesizeAll({
+        questions: state.questions.filter(q=>q.checked).map(q=>q.text),
+        papers: state.papers,
+        refine_focus_by_id: refine_obj
+      });
+      let modified=0;
+      for(const id of toDoIds){
+        const got = r.chapters && r.chapters[id];
+        if(got && got.content && got.content!=='（本章节未生成）'){
+          state.chapters[id] = { title: got.title || state.chapters[id]?.title || '', content: got.content, role: state.chapters[id]?.role, status: 'done', updatedAt: now()};
+          modified++;
+        } else {
+          state.chapters[id].status = 'err';
+          state.chapters[id].error = '后端未返回新内容';
+        }
+      }
+      stMsg('assistant','✅ 重写完毕（'+modified+'/'+toDoIds.length+'）。你可以继续调整要点或导出。',{round:5});
+    }catch(e){
+      toDoIds.forEach(id=>{ if(state.chapters[id]) state.chapters[id].status = 'err'; });
+      stMsg('err','精修失败：'+e.message);
+    }finally{ setBusy(false); stRenderReview(); }
+  }
+
+  /* ======== 对外 send ======== */
+  window.stSend = async function(){
+    if(state.isBusy){ alert('当前有任务在执行，请等待…'); return; }
+    const txt = ($('st-input').value||'').trim();
+    if(!txt){
+      if(state.round===2){ stGotoRound3(); }
+      return;
+    }
+    $('st-input').value = '';
+    if(state.round===1) await stRound1Clarify(txt);
+    else if(state.round===2){
+      stMsg('user',txt,{round:2});
+      stMsg('sys','ℹ 建议使用问题清单末尾的「➕ 追加一个自定义问题」按钮来管理问题；该文本已记入对话。',{round:2});
+    }
+    else if(state.round===3) await stRound3Chat(txt);
+    else if(state.round===4){
+      stMsg('user',txt,{round:4});
+      stMsg('sys','ℹ 第 4 轮正在串行生成章节，你可在完成后在第 5 轮进行精修；本次备注已记录。');
+    }
+    else if(state.round===5){
+      // 整体精修：把内容作为非空章节的默认 refine_focus（追加）
+      ST_CHAPTERS.forEach(c=>{
+        if(c.id==='ch1'||c.id==='ch2') return;
+        state.refineFocuses[c.id] = (state.refineFocuses[c.id]?(state.refineFocuses[c.id]+'；'):'') + txt;
+      });
+      stMsg('user',txt,{round:5});
+      stMsg('assistant','已把你的要求追加到 3–8 章精修要点，点击「🔧 按精修要点重建章节」执行。如果要精修单章，使用综述面板下方的输入框。',{round:5});
+      if($('st-refine-box')) $('st-refine-box').remove(); // 重新渲染
+      stRenderRefineInputs();
+    }
+  };
+
+  /* ======== 忙碌态 ======== */
+  function setBusy(v){
+    state.isBusy = v;
+    const s = $('st-send'); if(s) s.disabled = v;
+    const t = $('st-input'); if(t) t.style.opacity = v?'0.6':'1';
+    // thinking bubble
+    const chat = $('st-chat');
+    if(!chat) return;
+    let th = chat.querySelector('.st-thinking');
+    if(v && !th){
+      th = el('div','st-thinking');
+      th.innerHTML = '<div class="st-dots"><span></span><span></span><span></span></div> <span>助手正在思考…</span>';
+      chat.appendChild(th);
+    } else if(!v && th){ th.remove(); }
+    setTimeout(()=>chat.scrollTop=chat.scrollHeight, 10);
+  }
+
+  /* ======== RenderAll ======== */
+  function stRenderAll(){
+    stLoadConfig();
+    setRound(state.round||1);
+    stRenderChat(); stRenderPapers(); stRenderReview();
+    if(state.round===2 && state.questions.length) setTimeout(stRenderQuestions,50);
+    if(state.round===5) setTimeout(stRenderRefineInputs,50);
+    stRenderActions();
+  }
+
+  /* ======== 入口：window.stInit ======== */
+  window.stInit = function(){
+    // 默认恢复上次状态
+    try{
+      const saved = localStorage.getItem(ST_LS_STATE);
+      if(saved){
+        try{
+          const s = JSON.parse(saved);
+          Object.assign(state, s, {isBusy:false});
+          // 清除已完成未完成的 run status
+          ST_CHAPTERS.forEach(c=>{ if(state.chapters[c.id]?.status==='run') state.chapters[c.id].status='idle'; });
+        }catch(e){}
+      }
+    }catch(e){}
+    // 自动保存（节流）
+    const saveState = debounce(()=>{
+      try{
+        localStorage.setItem(ST_LS_STATE, JSON.stringify({
+          round:state.round, chat:state.chat.slice(-40), papers:state.papers.slice(0,80),
+          questions:state.questions, chapters:state.chapters, topicSummary:state.topicSummary,
+          searchQueries:state.searchQueries, refineFocuses:state.refineFocuses, sessionId:state.sessionId
+        }));
+      }catch(e){}
+    },800);
+    setInterval(saveState, 2000);
+    stRenderAll();
+  };
+
+})();/* /STORM IIFE */
 
 </script>
 
