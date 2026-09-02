@@ -12830,7 +12830,8 @@ document.getElementById('lit-modal-bg').addEventListener('click',function(e){if(
     papers:[],               // {doi,pmid,title,authors,year,journal,abstract,source,link,methods?,cited_count?}
     questions:[],            // {id,text,editing,custom,checked}
     chapters:{},             // id -> {title,content,role,status:'idle'|'run'|'done'|'err',error}
-    topicSummary:'',         // 第 1 轮澄清后生成的 concise 主题摘要
+    topic:'',                // 用户第 1 轮原始输入（最干净的检索词来源）
+    topicSummary:'',         // 第 1 轮澄清后生成的 concise 主题摘要（可能含 LLM 乱码）
     searchQueries:[],        // 第 2 轮后确定的检索关键词数组
     refineFocuses:{
       ch3:'',ch4:'',ch5:'',ch6:'',ch7:'',ch8:''
@@ -13202,9 +13203,11 @@ document.getElementById('lit-modal-bg').addEventListener('click',function(e){if(
   /* ======== 文献面板 ======== */
   function stAddPapers(list){
     if(!list || !list.length) return;
-    const seen = new Set(state.papers.map(p=>(p.doi||p.pmid||(p.title+'|'+(p.authors||[]).join(',')))));
+    // 注意：后端检索 API 返回的 authors 是字符串（如 "Smith J, Doe J"），不是数组
+    // 所以这里不能用 .join()，要用 String() 防御性处理
+    const seen = new Set(state.papers.map(p=>(p.doi||p.pmid||(p.title+'|'+String(p.authors||'').slice(0,40)))));
     for(const p of list){
-      const key = p.doi||p.pmid||(p.title+'|'+(p.authors||[]).join(','));
+      const key = p.doi||p.pmid||(p.title+'|'+String(p.authors||'').slice(0,40));
       if(!key || seen.has(key)) continue;
       seen.add(key); state.papers.push(p);
     }
@@ -13333,7 +13336,11 @@ document.getElementById('lit-modal-bg').addEventListener('click',function(e){if(
       parts.push('');
       state.papers.forEach((p,i)=>{
         const link = p.link || (p.doi?('https://doi.org/'+p.doi):(p.pmid?('https://pubmed.ncbi.nlm.nih.gov/'+p.pmid+'/'):''));
-        parts.push(`${i+1}. ${(p.authors||[]).slice(0,3).join(', ')+((p.authors||[]).length>3?', et al.':'')}. "${p.title||''}" ${p.journal||''}${p.year?', '+p.year:''}${p.doi?'. https://doi.org/'+p.doi:(link?' . '+link:'')}.`);
+        // authors 可能是字符串也可能是数组，统一处理
+        const authRaw = p.authors || '';
+        const authArr = Array.isArray(authRaw) ? authRaw : String(authRaw).split(/[,;，]/).map(s=>s.trim()).filter(Boolean);
+        const authDisplay = authArr.slice(0,3).join(', ')+(authArr.length>3?', et al.':'');
+        parts.push(`${i+1}. ${authDisplay}. "${p.title||''}" ${p.journal||''}${p.year?', '+p.year:''}${p.doi?'. https://doi.org/'+p.doi:(link?' . '+link:'')}.`);
       });
     }
     return parts.join('\n');
@@ -13412,10 +13419,10 @@ document.getElementById('lit-modal-bg').addEventListener('click',function(e){if(
   function stReset(justRound=false){
     if(justRound){
       state.round=1; state.chat=[]; state.papers=[]; state.questions=[]; state.chapters={};
-      state.searchQueries=[]; state.topicSummary=''; state.sessionId=null;
+      state.searchQueries=[]; state.topicSummary=''; state.topic=''; state.sessionId=null;
     }else{
       state.round=1; state.chat=[]; state.papers=[]; state.questions=[]; state.chapters={};
-      state.topicSummary=''; state.searchQueries=[]; state.sessionId=null;
+      state.topicSummary=''; state.topic=''; state.searchQueries=[]; state.sessionId=null;
       Object.keys(state.refineFocuses).forEach(k=>state.refineFocuses[k]='');
     }
     setRound(1); stRenderAll();
@@ -13432,6 +13439,7 @@ document.getElementById('lit-modal-bg').addEventListener('click',function(e){if(
     }
     try{
       const r = await STORM.clarify(userText);
+      state.topic = state.topic || userText;   // 保存用户原始输入（检索词最可靠来源）
       state.topicSummary = r.topic_summary || state.topicSummary;
       stMsg('assistant', r.reply, {round:1});
       // 追问按钮
@@ -13517,14 +13525,31 @@ document.getElementById('lit-modal-bg').addEventListener('click',function(e){if(
     if(!picked.length){ alert('请至少勾选一个核心问题。'); return; }
     setRound(3);
     setBusy(true);
-    stMsg('assistant','📥 第 3 轮开始！正在基于你勾选的 '+picked.length+' 个问题构造检索关键词，并从 5 个公开数据源拉取真实文献…这一步会较费时（15–40 秒）。',{round:3});
+    stMsg('assistant','📥 第 3 轮开始！正在基于你的研究主题构造检索关键词，并从 5 个公开数据源拉取真实文献…这一步会较费时（15–40 秒）。',{round:3});
     try{
-      const queries = [state.topicSummary].concat(picked).filter(Boolean);
+      // 构造检索关键词：优先使用用户原始输入（最干净），避免使用 LLM 生成的问题文本（可能含乱码 D 字符）
+      const rawTopic = (state.topic || state.topicSummary || '').trim();
+      // 清理可能残留的 LLM 乱码（连续 D 字符、重复词）
+      const cleanTopic = rawTopic
+        .replace(/\bD{2,}\b/g, ' ')           // 连续 D 字符
+        .replace(/([，,])\s*D\s+/g, '$1')      // 逗号后的单个 D
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+      // 从主题中提取关键概念（按标点分词，取长度 2-30 的有效片段）
+      const topicTokens = cleanTopic
+        .split(/[\s,，。、；;:：()（）【】\[\]]+/)
+        .map(s=>s.trim())
+        .filter(s=>s.length>=2 && s.length<=30 && !/^\d+$/.test(s) && !/^D+$/i.test(s));
+      const uniqueTokens = [...new Set(topicTokens)];
+      // 主检索词 = 完整主题；补充检索词 = 主题中的关键概念片段（最多 4 个）
+      const queries = [cleanTopic, ...uniqueTokens.slice(0, 4)].filter(q=>q && q.length>=2);
+      // 用于后端相关性打分的核心概念
+      const keyConcepts = uniqueTokens.slice(0, 5);
       let idx = 0;
       for(const q of queries.slice(0,5)){
         stMsg('sys',`🔍 检索 ${idx+1}/${Math.min(queries.length,5)}："${q.slice(0,60)}"`);
         try{
-          const resp = await stFetch('/search',{query:q,limit:10,year_min:2015},{timeoutMs:50000});
+          const resp = await stFetch('/search',{query:q, limit:10, year_min:2015, keyConcepts: idx===0 ? keyConcepts : []},{timeoutMs:50000});
           const arr = resp && Array.isArray(resp.papers) ? resp.papers : [];
           if(arr.length){
             stAddPapers(arr);
@@ -13785,7 +13810,7 @@ document.getElementById('lit-modal-bg').addEventListener('click',function(e){if(
       try{
         localStorage.setItem(ST_LS_STATE, JSON.stringify({
           round:state.round, chat:state.chat.slice(-40), papers:state.papers.slice(0,80),
-          questions:state.questions, chapters:state.chapters, topicSummary:state.topicSummary,
+          questions:state.questions, chapters:state.chapters, topic:state.topic, topicSummary:state.topicSummary,
           searchQueries:state.searchQueries, refineFocuses:state.refineFocuses, sessionId:state.sessionId
         }));
       }catch(e){}
