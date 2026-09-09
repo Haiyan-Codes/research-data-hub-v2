@@ -4687,7 +4687,7 @@ else:
       <button class="agent-tab" onclick="agentSwitchTab(this,'papers')"> 文献汇总 <span id="a-tab-count-papers" class="badge" style="display:none"></span></button>
       <button class="agent-tab" onclick="agentSwitchTab(this,'datasets')"> 相关数据集</button>
       <button class="agent-tab" onclick="agentSwitchTab(this,'insights')"> 研究洞察</button>
-      <button class="agent-tab" onclick="agentSwitchTab(this,'qa')"> 文献问答 <span style="background:#ffe58f;color:#874d00;border-radius:10px;padding:0 7px;font-size:11px;margin-left:4px">NEW</span></button>
+      <button class="agent-tab" onclick="agentSwitchTab(this,'qa')"> 文献问答 <span style="background:rgba(245,158,11,.25);color:#fbbf24;border-radius:10px;padding:0 7px;font-size:11px;margin-left:4px">NEW</span></button>
       <button class="agent-tab" onclick="agentSwitchTab(this,'report')"> 综合报告</button>
     </div>
 
@@ -4763,7 +4763,7 @@ else:
           <button class="btn sm" onclick="saveAgentReport()">⭐ 收藏报告</button>
         </div>
         <div id="agent-md-html" style="background:var(--bg-card);padding:20px 28px;border:1px solid var(--line);border-radius:4px;max-height:600px;overflow:auto;font-size:14px;line-height:1.8;color:var(--ink2)"></div>
-        <details style="margin-top:10px"><summary style="cursor:pointer;font-size:12.5px;color:var(--accent)">查看原始 Markdown</summary><pre id="agent-md" style="background:#f7f7f7;padding:12px;border-radius:3px;white-space:pre-wrap;max-height:400px;overflow:auto;font-size:12px;line-height:1.5;margin-top:8px"></pre></details>
+        <details style="margin-top:10px"><summary style="cursor:pointer;font-size:12.5px;color:var(--accent)">查看原始 Markdown</summary><pre id="agent-md" style="background:var(--bg-elev);padding:12px;border-radius:3px;white-space:pre-wrap;max-height:400px;overflow:auto;font-size:12px;line-height:1.5;margin-top:8px"></pre></details>
       </div>
     </div>
   </div>
@@ -4782,7 +4782,7 @@ else:
 .agent-card h3{margin:0 0 10px;font-size:14px;color:var(--ink2)}
 .bar-chart .bar-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:12px}
 .bar-chart .bar-label{width:32%;text-align:right;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar-chart .bar-track{flex:1;background:#eee;border-radius:2px;height:14px;overflow:hidden}
+.bar-chart .bar-track{flex:1;background:rgba(255,255,255,.06);border-radius:2px;height:14px;overflow:hidden}
 .bar-chart .bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),#5b9bd6);transition:width .5s}
 .bar-chart .bar-val{width:38px;text-align:right;color:var(--muted);font-family:monospace}
 #agent-top-papers ol{margin:0;padding-left:20px}
@@ -4794,9 +4794,9 @@ else:
 /* Agent sub-tabs */
 .agent-tabs{display:flex;gap:4px;margin:14px 0 18px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:0}
 .agent-tab{background:transparent;border:1px solid transparent;border-bottom:none;padding:8px 14px;border-radius:4px 4px 0 0;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
-.agent-tab:hover{color:var(--ink2);background:#f5f8fd}
+.agent-tab:hover{color:var(--ink2);background:rgba(124,58,237,.1)}
 .agent-tab.active{background:var(--panel);border-color:var(--line);color:var(--accent);font-weight:600;position:relative;top:1px;z-index:1}
-.agent-tab .badge{display:inline-block;margin-left:6px;background:#dce8ff;color:var(--accent);border-radius:10px;padding:0 7px;font-size:11px;font-weight:600}
+.agent-tab .badge{display:inline-block;margin-left:6px;background:rgba(124,58,237,.15);color:var(--accent);border-radius:10px;padding:0 7px;font-size:11px;font-weight:600}
 .agent-tab-panel{display:none;animation:fade .3s ease}
 .agent-tab-panel.active{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
@@ -4807,10 +4807,10 @@ else:
 .paper-card h4 a{color:inherit;text-decoration:none}
 .paper-card h4 a:hover{color:var(--accent)}
 .paper-card .pc-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
-.paper-card .pc-abs{color:var(--ink2);font-size:12.5px;line-height:1.6;margin:6px 0;background:#f9fbfd;padding:8px 10px;border-left:3px solid var(--accent);border-radius:0 3px 3px 0}
-.paper-card .pc-struct{margin:8px 0;padding:8px 10px;background:var(--bg-card)9ec;border:1px solid #ffe6a3;border-radius:3px;font-size:12.5px;line-height:1.6}
-.paper-card .pc-struct .s-row{margin-bottom:3px}
-.paper-card .pc-struct .s-label{display:inline-block;min-width:70px;color:#b37b00;font-weight:600;margin-right:6px}
+.paper-card .pc-abs{color:var(--ink2);font-size:12.5px;line-height:1.6;margin:6px 0;background:rgba(124,58,237,.08);padding:8px 10px;border-left:3px solid var(--accent);border-radius:0 3px 3px 0}
+.paper-card .pc-struct{margin:8px 0;padding:8px 10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);border-radius:3px;font-size:12.5px;line-height:1.6}
+.paper-card .pc-struct .s-row{margin-bottom:3px;color:var(--ink2)}
+.paper-card .pc-struct .s-label{display:inline-block;min-width:70px;color:#fbbf24;font-weight:600;margin-right:6px}
 .paper-card .pc-foot{margin-top:6px;color:var(--muted);font-size:11.5px;display:flex;gap:12px;flex-wrap:wrap}
 .paper-card .pc-actions{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
 
@@ -4821,14 +4821,14 @@ else:
 .insight-box .topic-group h5{margin:0 0 4px;font-size:13px;color:var(--accent2)}
 .insight-box .topic-group ul{margin:4px 0;padding-left:18px}
 .insight-box .topic-group li{font-size:12.5px;color:var(--ink2);line-height:1.6}
-.citation-timeline{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end;padding:8px;background:#f7f9fc;border-radius:3px}
+.citation-timeline{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end;padding:8px;background:rgba(124,58,237,.08);border-radius:3px}
 .citation-timeline .tl-node{flex:1;min-width:90px;background:var(--bg-card);border:1px solid var(--line);border-radius:3px;padding:6px 8px;text-align:center;font-size:11.5px}
 .citation-timeline .tl-node .year{font-weight:700;color:var(--accent);display:block}
 .citation-timeline .tl-node .title{color:var(--ink2);line-height:1.4;max-height:48px;overflow:hidden}
 .gap-list{margin:0;padding-left:20px}
 .gap-list li{font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:5px}
 .rec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
-.rec-card{background:linear-gradient(135deg,#eef5ff,#f5f0ff);border:1px solid #d8e4f5;border-radius:4px;padding:10px;font-size:12.5px;line-height:1.6;color:var(--ink2)}
+.rec-card{background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(34,211,238,.08));border:1px solid var(--line);border-radius:4px;padding:10px;font-size:12.5px;line-height:1.6;color:var(--ink2)}
 .rec-card b{color:var(--accent);display:block;margin-bottom:4px}
 </style>
 
@@ -5172,7 +5172,7 @@ async function dsSearch(){
   elSt.className='empty-tip'; elSt.innerHTML=' 正在从 Zenodo 检索数据集…<br><small style="color:var(--muted)">Zenodo Open Access</small>';
 
   try{
-    var z=await fetchZenodo(q,yMin);
+    var z=await withTimeout(fetchZenodo(q,yMin),20000,'Zenodo');
     DS_RESULTS=z;
     if(DS_RESULTS.length===0){
       elSt.className='empty-tip'; elSt.innerHTML=' 未检索到数据集。请尝试更换关键词。<br><small style="color:var(--muted)">提示：使用英文关键词通常命中更多结果。</small>';
@@ -5181,7 +5181,11 @@ async function dsSearch(){
       dsRenderResults();
     }
   }catch(e){
-    elSt.className='empty-tip'; elSt.innerHTML=' 检索出错：'+e.message;
+    var msg=e.message||String(e);
+    var hint='';
+    if(/TIMEOUT/i.test(msg)) hint='<br><small style="color:var(--muted)">网络较慢，Zenodo 响应超时。可稍后重试，或检查网络连接。</small>';
+    else if(/Failed to fetch|Network/i.test(msg)) hint='<br><small style="color:var(--muted)">网络请求失败，可能是网络连接问题或 Zenodo 暂时不可达。请检查网络后重试。</small>';
+    elSt.className='empty-tip'; elSt.innerHTML=' 检索出错：'+escapeHtml(msg)+hint;
     console.error('Zenodo dsSearch',e);
   }
 }
@@ -5199,7 +5203,7 @@ function dsRenderResults(){
     var tags='';
     if(r.year) tags+='<span class="tag">'+r.year+'年</span> ';
     if(r.type) tags+='<span class="tag">'+r.type+'</span> ';
-    tags+='<span class="tag" style="background:#e8f5e9">数据集</span>';
+    tags+='<span class="tag" style="background:rgba(16,185,129,.15)">数据集</span>';
     if(r.rid) tags+='<span class="tag">Zenodo:'+r.rid+'</span>';
     card.innerHTML='<div class="rc-title"><a href="'+(r.url||'#')+'" target="_blank">'+(r.title||'无标题')+'</a></div>'
       +'<div class="rc-authors">'+authors+'</div>'
@@ -5305,30 +5309,43 @@ async function fetchZenodo(q, yMin){
   var params='q='+encodeURIComponent(q+' AND (mental OR depression OR anxiety OR psychiatry OR cognitive OR neuroscience OR mental health OR psychology OR survey OR cohort OR behavioral OR brain OR neuro)')+'&type=dataset&size=20&sort=bestmatch';
   if(yMin) params+='&all_versions=false';
   var u='https://zenodo.org/api/records?'+params;
-  var r=await fetch(u,{cache:'no-store'});
-  if(!r.ok) throw new Error('Zenodo HTTP '+r.status);
-  var j=await r.json();
-  var items=j.hits&&j.hits.hits?j.hits.hits:[];
-  var out=[];
-  items.forEach(function(it){
-    var md=it.metadata||{};
-    var dates=md.publication_date||(it.created||'').slice(0,10);
-    var yr=dates?parseInt(dates.slice(0,4)):null;
-    if(yMin && yr && yr<parseInt(yMin)) return;
-    var kw=(md.keywords||[]).slice(0,6).join(' · ');
-    var desc=(md.description||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,800);
-    var authors=(md.creators||[]).slice(0,4).map(function(c){return c.name}).join(', ')+((md.creators||[]).length>4?' 等':'');
-    out.push({
-      kind:'dataset', source:'Zenodo', relevance:4, rid:it.id, doi:md.doi||'', pmid:'',
-      title:md.title||'(无标题)',
-      abstract: desc+(kw?'\n关键词：'+kw:''),
-      authors, journal:'Zenodo Dataset', year:yr, citations:0,
-      url:it.links&&it.links.html?it.links.html:'https://zenodo.org/record/'+it.id,
-      access:md.access_right||'open',
-      size:it.files?'文件数：'+it.files.length:''
-    });
-  });
-  return out;
+  var lastErr=null;
+  for(var attempt=0; attempt<2; attempt++){
+    try{
+      var r=await fetch(u,{cache:'no-store'});
+      if(!r.ok) throw new Error('Zenodo HTTP '+r.status);
+      var j=await r.json();
+      var items=j.hits&&j.hits.hits?j.hits.hits:[];
+      var out=[];
+      items.forEach(function(it){
+        var md=it.metadata||{};
+        var dates=md.publication_date||(it.created||'').slice(0,10);
+        var yr=dates?parseInt(dates.slice(0,4)):null;
+        if(yMin && yr && yr<parseInt(yMin)) return;
+        var kw=(md.keywords||[]).slice(0,6).join(' · ');
+        var desc=(md.description||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,800);
+        var authors=(md.creators||[]).slice(0,4).map(function(c){return c.name}).join(', ')+((md.creators||[]).length>4?' 等':'');
+        out.push({
+          kind:'dataset', source:'Zenodo', relevance:4, rid:it.id, doi:md.doi||'', pmid:'',
+          title:md.title||'(无标题)',
+          abstract: desc+(kw?'\n关键词：'+kw:''),
+          authors, journal:'Zenodo Dataset', year:yr, citations:0,
+          url:it.links&&it.links.html?it.links.html:'https://zenodo.org/record/'+it.id,
+          access:md.access_right||'open',
+          size:it.files?'文件数：'+it.files.length:''
+        });
+      });
+      return out;
+    }catch(e){
+      lastErr=e;
+      if(attempt===0 && /Failed to fetch|NetworkError|TypeError|503|502|500|429/i.test(e.message)){
+        await new Promise(rs=>setTimeout(rs, 1500));
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw lastErr;
 }
 
 async function fetchPubmed(q, yMin){
@@ -5386,8 +5403,16 @@ async function fetchCrossref(q, yMin){
 async function fetchS2(q, yMin){
   var u='https://api.semanticscholar.org/graph/v1/paper/search?query='+encodeURIComponent(q)+'&limit=25&fields=title,abstract,year,authors,externalIds,citationCount,journal,publicationDate,url';
   if(yMin) u+='&year='+yMin+'-';
-  // S2 公开 API 限流较严：429 时退避后重试 1 次
-  var r=await fetch(u,{cache:'no-store'});
+  // S2 公开 API 限流较严：429 或网络错误时退避后重试 1 次
+  var r;
+  try{
+    r=await fetch(u,{cache:'no-store'});
+  }catch(e){
+    if(/Failed to fetch|NetworkError|TypeError/i.test(e.message)){
+      await new Promise(rs=>setTimeout(rs, 1500));
+      r=await fetch(u,{cache:'no-store'});
+    }else{ throw e; }
+  }
   if(r.status===429){
     await new Promise(rs=>setTimeout(rs, 1200));
     r=await fetch(u,{cache:'no-store'});
@@ -6791,7 +6816,7 @@ async function runR(a){
       var rows=['<div class="tbl"><table><tr><th>'+nms[i]+'</th><th>N</th><th>%</th></tr>'];
       var totalN=0;
       lvls.forEach(function(l,k){var n=Number(tArr[k])||0;var p=Number(pctArr[k])||0;totalN+=n;rows.push('<tr><td>'+(l=='NA'?'<span style="color:var(--muted)">缺失</span>':l)+'</td><td>'+n+'</td><td>'+p.toFixed(2)+'</td></tr>');});
-      rows.push('<tr style="background:#f3f4f6"><td><b>合计</b></td><td>'+totalN+'</td><td>100.00</td></tr></table></div>');
+      rows.push('<tr style="background:rgba(255,255,255,.04)"><td><b>合计</b></td><td>'+totalN+'</td><td>100.00</td></tr></table></div>');
       htmls.push('<h5 style="margin:12px 0 6px"><span class="chip grey">分类变量</span> '+nms[i]+'</h5>'+rows.join(''));
     }
     return `<h3 style="margin:6px 0 10px">② 频数 / 百分比表</h3>` + (htmls.length?htmls.join(''):'<div class="empty-tip">没有检测到分类变量。</div>');
@@ -6934,7 +6959,7 @@ async function runAgentAnalysis(){
   document.getElementById('agent-report').style.display='none';
   var st=document.getElementById('agent-status');
   st.className='empty-tip';st.style.display='block';
-  st.innerHTML=' 启动智能分析：<b>'+escapeHtml(q)+'</b><br><small style="color:var(--muted)">预计耗时 15-40 秒（各源超时 12 秒自动跳过）</small>';
+  st.innerHTML=' 启动智能分析：<b>'+escapeHtml(q)+'</b><br><small style="color:var(--muted)">预计耗时 15-40 秒（各源超时 14-16 秒自动跳过）</small>';
 
   var papers=[], datasets=[], errLog=[], stats={}, related=[], md='';
 
@@ -6947,17 +6972,17 @@ async function runAgentAnalysis(){
     var list1=await withTimeout(fetchPubmed(q,yMin),12000,'PubMed');
     papers=papers.concat(list1); sourcesOk++;
     st.innerHTML+='<div style="margin-top:4px;color:var(--ok)">&nbsp;&nbsp;PubMed: '+list1.length+' 篇</div>';
-  }catch(e){errLog.push('PubMed: '+e.message);st.innerHTML+='<div style="margin-top:4px;color:#b26a00">&nbsp;&nbsp;⚠ PubMed 跳过（'+e.message+'）</div>'}
+  }catch(e){errLog.push('PubMed: '+e.message);st.innerHTML+='<div style="margin-top:4px;color:#fbbf24">&nbsp;&nbsp;⚠ PubMed 跳过（'+e.message+'）</div>'}
   try{
     var list2=await withTimeout(fetchCrossref(q,yMin),12000,'Crossref');
     papers=papers.concat(list2); sourcesOk++;
     st.innerHTML+='<div style="margin-top:4px;color:var(--ok)">&nbsp;&nbsp;Crossref: '+list2.length+' 篇</div>';
-  }catch(e){errLog.push('Crossref: '+e.message);st.innerHTML+='<div style="margin-top:4px;color:#b26a00">&nbsp;&nbsp;⚠ Crossref 跳过（'+e.message+'）</div>'}
+  }catch(e){errLog.push('Crossref: '+e.message);st.innerHTML+='<div style="margin-top:4px;color:#fbbf24">&nbsp;&nbsp;⚠ Crossref 跳过（'+e.message+'）</div>'}
   try{
     var list3=await withTimeout(fetchS2(q,yMin),14000,'S2');
     papers=papers.concat(list3); sourcesOk++;
     st.innerHTML+='<div style="margin-top:4px;color:var(--ok)">&nbsp;&nbsp;Semantic Scholar: '+list3.length+' 篇</div>';
-  }catch(e){errLog.push('S2: '+e.message);st.innerHTML+='<div style="margin-top:4px;color:#b26a00">&nbsp;&nbsp;⚠ S2 跳过（'+e.message+'）</div>'}
+  }catch(e){errLog.push('S2: '+e.message);st.innerHTML+='<div style="margin-top:4px;color:#fbbf24">&nbsp;&nbsp;⚠ S2 跳过（'+e.message+'）</div>'}
   try{ papers=dedupePapers(papers); }catch(e){errLog.push('dedupe: '+e.message);papers=papers||[]}
   /* 心理健康相关性过滤 */
   var mhFilter=filterMentalHealthPapers(papers,q);
@@ -6965,7 +6990,7 @@ async function runAgentAnalysis(){
   papers=mhFilter.filtered;
   if(mhFilter.removed.length>0){
     errLog.push('相关性过滤：移除 '+mhFilter.removed.length+' 篇无关文献（保留 '+papers.length+' 篇）');
-    st.innerHTML+='<div style="margin-top:4px;color:#b26a00">&nbsp;&nbsp;相关性过滤：移除 '+mhFilter.removed.length+' 篇疑似非心理健康相关文献，保留 '+papers.length+' 篇</div>';
+    st.innerHTML+='<div style="margin-top:4px;color:#fbbf24">&nbsp;&nbsp;相关性过滤：移除 '+mhFilter.removed.length+' 篇疑似非心理健康相关文献，保留 '+papers.length+' 篇</div>';
   }
   setStep(1,'done');
   st.innerHTML+='<div style="margin-top:4px;color:var(--ok);font-weight:600">合计文献: '+papers.length+' 篇（去重+过滤后）</div>';
@@ -6974,17 +6999,17 @@ async function runAgentAnalysis(){
   setStep(2,'active');
   st.innerHTML+='<div style="margin-top:8px"> 正在从 Zenodo 爬取数据集...</div>';
   try{
-    datasets=await withTimeout(fetchZenodo(q,yMin),12000,'Zenodo')||[];
+    datasets=await withTimeout(fetchZenodo(q,yMin),16000,'Zenodo')||[];
     /* 数据集相关性过滤 */
     var dsFilter=filterMentalHealthDatasets(datasets,q);
     if(dsFilter.removed.length>0){
       errLog.push('数据集过滤：移除 '+dsFilter.removed.length+' 个无关数据集');
-      st.innerHTML+='<div style="margin-top:4px;color:#b26a00">&nbsp;&nbsp;数据集相关性过滤：保留 '+dsFilter.filtered.length+' 个</div>';
+      st.innerHTML+='<div style="margin-top:4px;color:#fbbf24">&nbsp;&nbsp;数据集相关性过滤：保留 '+dsFilter.filtered.length+' 个</div>';
     }
     datasets=dsFilter.filtered;
     setStep(2,'done');
     st.innerHTML+='<div style="margin-top:4px;color:var(--ok)">数据集: '+datasets.length+' 个（过滤后）</div>';
-  }catch(e){errLog.push('Zenodo: '+e.message);datasets=[]; setStep(2,'done');st.innerHTML+='<div style="margin-top:4px;color:#b26a00">⚠ Zenodo 跳过（'+e.message+'），继续后续流程</div>'}
+  }catch(e){errLog.push('Zenodo: '+e.message);datasets=[]; setStep(2,'done');st.innerHTML+='<div style="margin-top:4px;color:#fbbf24">⚠ Zenodo 跳过（'+e.message+'），继续后续流程</div>'}
 
   /* -------- Step 3: bibliometrics -------- */
   setStep(3,'active');
@@ -7008,7 +7033,7 @@ async function runAgentAnalysis(){
   }catch(e){
     errLog.push('related: '+e.message);related=[];
     if(document.getElementById('step-4')){document.getElementById('step-4').classList.remove('active');document.getElementById('step-4').classList.add('error')}
-    st.innerHTML+='<div style="margin-top:4px;color:#b26a00">⚠ 关联数据集失败：'+e.message+'（忽略）</div>';
+    st.innerHTML+='<div style="margin-top:4px;color:#fbbf24">⚠ 关联数据集失败：'+e.message+'（忽略）</div>';
   }
 
   /* -------- Step 5: report + render -------- */
@@ -7037,7 +7062,7 @@ async function runAgentAnalysis(){
     document.getElementById('agent-report').style.display='block';
     // 如果有错误，在 overview 顶部插入提示条
     if(errLog.length>0){
-      var warnHtml='<div class="agent-card" style="border-color:#ffd591;background:var(--bg-card)be6;color:#8a4b00;margin-bottom:12px">'+
+      var warnHtml='<div class="agent-card" style="border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.08);color:#fbbf24;margin-bottom:12px">'+
         '<b>⚠ 部分源返回异常（已自动跳过，结果基于成功返回的数据）：</b><br>'+
         '<ul style="margin:6px 0 0;padding-left:20px;font-size:12.5px;line-height:1.7">'+
         errLog.map(function(e){return '<li>'+escapeHtml(e)+'</li>'}).join('')+
@@ -7553,8 +7578,8 @@ function renderAgentReport(papers,datasets,stats,related,md){
         '<div class="meta">'+(p.authors||'').slice(0,90)+' · '+(p.journal||'')+' '+(p.year||'')+' · 被引 <b>'+(p.citations||0)+'</b> · 来源 '+p.source+
         (p.doi?' · DOI: '+p.doi:'')+(p.pmid?' · PMID: '+p.pmid:'')+
         (p.url?' · <a href="'+p.url+'" target="_blank">↗原文</a>':'')+'</div>'+
-        (shortAbs?('<div style="margin-top:4px;color:var(--ink2);font-size:12.5px;line-height:1.6;background:#f9fbfd;padding:6px 10px;border-left:3px solid var(--accent);border-radius:0 3px 3px 0">'+shortAbs+'</div>'):'')+
-        (struc?('<div style="margin-top:6px;padding:6px 10px;background:var(--bg-card)9ec;border:1px solid #ffe6a3;border-radius:3px;font-size:12px;color:#8a6400;line-height:1.6"> '+struc.population+' · '+struc.method+' · '+struc.sample+' · '+struc.finding+'</div>'):'')+
+        (shortAbs?('<div style="margin-top:4px;color:var(--ink2);font-size:12.5px;line-height:1.6;background:rgba(124,58,237,.08);padding:6px 10px;border-left:3px solid var(--accent);border-radius:0 3px 3px 0">'+shortAbs+'</div>'):'')+
+        (struc?('<div style="margin-top:6px;padding:6px 10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);border-radius:3px;font-size:12px;color:var(--ink2);line-height:1.6"> '+struc.population+' · '+struc.method+' · '+struc.sample+' · '+struc.finding+'</div>'):'')+
         '</li>';
     }).join('')+'</ol>';
   }
@@ -7807,35 +7832,35 @@ function renderAgentInsights(papers,stats){
   }
 
   // 3) Research gaps: heuristic rule based analysis
-  var gapHtml='<div class="insight-box"><h3> 识别到的潜在研究空白（规则启发式）</h3><ul class="gap-list">';
+  var gapArr=[];
   var recentCnt=papers.filter(function(p){return p.year>=2023}).length;
   var ratio=papers.length?recentCnt/papers.length:0;
-  if(papers.length<15) gapHtml.push('<li> 文献量偏<b>少</b>（'+papers.length+' 篇），建议扩展同义词、相关 MeSH 词或放宽年份继续检索。</li>');
-  if(recentCnt<3) gapHtml.push('<li>⏰ 近 2 年（2023+）文献仅 '+recentCnt+' 篇 → <b>新兴话题或数据尚未发表</b>，关注预印本与前沿会议。</li>');
-  else if(ratio<0.15) gapHtml.push('<li>⏳ 近年更新率较低（近 2 年占比仅 '+(Math.round(ratio*100))+'%）→ <b>主题可能趋冷</b>，或存在发表/检索偏倚。</li>');
+  if(papers.length<15) gapArr.push('<li> 文献量偏<b>少</b>（'+papers.length+' 篇），建议扩展同义词、相关 MeSH 词或放宽年份继续检索。</li>');
+  if(recentCnt<3) gapArr.push('<li>⏰ 近 2 年（2023+）文献仅 '+recentCnt+' 篇 → <b>新兴话题或数据尚未发表</b>，关注预印本与前沿会议。</li>');
+  else if(ratio<0.15) gapArr.push('<li>⏳ 近年更新率较低（近 2 年占比仅 '+(Math.round(ratio*100))+'%）→ <b>主题可能趋冷</b>，或存在发表/检索偏倚。</li>');
   // RCT / meta / longitudinal
   var rctCount=papers.filter(function(p){return /randomi|rct\b|randomized/i.test((p.title+' '+(p.abstract||'')).toLowerCase())}).length;
   var metaCount=papers.filter(function(p){return /meta.?analys|systematic.?review/i.test((p.title+' '+(p.abstract||'')).toLowerCase())}).length;
   var longCount=papers.filter(function(p){return /cohort|longitudinal|prospective|follow.?up/i.test((p.title+' '+(p.abstract||'')).toLowerCase())}).length;
-  if(rctCount<2) gapHtml.push('<li> <b>高质量因果证据不足</b>：RCT 仅 '+rctCount+' 篇，结论多为相关性，推断因果需谨慎。</li>');
-  if(metaCount<1) gapHtml.push('<li> <b>缺少系统综述/Meta分析</b>：该主题暂无整合性结论，适合撰写综述类文章。</li>');
-  if(longCount<2) gapHtml.push('<li> <b>纵向/队列研究偏少</b>（'+longCount+' 篇）：难以说明发生时序与因果方向，前瞻性队列是推荐方向。</li>');
+  if(rctCount<2) gapArr.push('<li> <b>高质量因果证据不足</b>：RCT 仅 '+rctCount+' 篇，结论多为相关性，推断因果需谨慎。</li>');
+  if(metaCount<1) gapArr.push('<li> <b>缺少系统综述/Meta分析</b>：该主题暂无整合性结论，适合撰写综述类文章。</li>');
+  if(longCount<2) gapArr.push('<li> <b>纵向/队列研究偏少</b>（'+longCount+' 篇）：难以说明发生时序与因果方向，前瞻性队列是推荐方向。</li>');
   // method gaps: 样本量 / 亚组 / 机制
   var bigN=papers.filter(function(p){
     var s=makeStructuredAbstract(p);
     return s && /大规模|较大样本|N=[5-9]\d{3,}|N=\d{5}/.test(s.sample);
   }).length;
-  if(bigN<1) gapHtml.push('<li> <b>大规模代表性研究缺失</b>：现有研究样本量较小，结论的外部效度有限。</li>');
+  if(bigN<1) gapArr.push('<li> <b>大规模代表性研究缺失</b>：现有研究样本量较小，结论的外部效度有限。</li>');
   var neuro=papers.filter(function(p){return /fmri|eeg|neuroimaging|brain|biomarker|inflammat|genet|epigenet/i.test((p.title+' '+(p.abstract||'')).toLowerCase())}).length;
-  if(papers.length>=8 && neuro<1) gapHtml.push('<li> <b>机制/生物学研究不足</b>：现有研究多为行为/调查层面，缺乏脑影像、生物标志物、遗传与炎症机制证据。</li>');
+  if(papers.length>=8 && neuro<1) gapArr.push('<li> <b>机制/生物学研究不足</b>：现有研究多为行为/调查层面，缺乏脑影像、生物标志物、遗传与炎症机制证据。</li>');
   var lowSE=papers.filter(function(p){return /low.income|rural|minority|socioeconomic|poverty|indigenous|refugee/i.test((p.title+' '+(p.abstract||'')).toLowerCase())}).length;
-  if(papers.length>=10 && lowSE<1) gapHtml.push('<li> <b>文化/地域样本单一</b>：缺乏低收入、农村、少数族裔、移民等多样性群体研究，跨文化普适性存疑。</li>');
+  if(papers.length>=10 && lowSE<1) gapArr.push('<li> <b>文化/地域样本单一</b>：缺乏低收入、农村、少数族裔、移民等多样性群体研究，跨文化普适性存疑。</li>');
   var inter=papers.filter(function(p){return /intervention|therapy|treatment|program|prevent/i.test((p.title+' '+(p.abstract||'')).toLowerCase())}).length;
-  if(inter<2) gapHtml.push('<li> <b>干预性研究较少</b>（'+inter+' 篇）：现多为描述性研究，适合设计评估类干预研究方案。</li>');
+  if(inter<2) gapArr.push('<li> <b>干预性研究较少</b>（'+inter+' 篇）：现多为描述性研究，适合设计评估类干预研究方案。</li>');
   var aiCount=papers.filter(function(p){return /machine.?learning|deep.?learning|neural.?network|bert|llm|transformer|ai\b|chatgpt|nlp/i.test((p.title+' '+(p.abstract||'')).toLowerCase())}).length;
-  if(papers.length>=12 && aiCount<1) gapHtml.push('<li> <b>AI / NLP 方法尚未渗透</b>：适合引入大模型自动筛查文献、识别风险因素、构建预测模型。</li>');
-  if(gapHtml.split('<li>').length<=2) gapHtml+='<li>未发现明显的空白，建议从「纵向时序 + 机制通路 + 干预评估」三维度深化。</li>';
-  gapHtml+='</ul></div>';
+  if(papers.length>=12 && aiCount<1) gapArr.push('<li> <b>AI / NLP 方法尚未渗透</b>：适合引入大模型自动筛查文献、识别风险因素、构建预测模型。</li>');
+  if(gapArr.length===0) gapArr.push('<li>未发现明显的空白，建议从「纵向时序 + 机制通路 + 干预评估」三维度深化。</li>');
+  var gapHtml='<div class="insight-box"><h3> 识别到的潜在研究空白（规则启发式）</h3><ul class="gap-list">'+gapArr.join('')+'</ul></div>';
 
   // 4) Recommendations
   var recHtml='<div class="insight-box"><h3> 下一步研究方向推荐</h3><div class="rec-grid">';
@@ -8006,7 +8031,7 @@ async function qaAsk(){
   if(!AGENT_LAST||!AGENT_LAST.papers||AGENT_LAST.papers.length===0){ alert('请先在上方完成一次「 启动智能分析」，构建文献库后再提问'); return }
   var hist=document.getElementById('qa-history');
   var blockId='qa-'+Date.now();
-  hist.insertAdjacentHTML('beforeend','<div class="qa-block" id="'+blockId+'" style="margin-bottom:14px"><div class="qa-q" style="background:#eef5ff;border:1px solid #cfe0ff;padding:8px 12px;border-radius:6px 6px 0 6px;max-width:80%;margin-left:auto"><b> 提问：</b>'+escapeHtml(q)+'</div><div class="qa-a" style="margin-top:8px;background:#f6ffed;border:1px solid #cdeac0;padding:10px 12px;border-radius:0 6px 6px 6px"><div id="'+blockId+'-body">正在从 '+qaBuildIndex().posts.length+' 篇文献中检索相关证据…</div></div></div>');
+  hist.insertAdjacentHTML('beforeend','<div class="qa-block" id="'+blockId+'" style="margin-bottom:14px"><div class="qa-q" style="background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);padding:8px 12px;border-radius:6px 6px 0 6px;max-width:80%;margin-left:auto"><b> 提问：</b>'+escapeHtml(q)+'</div><div class="qa-a" style="margin-top:8px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);padding:10px 12px;border-radius:0 6px 6px 6px"><div id="'+blockId+'-body">正在从 '+qaBuildIndex().posts.length+' 篇文献中检索相关证据…</div></div></div>');
   input.value='';
   try{
     var results=qaSearch(q,8);
@@ -8036,9 +8061,9 @@ async function qaAsk(){
       var llm=await qaAskLlmPolish(q,extract,cfg);
       var llmEl=document.getElementById(blockId+'-llm');
       if(llm){
-        llmEl.innerHTML='<div style="font-size:13.5px;line-height:1.8;color:var(--ink2);background:var(--bg-card)be6;border:1px solid #ffe58f;padding:10px 12px;border-radius:4px"><b style="color:#874d00"> LLM 润色版（证据不变，仅调整语气语序）：</b><br><br>'+escapeHtml(llm).replace(/\n/g,'<br>')+'</div>';
+        llmEl.innerHTML='<div style="font-size:13.5px;line-height:1.8;color:var(--ink2);background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.35);padding:10px 12px;border-radius:4px"><b style="color:#fbbf24"> LLM 润色版（证据不变，仅调整语气语序）：</b><br><br>'+escapeHtml(llm).replace(/\n/g,'<br>')+'</div>';
       } else {
-        llmEl.innerHTML='<div style="font-size:12.5px;color:#b26a00">⚠ LLM 接口调用失败（可能 Key 错误 / 网络 / 限流），已保留抽取式答案。可到配置中检查或清除 Key 后重试。</div>';
+        llmEl.innerHTML='<div style="font-size:12.5px;color:#fbbf24">⚠ LLM 接口调用失败（可能 Key 错误 / 网络 / 限流），已保留抽取式答案。可到配置中检查或清除 Key 后重试。</div>';
       }
     } else {
       bodyEl.insertAdjacentHTML('beforeend','<div style="margin-top:8px;font-size:11.5px;color:var(--muted)"> 如需更流畅的自然语言整合，可在下方「 LLM 润色配置」中填入你自己的 OpenAI 兼容接口 Key（默认纯事实抽取，无调用、无费用、无幻觉）。</div>');
@@ -8138,11 +8163,11 @@ function downloadAgentReportHtml(){
     'h3{font-size:16px;margin-top:20px;color:#334}'+
     'table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px}'+
     'th,td{border:1px solid #ddd;padding:6px 10px;text-align:left}'+
-    'tr:nth-child(even){background:#f9f9f9}'+
-    'blockquote{border-left:4px solid #1e3a8a;background:#f0f4ff;padding:10px 16px;margin:10px 0;color:#555}'+
+    'tr:nth-child(even){background:rgba(255,255,255,.04)}'+
+    'blockquote{border-left:4px solid #1e3a8a;background:rgba(124,58,237,.1);padding:10px 16px;margin:10px 0;color:#555}'+
     'a{color:#1e3a8a;text-decoration:none}'+
     'a:hover{text-decoration:underline}'+
-    'code{background:#f0f0f0;padding:2px 6px;border-radius:3px;font-size:13px}'+
+    'code{background:rgba(255,255,255,.1);padding:2px 6px;border-radius:3px;font-size:13px}'+
     'hr{border:none;border-top:1px solid #ddd;margin:20px 0}'+
     'li{margin-bottom:4px}'+
     '</style></head><body>'+body+'</body></html>';
@@ -8796,7 +8821,7 @@ function studyRenderLit(list) {
   html += '④ <b>后过滤排序</b>：每篇文献计算概念命中分，优先保留命中 ≥2 的强相关文献，按命中分降序排列<br>';
   if (concepts.length > 0) {
     html += '<div style="margin-top:6px"><b>提取到的核心概念：</b>';
-    html += concepts.map(function (c) { return '<span style="display:inline-block;background:#eef3ff;color:var(--accent);padding:1px 7px;border-radius:8px;margin:2px 3px;font-size:11px">' + studyEsc(c) + '</span>'; }).join('');
+    html += concepts.map(function (c) { return '<span style="display:inline-block;background:rgba(124,58,237,.12);color:var(--accent);padding:1px 7px;border-radius:8px;margin:2px 3px;font-size:11px">' + studyEsc(c) + '</span>'; }).join('');
     html += '</div>';
   }
   if (qType) {
@@ -8822,8 +8847,8 @@ function studyRenderLit(list) {
       concepts.forEach(function (kc) {
         if (kc.length < 2) return;
         var re = new RegExp(kc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-        titleHtml = titleHtml.replace(re, '<mark style="background:var(--bg-card)3a0;padding:0 2px">$&</mark>');
-        absHtml = absHtml.replace(re, '<mark style="background:var(--bg-card)3a0;padding:0 2px">$&</mark>');
+        titleHtml = titleHtml.replace(re, '<mark style="background:rgba(245,158,11,.35);color:#fff;padding:0 2px;border-radius:2px">$&</mark>');
+        absHtml = absHtml.replace(re, '<mark style="background:rgba(245,158,11,.35);color:#fff;padding:0 2px;border-radius:2px">$&</mark>');
       });
     }
     html += '<div style="border-left:3px solid var(--accent);padding:10px 14px;background:var(--bg-elev);border-radius:0 4px 4px 0">';
@@ -10215,7 +10240,7 @@ function studyRenderPlans(plans) {
         { key: 'D', label: '概念匹配', val: sb.D, w: w.D },
         { key: 'E', label: '统计方法缺口', val: sb.E, w: w.E }
       ];
-      html += '<div style="padding:10px 18px;background:#f9fbfd;border-bottom:1px solid var(--line)">';
+      html += '<div style="padding:10px 18px;background:rgba(124,58,237,.08);border-bottom:1px solid var(--line)">';
       html += '<div style="font-size:11.5px;color:var(--muted);margin-bottom:6px">评分明细（' + studyEsc(p.algorithm || '4因子加权规则评分') + '）</div>';
       html += '<div style="display:grid;grid-template-columns:1fr;gap:4px">';
       factors.forEach(function (f) {
@@ -10224,7 +10249,7 @@ function studyRenderPlans(plans) {
         var barColor = f.val >= 0.7 ? '#4caf50' : (f.val >= 0.4 ? '#ff9800' : '#bbb');
         html += '<div style="display:flex;align-items:center;gap:8px;font-size:11px">';
         html += '<span style="width:120px;color:var(--ink2)">' + f.label + ' <span style="color:var(--muted)">(' + wpct + '%)</span></span>';
-        html += '<div style="flex:1;height:14px;background:#eee;border-radius:7px;overflow:hidden;position:relative">';
+        html += '<div style="flex:1;height:14px;background:rgba(255,255,255,.06);border-radius:7px;overflow:hidden;position:relative">';
         html += '<div style="height:100%;width:' + pct + '%;background:' + barColor + ';border-radius:7px;transition:width 0.3s"></div>';
         html += '</div>';
         html += '<span style="width:38px;text-align:right;color:var(--ink2)">' + pct + '%</span>';
@@ -10637,7 +10662,7 @@ function studyRenderUploaded() {
     ds.variables.forEach(function (v) {
       html += '<tr>';
       html += '<td style="padding:5px 10px;border:1px solid var(--line);font-family:monospace;font-weight:600">' + studyEsc(v.name) + '</td>';
-      html += '<td style="padding:5px 10px;border:1px solid var(--line)"><span style="background:#e0e7ff;padding:1px 6px;border-radius:3px;font-size:11px">' + studyEsc(v.type) + '</span></td>';
+      html += '<td style="padding:5px 10px;border:1px solid var(--line)"><span style="background:rgba(124,58,237,.15);padding:1px 6px;border-radius:3px;font-size:11px">' + studyEsc(v.type) + '</span></td>';
       html += '<td style="padding:5px 10px;border:1px solid var(--line)">' + studyEsc(v.label) + '</td>';
       html += '<td style="padding:5px 10px;border:1px solid var(--line);font-size:11.5px;color:var(--muted)">' + studyEsc(v.values) + '</td>';
       html += '<td style="padding:5px 10px;border:1px solid var(--line)">' + studyEsc(v.unit) + '</td>';
@@ -10725,8 +10750,8 @@ function studyRunP2(plans) {
     html += '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">';
     allVars.forEach(function (v) {
       var isMatched = mapped.matches.some(function (m) { return m.varName === v.name });
-      var bg = isMatched ? '#dcfce7' : '#f1f5f9';
-      var border = isMatched ? '#86efac' : 'var(--line)';
+      var bg = isMatched ? 'rgba(16,185,129,.18)' : 'var(--bg-elev)';
+      var border = isMatched ? 'rgba(16,185,129,.4)' : 'var(--line)';
       html += '<span style="background:' + bg + ';border:1px solid ' + border + ';padding:2px 8px;border-radius:3px;font-size:11.5px;font-family:monospace">' + studyEsc(v.name) + '<span style="color:var(--muted);margin-left:4px">(' + studyEsc(v.type) + ')</span></span>';
     });
     html += '</div>';
@@ -12761,7 +12786,7 @@ function renderLits(){
       // ref 通常包含作者+标题+期刊，若长度超过 140 说明含摘要信息，截取 140 字展示
       if(refText.length>140){
         var snippet=refText.slice(refText.indexOf(' ', refText.indexOf('.')+4)>=0?Math.min(refText.indexOf(' ', refText.indexOf('.')+4)+1,80):80, 80+160);
-        absSnippet='<p style="font-size:12px;color:var(--ink2);margin:4px 0 8px;line-height:1.6;background:#f9fbfd;padding:4px 8px;border-left:3px solid var(--accent);border-radius:0 3px 3px 0">'+escLit(refText.length>150?refText.slice(80,240)+'…':refText)+'</p>';
+        absSnippet='<p style="font-size:12px;color:var(--ink2);margin:4px 0 8px;line-height:1.6;background:rgba(124,58,237,.08);padding:4px 8px;border-left:3px solid var(--accent);border-radius:0 3px 3px 0">'+escLit(refText.length>150?refText.slice(80,240)+'…':refText)+'</p>';
       }
       return '<div class="dset-card" style="cursor:pointer" onclick="openLit('+l._idx+')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><h4 style="font-size:13.5px;line-height:1.4">'+escLit(litShort(l.ref,110))+'</h4><span class="chip '+tagClass+'">'+escLit(l.catName)+'</span></div>'+absSnippet+'<p style="font-size:12px;color:var(--muted);margin:6px 0">'+escLit(srcLine)+'</p><div class="dc-foot"><span>DOI</span><span>'+doiLink+'</span></div></div>';
     }).join('');
@@ -12779,7 +12804,7 @@ function openLit(idx){
   var doiLink=l.doi?('<a href="https://doi.org/'+encodeURIComponent(l.doi)+'" target="_blank">'+escLit(l.doi)+'</a>'):'<span style="color:var(--muted)">未提供</span>';
   var html='<button class="close-btn" onclick="document.getElementById(\'lit-modal-bg\').style.display=\'none\'">×</button>';
   html+='<h3 style="font-size:16px;line-height:1.5">文献详情</h3>';
-  html+='<h4 style="margin-top:12px">完整引文 / 摘要信息</h4><div style="font-size:13px;line-height:1.8;background:#f9fbfd;padding:10px 12px;border-left:3px solid var(--accent);border-radius:0 3px 3px 0">'+escLit(l.ref)+'</div>';
+  html+='<h4 style="margin-top:12px">完整引文 / 摘要信息</h4><div style="font-size:13px;line-height:1.8;background:rgba(124,58,237,.08);padding:10px 12px;border-left:3px solid var(--accent);border-radius:0 3px 3px 0">'+escLit(l.ref)+'</div>';
   // Try to produce structured Chinese research summary from ref string
   if(typeof makeStructuredAbstract==='function'){
     // extract best-effort title from ref: take first sentence
