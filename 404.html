@@ -93,6 +93,7 @@ main{max-width:1200px;margin:0 auto;padding:32px 28px 80px;position:relative;z-i
 section.page{display:none;animation:fade .3s ease}
 section.page.active{display:block;opacity:1}
 @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
 .page-title{display:flex;align-items:baseline;justify-content:space-between;margin:32px 0 20px;border-bottom:1px solid var(--line);padding-bottom:12px}
 .page-title h2{margin:0;font-size:24px;font-weight:700;letter-spacing:-.5px}
 .page-title .meta{color:var(--muted);font-size:12.5px}
@@ -4480,41 +4481,53 @@ select{cursor:pointer}
 
 <!-- ============ PAGE 1: HOME ============ -->
 <section id="p-home" class="page active">
-  <div class="hero">
-    <h1>心理健康相关科研平台</h1>
-    <p class="sub">文献检索 · 数据集收录与检索 · 研究智能体，一站式服务心理健康科研。</p>
-    <div class="actions">
+  <div class="hero" style="text-align:center">
+    <h1 style="text-align:center">心理健康相关科研平台</h1>
+    <p class="sub" style="margin-left:auto;margin-right:auto">文献检索 · 数据集收录与检索 · 研究智能体，一站式服务心理健康科研。</p>
+    <div class="actions" style="justify-content:center">
       <button class="btn primary" onclick="go('search')">文献检索</button>
       <button class="btn teal" onclick="go('datasets')">数据集收录与检索</button>
       <button class="btn violet" onclick="go('agent')">研究智能体</button>
     </div>
   </div>
 
-  <div class="grid-2" style="margin-top:26px">
-    
-    
-    
-    
+  <!-- 平台速览 -->
+  <div id="home-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:32px 0 24px">
+    <div style="background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;text-align:center">
+      <div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">54+</div>
+      <div style="font-size:13px;color:var(--ink2);margin-top:4px">公开数据集</div>
+    </div>
+    <div style="background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;text-align:center">
+      <div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--ok),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">5 源</div>
+      <div style="font-size:13px;color:var(--ink2);margin-top:4px">文献联检引擎</div>
+    </div>
+    <div style="background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;text-align:center">
+      <div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent">8 章</div>
+      <div style="font-size:13px;color:var(--ink2);margin-top:4px">智能综述生成</div>
+    </div>
+    <div style="background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;text-align:center">
+      <div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--warn),#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent">7518</div>
+      <div style="font-size:13px;color:var(--ink2);margin-top:4px">私有年鉴数据表</div>
+    </div>
   </div>
 
-  <div class="page-title"><h2>公开数据集</h2><div class="meta" id="dset-count">共 54 个数据集 · 当前第1/5 页</div></div>
-  <div id="dset-tabs" style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap"><button class="dset-cat-btn" data-c="all" onclick="filterDsets('all')">全部</button><button class="dset-cat-btn" data-c="m1" onclick="filterDsets('m1')">中国国内</button><button class="dset-cat-btn active" data-c="m2" onclick="filterDsets('m2')">国际数据</button><button class="dset-cat-btn" data-c="m3" onclick="filterDsets('m3')">脑科学</button><button class="dset-cat-btn" data-c="policy" onclick="filterDsets('policy')">政策/监测</button><button class="dset-cat-btn" data-c="survey" onclick="filterDsets('survey')">调查/队列</button></div>
-  <div id="dset-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px"><div class="dset-card" onclick="openDset('atlas')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><h4>WHO Atlas 2024</h4><span class="chip grey">国际</span></div><div class="dc-en">Mental Health Atlas 2024</div><p>WHO 精神卫生地图集第 7 版，144 国数据，2025 年 9 月发布，系统梳理各国精神卫生系统覆盖与资源配置。</p><div class="dc-foot"><span>144 国 · 第 7 版</span><span>ISBN:978-92-4-011448-7</span></div></div><div class="dset-card" onclick="openDset('gho')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><h4>WHO GHO</h4><span class="chip grey">国际</span></div><div class="dc-en">Global Health Observatory</div><p>WHO 全球卫生观察站，提供心理健康相关指标（自杀率、精神卫生人力/政策等）的跨国时间序列数据，支持 OData API 查询。</p><div class="dc-foot"><span>OData API · 全球指标</span><span>who.int/gho</span></div></div><div class="dset-card" onclick="openDset('gbd')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><h4>GBD/IHME</h4><span class="chip grey">国际</span></div><div class="dc-en">Global Burden of Disease</div><p>全球疾病负担研究，IHME 主持，最新轮次 GBD 2021 覆盖 371 种疾病，GBD 2019 精神障碍部分涵盖 12 类障碍、204 国、9.7 亿患者。</p><div class="dc-foot"><span>9.7 亿人 · 371 种疾病</span><span>vizhub.healthdata.org</span></div></div><div class="dset-card" onclick="openDset('wmh')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><h4>WMH</h4><span class="chip grey">国际</span></div><div class="dc-en">World Mental Health Survey</div><p>世界精神健康调查，WHO 与哈佛 Kessler 团队联合开展，30 国 16.6 万人，使用 WMH-CIDI 诊断工具，是跨国精神障碍患病率比较的金标准。</p><div class="dc-foot"><span>30 国 · 16.6 万人</span><span>Kessler 2004</span></div></div><div class="dset-card" onclick="openDset('owid')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><h4>OWID</h4><span class="chip grey">国际</span></div><div class="dc-en">Our World in Data Mental Health</div><p>Our World in Data 心理健康专题页面，整合 GBD/WHO 等数据源，提供可视化的全球心理健康趋势，采用 CC-BY 开放许可。</p><div class="dc-foot"><span>CC-BY · 开放获取</span><span>ourworldindata.org</span></div></div><div class="dset-card" onclick="openDset('cpwf')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><h4>Cohort profile: Walking for harm reduction through street engagement (WHiSE 2.0) [待核实]</h4><span class="chip grey">国际数据</span></div><div class="dc-en">Cohort profile: Walking for harm reduction through street engagement (WHiSE 2.0).</div><p>Indigenous people using substances experience health disparities that are compounded by systemic inequities shaped by colonialism. The WHiSE 2.0 study aims to describe substance use patterns and harm </p><div class="dc-foot"><span>待核实</span><span>PMID:42497183</span></div></div><div class="dset-card" onclick="openDset('cpkl')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><h4>Cohort Profile: Kenya Life Panel Survey. [待核实]</h4><span class="chip grey">国际数据</span></div><div class="dc-en">Cohort Profile: Kenya Life Panel Survey.</div><p>新发现的数据集文献：Cohort Profile: Kenya Life Panel Survey.</p><div class="dc-foot"><span>待核实</span><span>PMID:42490521</span></div></div><div class="dset-card" onclick="openDset('elpi')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><h4>Cohort Profile: The Early Childhood Longitudinal Survey (ELPI), Chile. [待核实]</h4><span class="chip grey">国际数据</span></div><div class="dc-en">Cohort Profile: The Early Childhood Longitudinal Survey (ELPI), Chile.</div><p>新发现的数据集文献：Cohort Profile: The Early Childhood Longitudinal Survey (ELPI), Chile.</p><div class="dc-foot"><span>待核实</span><span>PMID:42442393</span></div></div><div class="dset-card" onclick="openDset('cput')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><h4>Cohort Profile Update: The Finnish Gestational Diabetes (FinnGeDi) study. [待核实]</h4><span class="chip grey">国际数据</span></div><div class="dc-en">Cohort Profile Update: The Finnish Gestational Diabetes (FinnGeDi) study.</div><p>新发现的数据集文献：Cohort Profile Update: The Finnish Gestational Diabetes (FinnGeDi) study.</p><div class="dc-foot"><span>待核实</span><span>PMID:42424496</span></div></div><div class="dset-card" onclick="openDset('cpsp')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><h4>Cohort profile: Swiss personalized health network cohort consortium. [待核实]</h4><span class="chip grey">国际数据</span></div><div class="dc-en">Cohort profile: Swiss personalized health network cohort consortium.</div><p>Swiss cohort studies provide high-quality longitudinal data, but finding and comparing relevant studies across cohorts has historically been challenging. The Swiss Personalized Health Network Cohort C</p><div class="dc-foot"><span>21993 人</span><span>PMID:42360636</span></div></div><div class="dset-card" onclick="openDset('sid')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><h4>Sussex Integrated Dataset (SID) Data Resource Profile. [待核实]</h4><span class="chip grey">国际数据</span></div><div class="dc-en">Sussex Integrated Dataset (SID) Data Resource Profile.</div><p>This paper presents a data resource profile of the Sussex Integrated Dataset (SID). SID is a linked dataset of National Health Service (NHS) and adult social care data from across the geographical foo</p><div class="dc-foot"><span>待核实</span><span>PMID:42327976</span></div></div><div class="dset-card" onclick="openDset('post')"><div style="display:flex;justify-content:space-between;align-items:flex-start"><h4>Health, Social and Recidivism Outcomes Among People Who Have Been Incarcerated i [待核实]</h4><span class="chip grey">国际数据</span></div><div class="dc-en">Health, Social and Recidivism Outcomes Among People Who Have Been Incarcerated in New South Wales, Australia: Study Prot</div><p>We have been funded to examine post-incarceration health and social outcomes for all people incarcerated in New South Wales, Australia, 2000-2022; assess treatment and services for drug dependence and</p><div class="dc-foot"><span>待核实</span><span>PMID:42324076</span></div></div></div>
-  <div id="dset-pager" style="display:flex;gap:4px;justify-content:center;margin:16px 0;flex-wrap:wrap"><button class="dset-cat-btn active">1</button><button class="dset-cat-btn">2</button><button class="dset-cat-btn">3</button><button class="dset-cat-btn">4</button><button class="dset-cat-btn">5</button></div>
-
-  <div class="page-title"><h2> 核心文献</h2><div class="meta" id="lit-count">载入中…</div></div>
-  <div id="lit-tabs" style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap"></div>
-  <div id="lit-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px"></div>
-  <div id="lit-pager" style="display:flex;gap:4px;justify-content:center;margin:16px 0;flex-wrap:wrap"></div>
-
-  <div class="page-title"><h2> 数据与文献动态</h2><div class="meta">近期更新</div></div>
-  <div class="news-grid" id="news-grid">
-    <div class="news-card"><div class="src">NIH · Data</div><h3>NIMH 发布 2026 年心理健康研究数据共享计划</h3><p>涵盖多站点纵向脑成像、社区人群调查与电子病历整合数据的开放获取路线图。</p><div class="foot"><span>2026-08-15</span><a href="#" onclick="event.preventDefault();go('search')">相关文献 →</a></div></div>
-    <div class="news-card"><div class="src">Nature Mental Health</div><h3>2026 年青少年抑郁队列研究 Meta 分析更新</h3><p>基于 PHQ-9 工具的 142 个跨国样本联合分析，更新了患病率趋势估计。</p><div class="foot"><span>2026-08-10</span><a href="#" onclick="event.preventDefault();go('search')">检索 Meta →</a></div></div>
-    <div class="news-card"><div class="src">CDC / NHSS</div><h3>中国卫生统计年鉴 2026 版公开精神卫生指标</h3><p>省级层面的患病率、门诊人次、病床使用率等核心指标可在线下载 CSV。</p><div class="foot"><span>2026-08-05</span><a href="#" onclick="event.preventDefault();go('search')">检索数据 →</a></div></div>
-    <div class="news-card"><div class="src">UK Biobank</div><h3>第 3 次随访影像学 + 心理量表匹配数据开放</h3><p>新增 n≈50,000 的脑结构与 CES-D、GAD-7 配对记录，申请通道已开放。</p><div class="foot"><span>2026-07-28</span><a href="#" onclick="event.preventDefault();go('search')">检索 UKB →</a></div></div>
-    <div class="news-card"><div class="src">re3data</div><h3>心理健康领域新增 23 个可开放获取数据集登记</h3><p>覆盖老年认知、儿童行为、社区干预等方向，re3data 搜索 mental health 可定位。</p><div class="foot"><span>2026-07-22</span><a href="#" onclick="event.preventDefault();go('search')">检索数据集 →</a></div></div>
+  <!-- 近期动态（滚动条，占位小版面） -->
+  <div style="background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 20px;overflow:hidden;margin-bottom:24px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:12px;font-weight:600;color:var(--accent2);white-space:nowrap">📡 近期动态</span>
+      <div id="home-ticker" style="flex:1;overflow:hidden;white-space:nowrap">
+        <span style="display:inline-block;padding-left:100%;animation:ticker 28s linear infinite;color:var(--ink2);font-size:13px">
+          🌐 NIMH 发布 2026 年心理健康研究数据共享计划 &nbsp;|&nbsp;
+          📊 中国卫生统计年鉴 2026 版公开精神卫生指标 &nbsp;|&nbsp;
+          🧠 UK Biobank 第 3 次随访影像学 + 心理量表匹配数据开放 &nbsp;|&nbsp;
+          📚 2026 年青少年抑郁队列研究 Meta 分析更新 &nbsp;|&nbsp;
+          📁 re3data 心理健康领域新增 23 个开放数据集 &nbsp;|&nbsp;
+          🤖 研究智能体 STORM 上线，一键生成 8 章系统综述 &nbsp;|&nbsp;
+        </span>
+      </div>
+    </div>
   </div>
+
 </section>
 
 <!-- ============ PAGE 2: SEARCH ============ -->
@@ -4921,10 +4934,15 @@ else:
     <div id="ds-search-pager" class="pager" style="display:none;margin-top:8px"></div>
   </div>
 
-  <!-- 模块2：公开数据集（JS 在 init 时把首页的 dset-tabs/dset-grid/dset-pager 搬到这里） -->
+  <!-- 模块2：公开数据集 -->
   <div id="ds-section-public">
     <h3 style="margin:0 0 12px;padding-top:8px"> 公开数据集</h3>
-    <div id="ds-tab-public"></div>
+    <div id="ds-tab-public">
+      <div class="page-title" style="margin-top:0"><h2>公开数据集</h2><div class="meta" id="dset-count">载入中…</div></div>
+      <div id="dset-tabs" style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap"><button class="dset-cat-btn active" data-c="all" onclick="filterDsets('all')">全部</button><button class="dset-cat-btn" data-c="m1" onclick="filterDsets('m1')">中国国内</button><button class="dset-cat-btn" data-c="m2" onclick="filterDsets('m2')">国际数据</button><button class="dset-cat-btn" data-c="m3" onclick="filterDsets('m3')">脑科学</button><button class="dset-cat-btn" data-c="policy" onclick="filterDsets('policy')">政策/监测</button><button class="dset-cat-btn" data-c="survey" onclick="filterDsets('survey')">调查/队列</button></div>
+      <div id="dset-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px"></div>
+      <div id="dset-pager" style="display:flex;gap:4px;justify-content:center;margin:16px 0;flex-wrap:wrap"></div>
+    </div>
   </div>
 
   <!-- 模块3：私有数据集（JS 在 init 时把原 p-health 的内容搬到这里） -->
