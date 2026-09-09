@@ -94,6 +94,14 @@ section.page{display:none;animation:fade .3s ease}
 section.page.active{display:block;opacity:1}
 @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+.news-arrow:hover{background:rgba(0,0,0,.7)!important;border-color:rgba(255,255,255,.5)!important}
+.news-dot.active{background:#fff!important;width:20px!important}
+@media(max-width:640px){
+  .news-carousel{height:200px!important}
+  .news-slide h3{font-size:16px!important;max-width:85%!important}
+  .news-slide p{font-size:12px!important;max-width:85%!important}
+  .news-slide>div:last-child{padding:16px 20px!important}
+}
 .page-title{display:flex;align-items:baseline;justify-content:space-between;margin:32px 0 20px;border-bottom:1px solid var(--line);padding-bottom:12px}
 .page-title h2{margin:0;font-size:24px;font-weight:700;letter-spacing:-.5px}
 .page-title .meta{color:var(--muted);font-size:12.5px}
@@ -4492,40 +4500,74 @@ select{cursor:pointer}
   </div>
 
   <!-- 平台速览 -->
-  <div id="home-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:32px 0 24px">
-    <div style="background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;text-align:center">
-      <div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">54+</div>
-      <div style="font-size:13px;color:var(--ink2);margin-top:4px">公开数据集</div>
+  <div id="home-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:28px 0 24px">
+    <div style="background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;text-align:center">
+      <div style="font-size:26px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">54+</div>
+      <div style="font-size:12.5px;color:var(--ink2);margin-top:3px">公开数据集</div>
     </div>
-    <div style="background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;text-align:center">
-      <div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--ok),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">5 源</div>
-      <div style="font-size:13px;color:var(--ink2);margin-top:4px">文献联检引擎</div>
+    <div style="background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;text-align:center">
+      <div style="font-size:26px;font-weight:800;background:linear-gradient(135deg,var(--ok),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">5 源</div>
+      <div style="font-size:12.5px;color:var(--ink2);margin-top:3px">文献联检引擎</div>
     </div>
-    <div style="background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;text-align:center">
-      <div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent">8 章</div>
-      <div style="font-size:13px;color:var(--ink2);margin-top:4px">智能综述生成</div>
+    <div style="background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;text-align:center">
+      <div style="font-size:26px;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent">8 章</div>
+      <div style="font-size:12.5px;color:var(--ink2);margin-top:3px">智能综述生成</div>
     </div>
-    <div style="background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;text-align:center">
-      <div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--warn),#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent">7518</div>
-      <div style="font-size:13px;color:var(--ink2);margin-top:4px">私有年鉴数据表</div>
+    <div style="background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;text-align:center">
+      <div style="font-size:26px;font-weight:800;background:linear-gradient(135deg,var(--warn),#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent">7518</div>
+      <div style="font-size:12.5px;color:var(--ink2);margin-top:3px">私有年鉴数据表</div>
     </div>
   </div>
 
-  <!-- 近期动态（滚动条，占位小版面） -->
-  <div style="background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 20px;overflow:hidden;margin-bottom:24px">
-    <div style="display:flex;align-items:center;gap:12px">
-      <span style="font-size:12px;font-weight:600;color:var(--accent2);white-space:nowrap">📡 近期动态</span>
-      <div id="home-ticker" style="flex:1;overflow:hidden;white-space:nowrap">
-        <span style="display:inline-block;padding-left:100%;animation:ticker 28s linear infinite;color:var(--ink2);font-size:13px">
-          🌐 NIMH 发布 2026 年心理健康研究数据共享计划 &nbsp;|&nbsp;
-          📊 中国卫生统计年鉴 2026 版公开精神卫生指标 &nbsp;|&nbsp;
-          🧠 UK Biobank 第 3 次随访影像学 + 心理量表匹配数据开放 &nbsp;|&nbsp;
-          📚 2026 年青少年抑郁队列研究 Meta 分析更新 &nbsp;|&nbsp;
-          📁 re3data 心理健康领域新增 23 个开放数据集 &nbsp;|&nbsp;
-          🤖 研究智能体 STORM 上线，一键生成 8 章系统综述 &nbsp;|&nbsp;
-        </span>
+  <!-- 图片新闻轮播 -->
+  <div class="news-carousel" id="news-carousel" style="position:relative;border-radius:14px;overflow:hidden;height:240px;margin-bottom:20px;box-shadow:0 4px 24px rgba(0,0,0,.3)">
+    <div class="news-slides" id="news-slides" style="display:flex;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1)">
+      <!-- Slide 1 -->
+      <div class="news-slide" data-idx="0" style="flex:0 0 100%;height:100%;position:relative;cursor:pointer" onclick="go('search')">
+        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Website%20news%20banner%3A%20A%20serene%20mental%20health%20research%20laboratory%20with%20researchers%20analyzing%20brain%20scan%20data%20on%20screens%2C%20soft%20purple%20and%20cyan%20lighting%2C%20modern%20scientific%20atmosphere%2C%20photorealistic%2C%2016%3A9%20widescreen%2C%20professional%20editorial%20style&image_size=landscape_16_9" alt="NIMH 心理健康研究数据共享计划" style="width:100%;height:100%;object-fit:cover;display:block">
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,15,19,.85) 0%,rgba(15,15,19,.5) 45%,rgba(15,15,19,.1) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px 32px">
+          <span style="display:inline-block;background:rgba(124,58,237,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">NIH · 数据政策</span>
+          <h3 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;max-width:70%;line-height:1.3">NIMH 发布 2026 年心理健康研究数据共享计划</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,.8);margin:0;max-width:60%">涵盖多站点纵向脑成像、社区人群调查与电子病历整合数据的开放获取路线图</p>
+          <span style="font-size:11.5px;color:rgba(255,255,255,.5);margin-top:8px">2026-08-15</span>
+        </div>
+      </div>
+      <!-- Slide 2 -->
+      <div class="news-slide" data-idx="1" style="flex:0 0 100%;height:100%;position:relative;cursor:pointer" onclick="go('datasets')">
+        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Website%20news%20banner%3A%20Global%20public%20health%20data%20visualization%20with%20world%20map%20and%20statistics%20charts%2C%20dark%20navy%20background%20with%20glowing%20teal%20and%20purple%20data%20points%2C%20modern%20infographic%20style%2C%2016%3A9%20widescreen&image_size=landscape_16_9" alt="中国卫生统计年鉴 2026" style="width:100%;height:100%;object-fit:cover;display:block">
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,15,19,.85) 0%,rgba(15,15,19,.5) 45%,rgba(15,15,19,.1) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px 32px">
+          <span style="display:inline-block;background:rgba(16,185,129,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">CDC · 数据开放</span>
+          <h3 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;max-width:70%;line-height:1.3">中国卫生统计年鉴 2026 版公开精神卫生指标</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,.8);margin:0;max-width:60%">省级层面患病率、门诊人次、病床使用率等核心指标可在线下载 CSV</p>
+          <span style="font-size:11.5px;color:rgba(255,255,255,.5);margin-top:8px">2026-08-05</span>
+        </div>
+      </div>
+      <!-- Slide 3 -->
+      <div class="news-slide" data-idx="2" style="flex:0 0 100%;height:100%;position:relative;cursor:pointer" onclick="go('agent')">
+        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Website%20news%20banner%3A%20Artificial%20intelligence%20neural%20network%20generating%20a%20literature%20review%20document%2C%20glowing%20purple%20and%20cyan%20nodes%20connected%20with%20lines%2C%20digital%20manuscript%20pages%20floating%2C%20futuristic%20research%20atmosphere%2C%2016%3A9%20widescreen&image_size=landscape_16_9" alt="研究智能体 STORM 上线" style="width:100%;height:100%;object-fit:cover;display:block">
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,15,19,.85) 0%,rgba(15,15,19,.5) 45%,rgba(15,15,19,.1) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px 32px">
+          <span style="display:inline-block;background:rgba(139,92,246,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">AI · 新功能</span>
+          <h3 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;max-width:70%;line-height:1.3">研究智能体 STORM 上线，一键生成 8 章系统综述</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,.8);margin:0;max-width:60%">多轮对话 → 真实文献检索 → 自动生成中文系统综述，基于 Qwen2.5-32B 驱动</p>
+          <span style="font-size:11.5px;color:rgba(255,255,255,.5);margin-top:8px">2026-09-01</span>
+        </div>
+      </div>
+      <!-- Slide 4 -->
+      <div class="news-slide" data-idx="3" style="flex:0 0 100%;height:100%;position:relative;cursor:pointer" onclick="go('datasets')">
+        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Website%20news%20banner%3A%20Open%20dataset%20repository%20with%20rows%20of%20scientific%20data%20files%20and%20download%20icons%2C%20clean%20modern%20dark%20interface%20with%20teal%20accents%2C%20mental%20health%20research%20data%20theme%2C%2016%3A9%20widescreen&image_size=landscape_16_9" alt="re3data 新增开放数据集" style="width:100%;height:100%;object-fit:cover;display:block">
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,15,19,.85) 0%,rgba(15,15,19,.5) 45%,rgba(15,15,19,.1) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px 32px">
+          <span style="display:inline-block;background:rgba(6,182,212,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">re3data · 数据集</span>
+          <h3 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;max-width:70%;line-height:1.3">心理健康领域新增 23 个可开放获取数据集</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,.8);margin:0;max-width:60%">覆盖老年认知、儿童行为、社区干预等方向，re3data 搜索 mental health 可定位</p>
+          <span style="font-size:11.5px;color:rgba(255,255,255,.5);margin-top:8px">2026-07-22</span>
+        </div>
       </div>
     </div>
+    <!-- 箭头 -->
+    <button class="news-arrow news-prev" onclick="newsPrev(event)" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:18px;cursor:pointer;backdrop-filter:blur(4px);transition:all .2s;display:flex;align-items:center;justify-content:center">‹</button>
+    <button class="news-arrow news-next" onclick="newsNext(event)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:18px;cursor:pointer;backdrop-filter:blur(4px);transition:all .2s;display:flex;align-items:center;justify-content:center">›</button>
+    <!-- 指示点 -->
+    <div class="news-dots" id="news-dots" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px"></div>
   </div>
 
 </section>
@@ -12832,8 +12874,44 @@ document.getElementById('lit-modal-bg').addEventListener('click',function(e){if(
     try{initHealthHub();}catch(e){console.warn('initHealthHub fail:',e);}
     /* STORM 研究助手 初始化 */
     try{stInit();}catch(e){console.warn('stInit fail:',e);}
+    /* 首页图片新闻轮播 */
+    try{initNewsCarousel();}catch(e){console.warn('news carousel fail:',e);}
   };
 })();
+
+/* ========= 首页图片新闻轮播 ========= */
+var _newsIdx=0, _newsTimer=null, _newsTotal=4;
+function initNewsCarousel(){
+  var dots=document.getElementById('news-dots');
+  var slides=document.getElementById('news-slides');
+  if(!dots||!slides) return;
+  _newsTotal=slides.querySelectorAll('.news-slide').length;
+  dots.innerHTML='';
+  for(var i=0;i<_newsTotal;i++){
+    var d=document.createElement('button');
+    d.className='news-dot'+(i===0?' active':'');
+    d.style.cssText='width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;padding:0;background:rgba(255,255,255,.4);transition:all .2s';
+    d.onclick=(function(idx){return function(){newsGo(idx);};})(i);
+    dots.appendChild(d);
+  }
+  newsStart();
+  var c=document.getElementById('news-carousel');
+  if(c){
+    c.addEventListener('mouseenter',newsPause);
+    c.addEventListener('mouseleave',newsStart);
+  }
+}
+function newsGo(idx){
+  _newsIdx=(idx+_newsTotal)%_newsTotal;
+  var slides=document.getElementById('news-slides');
+  if(slides) slides.style.transform='translateX(-'+(_newsIdx*100)+'%)';
+  document.querySelectorAll('.news-dot').forEach(function(d,i){d.style.background=(i===_newsIdx?'#fff':'rgba(255,255,255,.4)');d.style.width=(i===_newsIdx?'20px':'8px');});
+}
+function newsNext(e){if(e)e.stopPropagation();newsGo(_newsIdx+1);newsReset();}
+function newsPrev(e){if(e)e.stopPropagation();newsGo(_newsIdx-1);newsReset();}
+function newsStart(){newsPause();_newsTimer=setInterval(function(){newsGo(_newsIdx+1);},5000);}
+function newsPause(){if(_newsTimer){clearInterval(_newsTimer);_newsTimer=null;}}
+function newsReset(){newsPause();newsStart();}
 
 /* =========================================================
  * STORM 式研究助手 —— 全部前端逻辑（单脚本 IIFE，无外部依赖）
