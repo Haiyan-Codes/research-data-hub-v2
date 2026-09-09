@@ -4516,8 +4516,8 @@ select{cursor:pointer}
         <img src="assets/news-global-data.jpg" alt="私有数据集" style="width:100%;height:100%;object-fit:cover;display:block">
         <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,15,19,.85) 0%,rgba(15,15,19,.5) 45%,rgba(15,15,19,.1) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px 32px">
           <span style="display:inline-block;background:rgba(16,185,129,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">私有数据集</span>
-          <h3 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;max-width:70%;line-height:1.3">7518 张中国卫生健康统计年鉴数据表</h3>
-          <p style="font-size:13px;color:rgba(255,255,255,.8);margin:0;max-width:60%">整合教育经费、卫生计生、卫生健康 4 大类年鉴（2003—2023），Excel 表格 + PDF 说明文档百度网盘整包下载，支持关键词智能检索与研究建议自动生成。</p>
+          <h3 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;max-width:70%;line-height:1.3">卫生健康数据智能库 + 私有研究数据</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,.8);margin:0;max-width:60%">内含卫生健康统计年鉴模块（4 大类、2003—2023 年、7518 张 Excel 表 + PDF，百度网盘整包下载），并支持用户上传管理自有研究数据集，提供关键词检索与研究建议智能体辅助。</p>
         </div>
       </div>
       <!-- Slide 3：研究智能体 -->
@@ -12829,6 +12829,8 @@ document.getElementById('lit-modal-bg').addEventListener('click',function(e){if(
     renderLits();
     initLitTabs();
     try{initHealthHub();}catch(e){console.warn('initHealthHub fail:',e);}
+    /* 首页图片新闻轮播 */
+    try{initNewsCarousel();}catch(e){console.warn('news carousel fail:',e);}
   }
   // hook for post-auth
   window._onAuthSuccess=function(){
