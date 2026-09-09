@@ -4499,42 +4499,35 @@ select{cursor:pointer}
     </div>
   </div>
 
-  <!-- 图片新闻轮播 -->
-  <div class="news-carousel" id="news-carousel" style="position:relative;border-radius:14px;overflow:hidden;height:240px;margin-bottom:20px;margin-top:24px;box-shadow:0 4px 24px rgba(0,0,0,.3);background:linear-gradient(135deg,#1a1a2e,#16213e)">
-    <div class="news-slides" id="news-slides" style="display:flex;height:100%;width:100%;transition:transform .5s cubic-bezier(.4,0,.2,1)">
-      <!-- Slide 1：公开数据集 -->
-      <div class="news-slide" data-idx="0" style="flex:0 0 100%;height:100%;position:relative;background:linear-gradient(135deg,#1e3a5f,#0f172a)">
-        <img src="assets/news-open-data.jpg" alt="公开数据集" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display='none'">
-        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,15,19,.85) 0%,rgba(15,15,19,.5) 45%,rgba(15,15,19,.1) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px 32px">
-          <span style="display:inline-block;background:rgba(6,182,212,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">公开数据集</span>
-          <h3 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;max-width:70%;line-height:1.3">精选心理健康开放数据集</h3>
-          <p style="font-size:13px;color:rgba(255,255,255,.8);margin:0;max-width:60%">覆盖 WHO Atlas、GBD 全球疾病负担、WMH 世界精神健康调查、UK Biobank 等国际权威数据源，含脑科学、调查队列、政策监测等分类，支持关键词检索与一键跳转原始页面。</p>
-        </div>
-      </div>
-      <!-- Slide 2：私有数据集 -->
-      <div class="news-slide" data-idx="1" style="flex:0 0 100%;height:100%;position:relative;background:linear-gradient(135deg,#064e3b,#0f172a)">
-        <img src="assets/news-global-data.jpg" alt="私有数据集" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display='none'">
-        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,15,19,.85) 0%,rgba(15,15,19,.5) 45%,rgba(15,15,19,.1) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px 32px">
-          <span style="display:inline-block;background:rgba(16,185,129,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">私有数据集</span>
-          <h3 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;max-width:70%;line-height:1.3">卫生健康数据智能库</h3>
-          <p style="font-size:13px;color:rgba(255,255,255,.8);margin:0;max-width:60%">内含卫生健康统计年鉴模块（4 大类、2003—2023 年、7518 张 Excel 表 + PDF，百度网盘整包下载），提供关键词检索与研究建议智能体辅助。</p>
-        </div>
-      </div>
-      <!-- Slide 3：研究智能体 -->
-      <div class="news-slide" data-idx="2" style="flex:0 0 100%;height:100%;position:relative;background:linear-gradient(135deg,#4c1d95,#0f172a)">
-        <img src="assets/news-ai-review.jpg" alt="研究智能体" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display='none'">
-        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,15,19,.85) 0%,rgba(15,15,19,.5) 45%,rgba(15,15,19,.1) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px 32px">
-          <span style="display:inline-block;background:rgba(139,92,246,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">研究智能体</span>
-          <h3 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;max-width:70%;line-height:1.3">STORM 多轮对话式系统综述生成</h3>
-          <p style="font-size:13px;color:rgba(255,255,255,.8);margin:0;max-width:60%">输入研究主题，智能体自动检索真实文献、多轮对话澄清问题，基于 Qwen2.5-32B 生成 8 章中文系统综述，含方法学分析、知识图谱与参考文献，支持在线精修。</p>
-        </div>
+  <!-- 三大模块并列展示 -->
+  <div id="home-modules" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px;margin-bottom:20px">
+    <!-- 模块1：公开数据集 -->
+    <div style="position:relative;border-radius:14px;overflow:hidden;height:220px;box-shadow:0 4px 24px rgba(0,0,0,.3);background:linear-gradient(135deg,#1e3a5f,#0f172a)">
+      <img src="assets/news-open-data.jpg" alt="公开数据集" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display='none'">
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,15,19,.2) 0%,rgba(15,15,19,.85) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:18px 20px">
+        <span style="display:inline-block;background:rgba(6,182,212,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">公开数据集</span>
+        <h3 style="font-size:16px;font-weight:700;color:#fff;margin:0 0 5px;line-height:1.3">精选心理健康开放数据集</h3>
+        <p style="font-size:12px;color:rgba(255,255,255,.8);margin:0;line-height:1.5">覆盖 WHO Atlas、GBD、WMH、UK Biobank 等权威数据源，支持关键词检索。</p>
       </div>
     </div>
-    <!-- 箭头 -->
-    <button class="news-arrow news-prev" onclick="newsPrev(event)" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:18px;cursor:pointer;backdrop-filter:blur(4px);transition:all .2s;display:flex;align-items:center;justify-content:center">‹</button>
-    <button class="news-arrow news-next" onclick="newsNext(event)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:18px;cursor:pointer;backdrop-filter:blur(4px);transition:all .2s;display:flex;align-items:center;justify-content:center">›</button>
-    <!-- 指示点 -->
-    <div class="news-dots" id="news-dots" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px"></div>
+    <!-- 模块2：私有数据集 -->
+    <div style="position:relative;border-radius:14px;overflow:hidden;height:220px;box-shadow:0 4px 24px rgba(0,0,0,.3);background:linear-gradient(135deg,#064e3b,#0f172a)">
+      <img src="assets/news-global-data.jpg" alt="私有数据集" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display='none'">
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,15,19,.2) 0%,rgba(15,15,19,.85) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:18px 20px">
+        <span style="display:inline-block;background:rgba(16,185,129,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">私有数据集</span>
+        <h3 style="font-size:16px;font-weight:700;color:#fff;margin:0 0 5px;line-height:1.3">卫生健康数据智能库</h3>
+        <p style="font-size:12px;color:rgba(255,255,255,.8);margin:0;line-height:1.5">含 4 大类统计年鉴（2003—2023，7518 张表），百度网盘整包下载。</p>
+      </div>
+    </div>
+    <!-- 模块3：研究智能体 -->
+    <div style="position:relative;border-radius:14px;overflow:hidden;height:220px;box-shadow:0 4px 24px rgba(0,0,0,.3);background:linear-gradient(135deg,#4c1d95,#0f172a)">
+      <img src="assets/news-ai-review.jpg" alt="研究智能体" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display='none'">
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,15,19,.2) 0%,rgba(15,15,19,.85) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:18px 20px">
+        <span style="display:inline-block;background:rgba(139,92,246,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">研究智能体</span>
+        <h3 style="font-size:16px;font-weight:700;color:#fff;margin:0 0 5px;line-height:1.3">STORM 系统综述生成</h3>
+        <p style="font-size:12px;color:rgba(255,255,255,.8);margin:0;line-height:1.5">多轮对话 + 真实文献检索，Qwen2.5-32B 生成 8 章中文综述。</p>
+      </div>
+    </div>
   </div>
 
 </section>
