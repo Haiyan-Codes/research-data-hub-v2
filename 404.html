@@ -31,6 +31,12 @@
   --shadow-glow:0 0 30px rgba(124,58,237,.12);
   --gradient-text:linear-gradient(135deg,#a78bfa 0%,#22d3ee 100%);
   --gradient-bg:linear-gradient(180deg,rgba(124,58,237,.06) 0%,transparent 60%);
+  /* aliases for legacy CSS references */
+  --ink1:#f5f5f7;
+  --bg2:#181820;
+  --accent-dark:#6d28d9;
+  --panel:#1c1c26;
+  --border:#2a2a36;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
@@ -80,6 +86,7 @@ main{max-width:1200px;margin:0 auto;padding:32px 28px 80px;position:relative;z-i
 .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff;box-shadow:0 4px 20px var(--accent-glow)}
 .btn.primary:hover{background:linear-gradient(135deg,#6d28d9,#0891b2);color:#fff;text-decoration:none;box-shadow:0 6px 28px var(--accent-glow)}
 .btn.teal{background:linear-gradient(135deg,var(--accent2),var(--accent));border-color:transparent;color:#fff;box-shadow:0 4px 20px var(--accent2-glow)}.btn.teal:hover{background:linear-gradient(135deg,#0891b2,#6d28d9);color:#fff}
+.btn.violet{background:linear-gradient(135deg,#8b5cf6,#22d3ee);border-color:transparent;color:#fff;box-shadow:0 4px 20px rgba(139,92,246,.35)}.btn.violet:hover{background:linear-gradient(135deg,#7c3aed,#06b6d4);color:#fff;transform:translateY(-1px)}
 .btn.sm{padding:8px 14px;font-size:12.5px;border-radius:8px}
 
 /* ===== section grid ===== */
@@ -110,6 +117,7 @@ select{cursor:pointer}
 .chip.grey{background:var(--line);color:var(--ink2)}
 .chip.ok{background:rgba(16,185,129,.15);color:var(--ok)}
 .chip.warn{background:rgba(245,158,11,.15);color:var(--warn)}
+.chip.teal{background:rgba(6,182,212,.18);color:#67e8f9}
 .chip.accent2{background:rgba(6,182,212,.15);color:var(--accent2)}
 .chip.bad{background:rgba(239,68,68,.15);color:var(--danger)}
 
@@ -335,7 +343,7 @@ select{cursor:pointer}
 /* modal */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-bg.open{display:flex}
-.modal{background:#fff;border-radius:6px;max-width:820px;width:100%;max-height:85vh;overflow-y:auto;padding:28px 32px;position:relative}
+.modal{background:var(--bg-card);border-radius:var(--radius);max-width:820px;width:100%;max-height:85vh;overflow-y:auto;padding:28px 32px;position:relative;border:1px solid var(--line)}
 .modal .close-btn{position:absolute;top:12px;right:16px;border:none;background:transparent;font-size:22px;cursor:pointer;color:var(--muted)}
 .modal h3{margin:0 0 4px;font-size:18px}
 .modal .m-en{color:var(--muted);font-size:12px;font-style:italic;margin-bottom:12px}
@@ -345,7 +353,7 @@ select{cursor:pointer}
 .modal th{background:var(--line2);font-weight:600;font-size:11.5px}
 .modal td:first-child{color:var(--muted);white-space:nowrap;width:140px}
 /* code editor */
-.code-editor{width:100%;min-height:150px;border:1px solid var(--line);border-radius:3px;font-family:"Source Code Pro",monospace;font-size:12px;padding:10px;resize:vertical;outline:none;background:#fafbfc}
+.code-editor{width:100%;min-height:150px;border:1px solid var(--line);border-radius:8px;font-family:"Source Code Pro",monospace;font-size:12px;padding:10px;resize:vertical;outline:none;background:var(--bg-elev);color:var(--ink)}
 .code-editor:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(30,64,175,.1)}
 
 /* =========================================================
@@ -355,23 +363,23 @@ select{cursor:pointer}
 .st-subtabs{display:flex;gap:4px;margin:0 0 16px;padding:4px;background:var(--bg2);border:1px solid var(--line);border-radius:10px}
 .st-subtab{flex:1;padding:9px 14px;border:0;background:transparent;border-radius:7px;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--ink2);transition:all .15s}
 .st-subtab:hover{background:rgba(14,165,233,.06);color:var(--ink1)}
-.st-subtab.active{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);color:var(--accent);font-weight:600}
-.st-subtab .st-newtag{display:inline-block;margin-left:6px;background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px}
+.st-subtab.active{background:var(--bg-card);box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);color:#a78bfa;font-weight:600}
+.st-subtab .st-newtag{display:inline-block;margin-left:6px;background:linear-gradient(135deg,rgba(245,158,11,.25),rgba(245,158,11,.15));color:#fbbf24;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px}
 
 /* 配置面板（Worker URL + Worker Key 混淆开关） */
-.st-config{display:flex;align-items:center;gap:8px;padding:10px 14px;margin-bottom:14px;border:1px dashed var(--line);border-radius:8px;background:#fcfcfd;font-size:12.5px;flex-wrap:wrap}
+.st-config{display:flex;align-items:center;gap:8px;padding:10px 14px;margin-bottom:14px;border:1px dashed var(--line);border-radius:8px;background:var(--bg-elev);font-size:12.5px;flex-wrap:wrap}
 .st-config label{color:var(--muted);font-size:12px}
 .st-config input{padding:6px 10px;border:1px solid var(--line);border-radius:5px;font-size:12.5px;outline:none;width:340px;max-width:100%}
 .st-config input:focus{border-color:var(--accent)}
 .st-config .btn{font-size:12px;padding:6px 10px}
 
 /* 轮次指示器 */
-.st-rounds{display:flex;align-items:center;gap:4px;padding:10px 12px;background:linear-gradient(135deg,#eff6ff,#f0f9ff);border:1px solid #bfdbfe;border-radius:10px;margin-bottom:14px;overflow-x:auto}
+.st-rounds{display:flex;align-items:center;gap:4px;padding:10px 12px;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(6,182,212,.08));border:1px solid rgba(124,58,237,.4);border-radius:10px;margin-bottom:14px;overflow-x:auto}
 .st-round{display:flex;align-items:center;gap:6px;white-space:nowrap;padding:5px 12px;border-radius:999px;font-size:12.5px;color:var(--muted);font-weight:500}
-.st-round .st-rnum{width:22px;height:22px;border-radius:50%;background:#e2e8f0;color:#475569;display:grid;place-items:center;font-weight:700;font-size:11.5px}
-.st-round.done{color:#166534;background:#dcfce7}
+.st-round .st-rnum{width:22px;height:22px;border-radius:50%;background:var(--muted);color:var(--bg);display:grid;place-items:center;font-weight:700;font-size:11.5px}
+.st-round.done{color:#6ee7b7;background:rgba(16,185,129,.15)}
 .st-round.done .st-rnum{background:#16a34a;color:#fff}
-.st-round.active{color:var(--accent-dark);background:#dbeafe;box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.st-round.active{color:#c4b5fd;background:rgba(124,58,237,.2);box-shadow:0 0 0 3px rgba(124,58,237,.15)}
 .st-round.active .st-rnum{background:var(--accent);color:#fff}
 .st-round-arrow{color:#94a3b8;font-size:14px;flex:0 0 auto}
 
@@ -380,19 +388,19 @@ select{cursor:pointer}
 @media(max-width:1280px){.st-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto auto} .st-col-review{grid-column:span 2}}
 @media(max-width:780px){.st-grid{grid-template-columns:1fr} .st-col-review{grid-column:auto}}
 
-.st-col{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-height:560px;max-height:82vh}
-.st-col-head{padding:10px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fff,#fafbfd);display:flex;align-items:center;justify-content:space-between;gap:8px;flex:0 0 auto}
+.st-col{background:var(--bg-card);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-height:560px;max-height:82vh}
+.st-col-head{padding:10px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--bg-elev),var(--bg-card));display:flex;align-items:center;justify-content:space-between;gap:8px;flex:0 0 auto}
 .st-col-head h3{font-size:13.5px;font-weight:600;margin:0;display:flex;align-items:center;gap:6px}
-.st-col-head .st-count{font-size:11.5px;background:#e0f2fe;color:#075985;padding:2px 8px;border-radius:999px;font-weight:600}
+.st-col-head .st-count{font-size:11.5px;background:rgba(6,182,212,.18);color:#22d3ee;padding:2px 8px;border-radius:999px;font-weight:600}
 .st-col-body{padding:12px 14px;overflow:auto;flex:1 1 auto;display:flex;flex-direction:column;gap:10px}
 
 /* ---- 对话列 ---- */
 .st-msg{display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:1.65}
 .st-msg-user{align-items:flex-end}
 .st-msg .st-mbubble{padding:9px 12px;border-radius:10px;max-width:92%;word-break:break-word}
-.st-msg-sys .st-mbubble{background:#f1f5f9;color:var(--ink1);border-bottom-left-radius:3px;border:1px solid #e2e8f0}
+.st-msg-sys .st-mbubble{background:var(--line);color:var(--ink1);border-bottom-left-radius:3px;border:1px solid var(--line2)}
 .st-msg-user .st-mbubble{background:linear-gradient(135deg,var(--accent),#0284c7);color:#fff;border-bottom-right-radius:3px;box-shadow:0 1px 2px rgba(14,165,233,.25)}
-.st-msg-err .st-mbubble{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.st-msg-err .st-mbubble{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.4)}
 .st-msg-meta{font-size:11px;color:var(--muted);padding:0 4px}
 .st-msg .st-citation{font-size:11.5px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);color:var(--muted);line-height:1.55}
 .st-msg .st-citation a{color:var(--accent);text-decoration:none}
@@ -405,16 +413,16 @@ select{cursor:pointer}
 .st-md p{margin:5px 0}
 .st-md ul,.st-md ol{margin:5px 0 5px 20px}
 .st-md li{margin:2px 0}
-.st-md code{background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:11.5px;font-family:"Source Code Pro",monospace;color:#b45309}
-.st-md blockquote{margin:5px 0;padding:4px 10px;border-left:3px solid #93c5fd;background:#eff6ff;color:#1e3a8a;font-size:12.5px}
+.st-md code{background:var(--line);padding:1px 5px;border-radius:3px;font-size:11.5px;font-family:"Source Code Pro",monospace;color:#fbbf24}
+.st-md blockquote{margin:5px 0;padding:4px 10px;border-left:3px solid rgba(124,58,237,.6);background:rgba(124,58,237,.12);color:#c4b5fd;font-size:12.5px}
 .st-md table{border-collapse:collapse;width:100%;margin:6px 0;font-size:12px}
 .st-md th,.st-md td{border:1px solid var(--line);padding:4px 8px;text-align:left}
-.st-md th{background:#f1f5f9}
+.st-md th{background:var(--line)}
 .st-md a{color:var(--accent);text-decoration:none}
 .st-md hr{border:0;border-top:1px solid var(--line);margin:10px 0}
 
 /* 对话输入 */
-.st-chat-footer{padding:10px 12px;border-top:1px solid var(--line);background:#fcfcfd;flex:0 0 auto;display:flex;flex-direction:column;gap:8px}
+.st-chat-footer{padding:10px 12px;border-top:1px solid var(--line);background:var(--bg-elev);flex:0 0 auto;display:flex;flex-direction:column;gap:8px}
 .st-actions{display:flex;gap:6px;flex-wrap:wrap}
 .st-input-wrap{display:flex;gap:6px;align-items:flex-end}
 .st-input-wrap textarea{flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:13px;resize:vertical;min-height:38px;max-height:160px;outline:none;font-family:inherit;line-height:1.5}
@@ -428,34 +436,34 @@ select{cursor:pointer}
 @keyframes stBounce{0%,80%,100%{transform:scale(.6);opacity:.5}40%{transform:scale(1);opacity:1}}
 
 /* ---- 文献列 ---- */
-.st-paper{border:1px solid var(--line);border-radius:7px;padding:10px 11px;background:#fff;display:flex;flex-direction:column;gap:5px}
+.st-paper{border:1px solid var(--line);border-radius:7px;padding:10px 11px;background:var(--bg-card);display:flex;flex-direction:column;gap:5px}
 .st-paper-title{font-weight:600;font-size:12.8px;color:var(--ink1);line-height:1.45;text-decoration:none}
 .st-paper-title:hover{color:var(--accent)}
 .st-paper-meta{font-size:11px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap}
-.st-paper-meta .st-src-pill{background:#e0f2fe;color:#075985;padding:1px 6px;border-radius:4px;font-weight:600;font-size:10.5px}
-.st-paper-meta .st-src-pill.src-PubMed{background:#fef3c7;color:#92400e}
-.st-paper-meta .st-src-pill.src-OpenAlex{background:#ede9fe;color:#5b21b6}
-.st-paper-meta .st-src-pill.src-Semantic-Scholar{background:#fce7f3;color:#9d174d}
-.st-paper-meta .st-src-pill.src-Europe-PMC{background:#dcfce7;color:#166534}
-.st-paper-meta .st-src-pill.src-Crossref{background:#fee2e2;color:#991b1b}
+.st-paper-meta .st-src-pill{background:rgba(6,182,212,.18);color:#67e8f9;padding:1px 6px;border-radius:4px;font-weight:600;font-size:10.5px}
+.st-paper-meta .st-src-pill.src-PubMed{background:rgba(245,158,11,.18);color:#fbbf24}
+.st-paper-meta .st-src-pill.src-OpenAlex{background:rgba(139,92,246,.18);color:#c4b5fd}
+.st-paper-meta .st-src-pill.src-Semantic-Scholar{background:rgba(236,72,153,.18);color:#f9a8d4}
+.st-paper-meta .st-src-pill.src-Europe-PMC{background:rgba(16,185,129,.18);color:#6ee7b7}
+.st-paper-meta .st-src-pill.src-Crossref{background:rgba(239,68,68,.18);color:#fca5a5}
 .st-paper-doi{font-size:11px;color:var(--accent);text-decoration:none}
 .st-paper-doi:hover{text-decoration:underline}
 .st-paper-abs{font-size:11.5px;color:var(--ink2);line-height:1.6;max-height:90px;overflow:hidden;position:relative}
 .st-paper-abs.expanded{max-height:none}
-.st-paper-abs::after{content:"";position:absolute;bottom:0;left:0;right:0;height:22px;background:linear-gradient(180deg,transparent,#fff);pointer-events:none}
+.st-paper-abs::after{content:"";position:absolute;bottom:0;left:0;right:0;height:22px;background:linear-gradient(180deg,transparent,var(--bg-card));pointer-events:none}
 .st-paper-abs.expanded::after{display:none}
 .st-paper-toggle{font-size:11px;color:var(--accent);cursor:pointer;background:none;border:0;padding:0;text-align:left}
 .st-method-tags{display:flex;gap:3px;flex-wrap:wrap;margin-top:2px}
-.st-tag{font-size:10px;padding:1px 6px;border-radius:999px;background:#f1f5f9;color:#475569;font-weight:500}
-.st-tag.design{background:#fef3c7;color:#92400e}
-.st-tag.stat{background:#ede9fe;color:#5b21b6}
-.st-tag.tool{background:#e0f2fe;color:#075985}
-.st-tag.quality{background:#dcfce7;color:#166534}
-.st-tag.risk{background:#fee2e2;color:#991b1b}
-.st-methods-box{margin-top:4px;padding:6px 8px;background:#fafbfd;border:1px dashed var(--line);border-radius:5px;font-size:11px;color:var(--ink2)}
+.st-tag{font-size:10px;padding:1px 6px;border-radius:999px;background:var(--line);color:var(--ink2);font-weight:500}
+.st-tag.design{background:rgba(245,158,11,.18);color:#fbbf24}
+.st-tag.stat{background:rgba(139,92,246,.2);color:#c4b5fd}
+.st-tag.tool{background:rgba(6,182,212,.18);color:#67e8f9}
+.st-tag.quality{background:rgba(16,185,129,.18);color:#6ee7b7}
+.st-tag.risk{background:rgba(239,68,68,.18);color:#fca5a5}
+.st-methods-box{margin-top:4px;padding:6px 8px;background:var(--bg-elev);border:1px dashed var(--line);border-radius:5px;font-size:11px;color:var(--ink2)}
 .st-methods-row{display:flex;gap:4px;align-items:baseline;margin:2px 0}
 .st-methods-row b{font-weight:600;color:var(--ink1);flex:0 0 62px;font-size:10.5px}
-.st-empty{padding:24px;text-align:center;color:var(--muted);font-size:12.5px;background:#fafbfd;border-radius:6px;border:1px dashed var(--line)}
+.st-empty{padding:24px;text-align:center;color:var(--muted);font-size:12.5px;background:var(--bg-elev);border-radius:6px;border:1px dashed var(--line)}
 .st-empty .st-emoji{font-size:28px;display:block;margin-bottom:6px}
 
 /* ---- 综述列 ---- */
@@ -463,32 +471,32 @@ select{cursor:pointer}
 .st-review h1{font-size:18px;margin:0 0 4px;font-weight:800}
 .st-review h2{font-size:14.5px;margin:14px 0 6px;padding-bottom:3px;border-bottom:1px solid var(--line);font-weight:700}
 .st-review h3{font-size:13px;margin:10px 0 4px;font-weight:700}
-.st-review blockquote{margin:6px 0;padding:6px 10px;border-left:3px solid #93c5fd;background:#eff6ff;font-size:12px;color:#1e3a8a}
+.st-review blockquote{margin:6px 0;padding:6px 10px;border-left:3px solid rgba(124,58,237,.6);background:rgba(124,58,237,.12);font-size:12px;color:#c4b5fd}
 .st-review .st-cite{color:var(--accent);font-weight:600}
 .st-review ref{color:var(--accent);font-weight:600}
 .st-review pre{background:#0f172a;color:#e2e8f0;padding:8px 10px;border-radius:5px;font-size:11px;overflow:auto}
-.st-review code{background:#f1f5f9;padding:1px 4px;border-radius:3px;font-size:11px;color:#b45309}
-.st-review-tools{padding:10px 12px;border-top:1px solid var(--line);background:#fcfcfd;flex:0 0 auto;display:flex;gap:6px;flex-wrap:wrap}
-.st-ch-status{padding:10px;background:linear-gradient(135deg,#ecfeff,#f0f9ff);border:1px solid #a5f3fc;border-radius:6px;font-size:12px;color:#0e7490}
+.st-review code{background:var(--line);padding:1px 4px;border-radius:3px;font-size:11px;color:#fbbf24}
+.st-review-tools{padding:10px 12px;border-top:1px solid var(--line);background:var(--bg-elev);flex:0 0 auto;display:flex;gap:6px;flex-wrap:wrap}
+.st-ch-status{padding:10px;background:linear-gradient(135deg,rgba(6,182,212,.12),rgba(124,58,237,.08));border:1px solid rgba(6,182,212,.35);border-radius:6px;font-size:12px;color:#67e8f9}
 .st-ch-list{display:flex;flex-direction:column;gap:4px;margin-top:6px}
-.st-ch-item{display:flex;align-items:center;gap:6px;font-size:12px;padding:4px 8px;background:#fff;border-radius:5px;border:1px solid var(--line)}
-.st-ch-item.done{background:#f0fdf4;border-color:#bbf7d0;color:#166534}
-.st-ch-item.run{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
-.st-ch-item .st-dot{width:8px;height:8px;border-radius:50%;background:#cbd5e1}
+.st-ch-item{display:flex;align-items:center;gap:6px;font-size:12px;padding:4px 8px;background:var(--bg-card);border-radius:5px;border:1px solid var(--line)}
+.st-ch-item.done{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.5);color:#6ee7b7}
+.st-ch-item.run{background:rgba(124,58,237,.18);border-color:rgba(124,58,237,.5);color:#c4b5fd;box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.st-ch-item .st-dot{width:8px;height:8px;border-radius:50%;background:#7a7a8c}
 .st-ch-item.done .st-dot{background:#16a34a}
 .st-ch-item.run .st-dot{background:var(--accent);animation:stPulse 1.2s infinite}
 @keyframes stPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.5}}
 
 /* 问题勾选（第 2 轮） */
-.st-qpanel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.st-qpanel{background:var(--bg-card);border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
 .st-qpanel h4{margin:0;font-size:13px;font-weight:700;color:var(--ink1)}
-.st-qitem{display:flex;gap:8px;align-items:flex-start;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;transition:all .12s}
-.st-qitem:hover{border-color:var(--accent);background:#eff6ff}
+.st-qitem{display:flex;gap:8px;align-items:flex-start;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg-card);cursor:pointer;transition:all .12s}
+.st-qitem:hover{border-color:var(--accent);background:rgba(124,58,237,.12)}
 .st-qitem input[type=checkbox]{margin-top:3px;flex:0 0 auto}
 .st-qitem .st-qtext{font-size:12.5px;line-height:1.55;flex:1}
-.st-qitem.checked{background:#eff6ff;border-color:var(--accent)}
-.st-qitem .st-qview{font-size:10px;padding:1px 6px;border-radius:999px;background:#f1f5f9;color:#64748b;font-weight:600;flex:0 0 auto}
-.st-qitem.checked .st-qview{background:#dbeafe;color:#1e40af}
+.st-qitem.checked{background:rgba(124,58,237,.12);border-color:var(--accent)}
+.st-qitem .st-qview{font-size:10px;padding:1px 6px;border-radius:999px;background:var(--line);color:#64748b;font-weight:600;flex:0 0 auto}
+.st-qitem.checked .st-qview{background:rgba(124,58,237,.2);color:#c4b5fd}
 .st-qitem textarea{width:100%;margin-top:4px;display:none;padding:5px 7px;font-size:12px;border:1px solid var(--line);border-radius:4px;font-family:inherit;resize:vertical;min-height:34px;outline:none}
 .st-qitem textarea:focus{border-color:var(--accent)}
 .st-qitem.editing textarea{display:block}
@@ -496,7 +504,7 @@ select{cursor:pointer}
 .st-qbtnrow .btn{font-size:12px;padding:5px 10px}
 
 /* 章节精修（第 5 轮） */
-.st-refine-row{display:flex;gap:6px;align-items:center;padding:5px 8px;background:#fafbfd;border:1px solid var(--line);border-radius:5px;font-size:12px;margin-bottom:4px}
+.st-refine-row{display:flex;gap:6px;align-items:center;padding:5px 8px;background:var(--bg-elev);border:1px solid var(--line);border-radius:5px;font-size:12px;margin-bottom:4px}
 .st-refine-row span{flex:1;font-weight:600;color:var(--ink1)}
 .st-refine-row input{padding:4px 8px;font-size:12px;flex:2;border:1px solid var(--line);border-radius:4px;outline:none}
 .st-refine-row input:focus{border-color:var(--accent)}
@@ -4478,7 +4486,7 @@ select{cursor:pointer}
     <div class="actions">
       <button class="btn primary" onclick="go('search')">文献检索</button>
       <button class="btn teal" onclick="go('datasets')">数据集收录与检索</button>
-      <button class="btn" onclick="go('agent')">研究智能体</button>
+      <button class="btn violet" onclick="go('agent')">研究智能体</button>
     </div>
   </div>
 
@@ -4715,7 +4723,7 @@ else:
           <button class="btn sm" onclick="document.getElementById('qa-api-config').style.display=document.getElementById('qa-api-config').style.display==='none'?'block':'none'"> LLM 润色配置</button>
           <button class="btn sm" onclick="document.getElementById('qa-history').innerHTML=''"> 清空对话</button>
         </div>
-        <div id="qa-api-config" style="display:none;margin-top:12px;padding:10px 12px;border:1px dashed var(--line);border-radius:4px;background:#fafbfd">
+        <div id="qa-api-config" style="display:none;margin-top:12px;padding:10px 12px;border:1px dashed var(--line);border-radius:4px;background:var(--bg-elev)">
           <div style="font-size:12.5px;margin-bottom:6px">填入以下信息后，回答将默认先做事实检索，再使用 LLM 基于检索到的上下文进行润色整合（始终保留原文引用）。配置保存在本地 localStorage，不会上传。</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
             <input class="input" id="qa-api-base" placeholder="API Base URL（例如 https://openrouter.ai/api/v1 或 https://dashscope.aliyuncs.com/compatible-mode/v1）" style="flex:1;min-width:260px">
@@ -4739,7 +4747,7 @@ else:
           <button class="btn sm teal" onclick="downloadAgentReportHtml()"> 下载 HTML</button>
           <button class="btn sm" onclick="saveAgentReport()">⭐ 收藏报告</button>
         </div>
-        <div id="agent-md-html" style="background:#fff;padding:20px 28px;border:1px solid var(--line);border-radius:4px;max-height:600px;overflow:auto;font-size:14px;line-height:1.8;color:var(--ink2)"></div>
+        <div id="agent-md-html" style="background:var(--bg-card);padding:20px 28px;border:1px solid var(--line);border-radius:4px;max-height:600px;overflow:auto;font-size:14px;line-height:1.8;color:var(--ink2)"></div>
         <details style="margin-top:10px"><summary style="cursor:pointer;font-size:12.5px;color:var(--accent)">查看原始 Markdown</summary><pre id="agent-md" style="background:#f7f7f7;padding:12px;border-radius:3px;white-space:pre-wrap;max-height:400px;overflow:auto;font-size:12px;line-height:1.5;margin-top:8px"></pre></details>
       </div>
     </div>
@@ -4748,13 +4756,13 @@ else:
 <style>
 .agent-flow{display:flex;gap:8px;margin:14px 0;flex-wrap:wrap}
 .agent-step{flex:1;min-width:120px;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:10px 8px;text-align:center;font-size:12px;color:var(--muted);transition:all .3s}
-.agent-step .num{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:#ddd;color:#333;margin-right:6px;font-weight:bold}
-.agent-step.active{border-color:var(--accent);background:#eef5ff;color:var(--accent)}
+.agent-step .num{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:var(--line);color:var(--ink2);margin-right:6px;font-weight:bold}
+.agent-step.active{border-color:var(--accent);background:rgba(124,58,237,.12);color:var(--accent)}
 .agent-step.active .num{background:var(--accent);color:#fff}
-.agent-step.done{border-color:var(--ok);background:#f0f9f0;color:var(--ok)}
+.agent-step.done{border-color:var(--ok);background:rgba(16,185,129,.15);color:var(--ok)}
 .agent-step.done .num{background:var(--ok);color:#fff}
-.agent-step.error{border-color:#f5c2c2;background:#fff1f0;color:#c33}
-.agent-step.error .num{background:#e66;color:#fff}
+.agent-step.error{border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.1);color:#fca5a5}
+.agent-step.error .num{background:var(--danger);color:#fff}
 .agent-card{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:12px;margin-bottom:14px}
 .agent-card h3{margin:0 0 10px;font-size:14px;color:var(--ink2)}
 .bar-chart .bar-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:12px}
@@ -4785,7 +4793,7 @@ else:
 .paper-card h4 a:hover{color:var(--accent)}
 .paper-card .pc-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
 .paper-card .pc-abs{color:var(--ink2);font-size:12.5px;line-height:1.6;margin:6px 0;background:#f9fbfd;padding:8px 10px;border-left:3px solid var(--accent);border-radius:0 3px 3px 0}
-.paper-card .pc-struct{margin:8px 0;padding:8px 10px;background:#fff9ec;border:1px solid #ffe6a3;border-radius:3px;font-size:12.5px;line-height:1.6}
+.paper-card .pc-struct{margin:8px 0;padding:8px 10px;background:var(--bg-card)9ec;border:1px solid #ffe6a3;border-radius:3px;font-size:12.5px;line-height:1.6}
 .paper-card .pc-struct .s-row{margin-bottom:3px}
 .paper-card .pc-struct .s-label{display:inline-block;min-width:70px;color:#b37b00;font-weight:600;margin-right:6px}
 .paper-card .pc-foot{margin-top:6px;color:var(--muted);font-size:11.5px;display:flex;gap:12px;flex-wrap:wrap}
@@ -4799,7 +4807,7 @@ else:
 .insight-box .topic-group ul{margin:4px 0;padding-left:18px}
 .insight-box .topic-group li{font-size:12.5px;color:var(--ink2);line-height:1.6}
 .citation-timeline{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end;padding:8px;background:#f7f9fc;border-radius:3px}
-.citation-timeline .tl-node{flex:1;min-width:90px;background:#fff;border:1px solid var(--line);border-radius:3px;padding:6px 8px;text-align:center;font-size:11.5px}
+.citation-timeline .tl-node{flex:1;min-width:90px;background:var(--bg-card);border:1px solid var(--line);border-radius:3px;padding:6px 8px;text-align:center;font-size:11.5px}
 .citation-timeline .tl-node .year{font-weight:700;color:var(--accent);display:block}
 .citation-timeline .tl-node .title{color:var(--ink2);line-height:1.4;max-height:48px;overflow:hidden}
 .gap-list{margin:0;padding-left:20px}
@@ -4891,8 +4899,15 @@ else:
 <section id="p-datasets" class="page">
   <div class="page-title"><h2>数据集收录与检索</h2><div class="meta">Zenodo 数据集检索 · 公开数据集 · 私有数据集</div></div>
 
+  <!-- 顶部快速跳转按钮 -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px">
+    <button class="btn sm primary" onclick="document.getElementById('ds-section-search').scrollIntoView({behavior:'smooth',block:'start'})"> 数据集检索</button>
+    <button class="btn sm teal" onclick="document.getElementById('ds-section-public').scrollIntoView({behavior:'smooth',block:'start'})"> 公开数据集</button>
+    <button class="btn sm violet" onclick="document.getElementById('ds-section-private').scrollIntoView({behavior:'smooth',block:'start'})"> 私有数据集</button>
+  </div>
+
   <!-- 模块1：Zenodo 数据集检索框 -->
-  <div style="border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:24px;background:var(--card-bg)">
+  <div id="ds-section-search" style="border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:24px;background:var(--bg-card)">
     <h3 style="margin:0 0 8px"> 数据集检索（Zenodo 开放获取）</h3>
     <div class="toolbar">
       <input class="input wide" id="ds-q" placeholder="输入关键词，例如：depression survey / mental health cohort / 心理健康">
@@ -4907,14 +4922,14 @@ else:
   </div>
 
   <!-- 模块2：公开数据集（JS 在 init 时把首页的 dset-tabs/dset-grid/dset-pager 搬到这里） -->
-  <div id="ds-public-section">
-    <h3 style="margin:0 0 12px"> 公开数据集</h3>
+  <div id="ds-section-public">
+    <h3 style="margin:0 0 12px;padding-top:8px"> 公开数据集</h3>
     <div id="ds-tab-public"></div>
   </div>
 
   <!-- 模块3：私有数据集（JS 在 init 时把原 p-health 的内容搬到这里） -->
-  <div id="ds-private-section" style="margin-top:32px">
-    <h3 style="margin:0 0 12px"> 私有数据集</h3>
+  <div id="ds-section-private" style="margin-top:32px">
+    <h3 style="margin:0 0 12px;padding-top:8px"> 私有数据集</h3>
     <div id="ds-tab-private"></div>
   </div>
 </section>
@@ -4930,7 +4945,7 @@ else:
 
   <!-- ========== 子TAB 1: 四类年鉴数据 ========== -->
   <div id="h-tab-search">
-    <div style="margin-bottom:14px;background:linear-gradient(135deg,#f0fdf4,#ecfeff);border:1px solid #86efac;border-radius:10px;padding:10px 16px;font-size:13.5px;color:#065f46;line-height:1.7">
+    <div style="margin-bottom:14px;background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(6,182,212,.08));border:1px solid rgba(16,185,129,.4);border-radius:10px;padding:10px 16px;font-size:13.5px;color:#86efac;line-height:1.7">
       每类数据整理为一个百度网盘整包（含 Excel 表格 + PDF 说明文档），点击下方卡片直接下载。
     </div>
     <div id="h-cards-grid"></div>
@@ -6547,7 +6562,7 @@ _r=_num.corr(method='pearson').round(3)
 _s=_num.corr(method='spearman').round(3)
 def _tag(x):
     x=float(x);
-    if x>=0.6 or x<=-0.6: return f'<b style="color:#991b1b">{x}</b>'
+    if x>=0.6 or x<=-0.6: return f'<b style="color:#fca5a5">{x}</b>'
     if x>=0.3 or x<=-0.3: return f'<b>{x}</b>'
     return str(x)
 def _fmt(df):
@@ -6556,7 +6571,7 @@ def _fmt(df):
     for i,r in enumerate(df.index):
         rows.append(f'<tr><td><b>{r}</b></td>')
         for j,c in enumerate(cols):
-            if i==j: rows.append(f'<td style="background:#eef2ff">—</td>')
+            if i==j: rows.append(f'<td style="background:rgba(124,58,237,.2)">—</td>')
             else: rows.append('<td>'+_tag(df.iat[i,j])+'</td>')
         rows.append('</tr>')
     rows.append('</table>')
@@ -7002,7 +7017,7 @@ async function runAgentAnalysis(){
     document.getElementById('agent-report').style.display='block';
     // 如果有错误，在 overview 顶部插入提示条
     if(errLog.length>0){
-      var warnHtml='<div class="agent-card" style="border-color:#ffd591;background:#fffbe6;color:#8a4b00;margin-bottom:12px">'+
+      var warnHtml='<div class="agent-card" style="border-color:#ffd591;background:var(--bg-card)be6;color:#8a4b00;margin-bottom:12px">'+
         '<b>⚠ 部分源返回异常（已自动跳过，结果基于成功返回的数据）：</b><br>'+
         '<ul style="margin:6px 0 0;padding-left:20px;font-size:12.5px;line-height:1.7">'+
         errLog.map(function(e){return '<li>'+escapeHtml(e)+'</li>'}).join('')+
@@ -7519,7 +7534,7 @@ function renderAgentReport(papers,datasets,stats,related,md){
         (p.doi?' · DOI: '+p.doi:'')+(p.pmid?' · PMID: '+p.pmid:'')+
         (p.url?' · <a href="'+p.url+'" target="_blank">↗原文</a>':'')+'</div>'+
         (shortAbs?('<div style="margin-top:4px;color:var(--ink2);font-size:12.5px;line-height:1.6;background:#f9fbfd;padding:6px 10px;border-left:3px solid var(--accent);border-radius:0 3px 3px 0">'+shortAbs+'</div>'):'')+
-        (struc?('<div style="margin-top:6px;padding:6px 10px;background:#fff9ec;border:1px solid #ffe6a3;border-radius:3px;font-size:12px;color:#8a6400;line-height:1.6"> '+struc.population+' · '+struc.method+' · '+struc.sample+' · '+struc.finding+'</div>'):'')+
+        (struc?('<div style="margin-top:6px;padding:6px 10px;background:var(--bg-card)9ec;border:1px solid #ffe6a3;border-radius:3px;font-size:12px;color:#8a6400;line-height:1.6"> '+struc.population+' · '+struc.method+' · '+struc.sample+' · '+struc.finding+'</div>'):'')+
         '</li>';
     }).join('')+'</ol>';
   }
@@ -8001,7 +8016,7 @@ async function qaAsk(){
       var llm=await qaAskLlmPolish(q,extract,cfg);
       var llmEl=document.getElementById(blockId+'-llm');
       if(llm){
-        llmEl.innerHTML='<div style="font-size:13.5px;line-height:1.8;color:var(--ink2);background:#fffbe6;border:1px solid #ffe58f;padding:10px 12px;border-radius:4px"><b style="color:#874d00"> LLM 润色版（证据不变，仅调整语气语序）：</b><br><br>'+escapeHtml(llm).replace(/\n/g,'<br>')+'</div>';
+        llmEl.innerHTML='<div style="font-size:13.5px;line-height:1.8;color:var(--ink2);background:var(--bg-card)be6;border:1px solid #ffe58f;padding:10px 12px;border-radius:4px"><b style="color:#874d00"> LLM 润色版（证据不变，仅调整语气语序）：</b><br><br>'+escapeHtml(llm).replace(/\n/g,'<br>')+'</div>';
       } else {
         llmEl.innerHTML='<div style="font-size:12.5px;color:#b26a00">⚠ LLM 接口调用失败（可能 Key 错误 / 网络 / 限流），已保留抽取式答案。可到配置中检查或清除 Key 后重试。</div>';
       }
@@ -8731,7 +8746,7 @@ function studyRenderMatches(list) {
   }
   var html = '';
   list.forEach(function (m) {
-    html += '<div style="border:1px solid var(--line);border-radius:6px;padding:14px;background:#fff;display:flex;flex-direction:column;gap:6px">';
+    html += '<div style="border:1px solid var(--line);border-radius:6px;padding:14px;background:var(--bg-card);display:flex;flex-direction:column;gap:6px">';
     html += '<span style="font-size:11px;color:var(--accent);font-weight:600">[' + m.type + '] 匹配分 ' + m.score + '</span>';
     html += '<div style="font-weight:600;font-size:14px">' + m.title + '</div>';
     if (m.desc) html += '<div style="font-size:12px;color:var(--muted);line-height:1.55">' + m.desc.substring(0, 160) + (m.desc.length > 160 ? '...' : '') + '</div>';
@@ -8752,7 +8767,7 @@ function studyRenderLit(list) {
   var html = '';
 
   /* === 检索算法透明声明 + 概念提取摘要 === */
-  html += '<div style="border:1px dashed var(--line);border-radius:6px;padding:12px 16px;background:#fafbfd;margin-bottom:12px;font-size:12px;line-height:1.7;color:var(--ink2)">';
+  html += '<div style="border:1px dashed var(--line);border-radius:6px;padding:12px 16px;background:var(--bg-elev);margin-bottom:12px;font-size:12px;line-height:1.7;color:var(--ink2)">';
   html += '<b style="color:var(--ink1);font-size:12.5px">🔍 文献检索算法说明</b><br>';
   html += '本系统<b>未调用大语言模型</b>生成检索结果，而是通过以下步骤实现精准匹配：<br>';
   html += '① <b>核心概念提取</b>：基于领域词典（80+ 术语）+ 英文词组/词 + 中文 2-gram（过滤通用词）<br>';
@@ -8777,8 +8792,8 @@ function studyRenderLit(list) {
   list.forEach(function (p) {
     var hits = p._conceptHits || 0;
     var hitBadge = hits > 0
-      ? '<span style="font-size:10.5px;background:' + (hits >= 3 ? '#e6f4ea' : '#fff3e0') + ';color:' + (hits >= 3 ? '#1e7d34' : '#b06a00') + ';padding:1px 7px;border-radius:8px;border:1px solid ' + (hits >= 3 ? '#b6d7c4' : '#f0d8a8') + '">概念命中 ' + hits + '</span>'
-      : '<span style="font-size:10.5px;color:var(--muted);background:#f3f3f3;padding:1px 7px;border-radius:8px">兜底召回</span>';
+      ? '<span style="font-size:10.5px;background:' + (hits >= 3 ? 'rgba(16,185,129,.2)' : 'rgba(245,158,11,.2)') + ';color:' + (hits >= 3 ? '#6ee7b7' : '#fbbf24') + ';padding:1px 7px;border-radius:8px;border:1px solid ' + (hits >= 3 ? 'rgba(16,185,129,.5)' : 'rgba(245,158,11,.5)') + '">概念命中 ' + hits + '</span>'
+      : '<span style="font-size:10.5px;color:var(--muted);background:var(--line);padding:1px 7px;border-radius:8px">兜底召回</span>';
     /* 高亮命中概念 */
     var titleHtml = studyEsc(p.title);
     var absText = p.abstract ? (p.abstract.length > 240 ? p.abstract.substring(0, 240) + '...' : p.abstract) : '';
@@ -8787,11 +8802,11 @@ function studyRenderLit(list) {
       concepts.forEach(function (kc) {
         if (kc.length < 2) return;
         var re = new RegExp(kc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-        titleHtml = titleHtml.replace(re, '<mark style="background:#fff3a0;padding:0 2px">$&</mark>');
-        absHtml = absHtml.replace(re, '<mark style="background:#fff3a0;padding:0 2px">$&</mark>');
+        titleHtml = titleHtml.replace(re, '<mark style="background:var(--bg-card)3a0;padding:0 2px">$&</mark>');
+        absHtml = absHtml.replace(re, '<mark style="background:var(--bg-card)3a0;padding:0 2px">$&</mark>');
       });
     }
-    html += '<div style="border-left:3px solid var(--accent);padding:10px 14px;background:#fafbfd;border-radius:0 4px 4px 0">';
+    html += '<div style="border-left:3px solid var(--accent);padding:10px 14px;background:var(--bg-elev);border-radius:0 4px 4px 0">';
     html += '<div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap">';
     html += '<b style="font-size:14px">' + titleHtml + '</b>';
     if (p.year) html += '<span style="font-size:11.5px;color:var(--muted)">(' + p.year + ')</span>';
@@ -10132,7 +10147,7 @@ function studyRenderPlans(plans) {
   var html = '';
 
   /* === 算法透明声明 === */
-  html += '<div style="border:1px dashed var(--line);border-radius:6px;padding:12px 16px;background:#fafbfd;margin-bottom:14px;font-size:12px;line-height:1.7;color:var(--ink2)">';
+  html += '<div style="border:1px dashed var(--line);border-radius:6px;padding:12px 16px;background:var(--bg-elev);margin-bottom:14px;font-size:12px;line-height:1.7;color:var(--ink2)">';
   html += '<b style="color:var(--ink1);font-size:12.5px">⚙️ 推荐算法说明</b><br>';
   html += '本系统<b>未调用大语言模型/机器学习模型</b>生成方案，而是采用<b>规则化专家评分系统</b>（rule-based scoring），基于 5 个因子加权打分：<br>';
   html += '• <b>因子 A · 研究问题类型亲和度（权重 30%）</b>：通过关键词识别研究问题类型（描述/病因/干预/政策/探索），与 6 大设计模板的亲和度矩阵匹配<br>';
@@ -10157,12 +10172,12 @@ function studyRenderPlans(plans) {
       (p.ethics ? '\n\n【伦理考量】\n' + p.ethics : '') +
       (p.timeline ? '\n\n【研究时间线】\n' + p.timeline : '') +
       (p.r_packages ? '\n\n【推荐R包】\n' + p.r_packages : '');
-    html += '<div id="plan-card-' + idx + '" style="border:1px solid var(--line);border-radius:6px;background:#fff;overflow:hidden">';
-    html += '<div style="padding:14px 18px;background:linear-gradient(135deg,#f0f5ff,#fff);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
+    html += '<div id="plan-card-' + idx + '" style="border:1px solid var(--line);border-radius:6px;background:var(--bg-card);overflow:hidden">';
+    html += '<div style="padding:14px 18px;background:linear-gradient(135deg,rgba(124,58,237,.14),rgba(6,182,212,.08));border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
     html += '<span style="background:var(--accent);color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600">推荐 #' + (idx + 1) + '</span>';
     html += '<b style="font-size:15px">' + studyEsc(p.name) + '</b>';
     html += '<span style="font-size:11.5px;color:var(--muted)">' + studyEsc(p.en || '') + '</span>';
-    html += '<span style="font-size:11px;color:var(--accent);background:#eef3ff;padding:2px 8px;border-radius:8px">综合分 ' + ((p.matchScore || 0) * 100).toFixed(1) + '</span>';
+    html += '<span style="font-size:11px;color:#c4b5fd;background:rgba(124,58,237,.2);padding:2px 8px;border-radius:8px">综合分 ' + ((p.matchScore || 0) * 100).toFixed(1) + '</span>';
     html += '<div style="flex:1"></div>';
     html += '<button class="btn sm" onclick="studyTogglePlan(' + idx + ')" style="padding:3px 10px;font-size:11.5px;margin-right:6px">展开/收起</button>';
     html += '<button class="btn sm" onclick="studyEditPlan(' + idx + ')" style="padding:3px 10px;font-size:11.5px;margin-right:6px">改进</button>';
@@ -10584,7 +10599,7 @@ function studyRenderUploaded() {
     var n = ds.info['样本量'] || '?';
     var yr = ds.info['采集年份'] || ds.info['时间跨度'] || '';
     html += '<div style="border:1px solid var(--line);border-radius:6px;overflow:hidden">';
-    html += '<div style="padding:10px 16px;background:#f8fafc;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)">';
+    html += '<div style="padding:10px 16px;background:var(--bg-elev);display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)">';
     html += '<span style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">数据集 #' + (idx + 1) + '</span>';
     html += '<b style="font-size:14px">' + studyEsc(name) + '</b>';
     html += '<span style="font-size:12px;color:var(--muted)">' + nvars + ' 个变量 · 样本量 ' + studyEsc(n) + (yr ? ' · ' + studyEsc(yr) : '') + '</span>';
@@ -10594,7 +10609,7 @@ function studyRenderUploaded() {
     html += '</div>';
     html += '<div id="st-ds-vars-' + idx + '" style="display:none;padding:14px 16px;overflow-x:auto">';
     html += '<table style="width:100%;border-collapse:collapse;font-size:12.5px">';
-    html += '<thead><tr style="background:#f1f5f9">';
+    html += '<thead><tr style="background:var(--line)">';
     ['变量名','类型','标签','取值/编码','单位','缺失率','备注'].forEach(function (h) {
       html += '<th style="padding:6px 10px;text-align:left;border:1px solid var(--line);white-space:nowrap">' + h + '</th>';
     });
@@ -10661,7 +10676,7 @@ function studyRunP2(plans) {
     var mapped = studyMapVars(allVars, planVars);
 
     html += '<div style="border:1px solid var(--line);border-radius:6px;overflow:hidden">';
-    html += '<div style="padding:12px 18px;background:linear-gradient(135deg,#f0f5ff,#fff);border-bottom:1px solid var(--line)">';
+    html += '<div style="padding:12px 18px;background:linear-gradient(135deg,rgba(124,58,237,.14),rgba(6,182,212,.08));border-bottom:1px solid var(--line)">';
     html += '<span style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">方案 #' + (pi + 1) + '</span>';
     html += '<b style="font-size:14px;margin-left:8px">' + studyEsc(plan.name) + '</b>';
     html += '<span style="font-size:11.5px;color:var(--muted);margin-left:8px">匹配 ' + mapped.matched + '/' + mapped.total + ' 个方案变量</span>';
@@ -10674,7 +10689,7 @@ function studyRunP2(plans) {
     html += '<div style="font-size:12.5px;font-weight:600;margin-bottom:6px;color:var(--ink2)">方案变量角色：</div>';
     planVars.forEach(function (pv) {
       var matchVar = mapped.matches.find(function (m) { return m.role === pv.role });
-      var badge = matchVar ? '<span style="background:#dcfce7;color:#16a34a;padding:1px 6px;border-radius:3px;font-size:11px;margin-left:6px">已匹配: ' + studyEsc(matchVar.varName) + '</span>' : '<span style="background:#fee2e2;color:#dc2626;padding:1px 6px;border-radius:3px;font-size:11px;margin-left:6px">未匹配</span>';
+      var badge = matchVar ? '<span style="background:rgba(16,185,129,.2);color:#6ee7b7;padding:1px 6px;border-radius:3px;font-size:11px;margin-left:6px">已匹配: ' + studyEsc(matchVar.varName) + '</span>' : '<span style="background:rgba(239,68,68,.2);color:#fca5a5;padding:1px 6px;border-radius:3px;font-size:11px;margin-left:6px">未匹配</span>';
       html += '<div style="font-size:12px;margin-bottom:4px;padding:4px 0">';
       html += '<span style="color:var(--muted)">[' + pv.role + ']</span> ';
       html += '<b>' + studyEsc(pv.desc) + '</b>';
@@ -11107,8 +11122,8 @@ function studyRenderCodeFrameworks(plans) {
   plans.forEach(function (p, idx) {
     var fw = STUDY_CODE_FRAMEWORKS[p.id];
     if (!fw) return;
-    html += '<div style="border:1px solid var(--line);border-radius:6px;background:#fff;overflow:hidden">';
-    html += '<div style="padding:12px 18px;background:linear-gradient(135deg,#f0f5ff,#fff);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px">';
+    html += '<div style="border:1px solid var(--line);border-radius:6px;background:var(--bg-card);overflow:hidden">';
+    html += '<div style="padding:12px 18px;background:linear-gradient(135deg,rgba(124,58,237,.14),rgba(6,182,212,.08));border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px">';
     html += '<span style="background:var(--accent);color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600">方案 ' + (idx + 1) + '</span>';
     html += '<b style="font-size:14px">' + p.name + '</b>';
     html += '<div style="flex:1"></div>';
@@ -11131,7 +11146,7 @@ function studyRenderCodeFrameworks(plans) {
 
     /* 说明 */
     if (fw.notes) {
-      html += '<div style="padding:10px 18px;font-size:12px;color:var(--ink2);background:#f8fafc;border-top:1px solid var(--line)"><b>说明:</b> ' + fw.notes + '</div>';
+      html += '<div style="padding:10px 18px;font-size:12px;color:var(--ink2);background:var(--bg-elev);border-top:1px solid var(--line)"><b>说明:</b> ' + fw.notes + '</div>';
     }
     html += '</div>';
   });
@@ -11233,7 +11248,7 @@ function studyRenderMethods() {
   var html = '';
   STUDY_METHOD_LIBRARY.forEach(function (m, idx) {
     var diffColor = m.difficulty === '高级' ? '#f59e0b' : '#3b82f6';
-    html += '<div style="border:1px solid var(--line);border-radius:6px;padding:0;background:#fff;overflow:hidden" id="method-card-' + idx + '">';
+    html += '<div style="border:1px solid var(--line);border-radius:6px;padding:0;background:var(--bg-card);overflow:hidden" id="method-card-' + idx + '">';
     html += '<div style="padding:16px;cursor:pointer" onclick="studyToggleMethod(' + idx + ')">';
     html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">';
     html += '<span style="font-size:24px">' + m.icon + '</span>';
@@ -11253,7 +11268,7 @@ function studyRenderMethods() {
     html += '</div>';
     html += '<div id="method-r-' + idx + '"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">R包: ' + m.packages + '</div><pre style="margin:0;padding:12px;font-size:12px;font-family:Consolas,monospace;white-space:pre-wrap;background:#1e293b;color:#e2e8f0;border-radius:4px;overflow-x:auto">' + studyEsc(m.r_framework) + '</pre></div>';
     html += '<div id="method-py-' + idx + '" style="display:none"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Python包: ' + m.py_packages + '</div><pre style="margin:0;padding:12px;font-size:12px;font-family:Consolas,monospace;white-space:pre-wrap;background:#1e293b;color:#e2e8f0;border-radius:4px;overflow-x:auto">' + studyEsc(m.py_framework) + '</pre></div>';
-    if (m.notes) html += '<div style="margin-top:8px;font-size:11.5px;color:var(--ink2);background:#f8fafc;padding:8px 10px;border-radius:4px"><b>说明:</b> ' + m.notes + '</div>';
+    if (m.notes) html += '<div style="margin-top:8px;font-size:11.5px;color:var(--ink2);background:var(--bg-elev);padding:8px 10px;border-radius:4px"><b>说明:</b> ' + m.notes + '</div>';
     html += '</div>';
     html += '</div>';
   });
@@ -11598,7 +11613,7 @@ function hRenderFourCards(){
   keys.forEach(function(k){
     var d=H_CAT_DESC[k]||{cn:'',yr:'',e:0,p:0,desc:'',topics:[]};
     var pan=H_CAT_PANS[k]||{url:'#',color:'#64748b'};
-    html+='<div style="border:1px solid var(--border);border-radius:14px;background:#fff;overflow:hidden;display:flex;flex-direction:column;transition:transform .15s,box-shadow .15s">';
+    html+='<div style="border:1px solid var(--border);border-radius:14px;background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column;transition:transform .15s,box-shadow .15s">';
     html+='<div style="padding:14px 18px;background:linear-gradient(135deg,'+pan.color+'15,'+pan.color+'05);border-bottom:1px solid var(--border)">';
     html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">';
     html+='<div><div style="font-weight:700;font-size:15.5px;color:var(--ink)">'+esc(k)+'</div>';
@@ -11608,13 +11623,13 @@ function hRenderFourCards(){
     html+='<div style="padding:14px 18px;flex:1;display:flex;flex-direction:column;gap:10px">';
     html+='<div style="display:flex;gap:10px;flex-wrap:wrap">';
     if(d.e>0) html+='<span class="chip" style="background:'+pan.color+'12;color:'+pan.color+';border-color:'+pan.color+'40;font-size:12px">'+d.e+' 张 Excel</span>';
-    if(d.p>0) html+='<span class="chip" style="background:#64748b12;color:#64748b;border-color:#64748b40;font-size:12px">'+d.p+' 本 PDF</span>';
+    if(d.p>0) html+='<span class="chip" style="background:rgba(100,116,139,.18);color:#cbd5e1;border-color:rgba(100,116,139,.4);font-size:12px">'+d.p+' 本 PDF</span>';
     html+='</div>';
-    html+='<div style="font-size:13px;color:#475569;line-height:1.65;flex:1">'+esc(d.desc)+'</div>';
+    html+='<div style="font-size:13px;color:var(--ink2);line-height:1.65;flex:1">'+esc(d.desc)+'</div>';
     if(d.topics&&d.topics.length){
       html+='<div style="display:flex;flex-wrap:wrap;gap:4px">';
       d.topics.forEach(function(t){
-        html+='<span class="chip" style="font-size:11px;background:#f1f5f9;color:#475569;border-color:#e2e8f0">'+esc(t)+'</span>';
+        html+='<span class="chip" style="font-size:11px;background:var(--line);color:var(--ink2);border-color:var(--line2)">'+esc(t)+'</span>';
       });
       html+='</div>';
     }
@@ -11648,13 +11663,13 @@ function hRenderAdminCards(){
   keys.forEach(function(k){
     var pan=H_CAT_PANS[k]||{url:'#',color:'#64748b'};
     var desc=H_CAT_DESC[k]||{cn:'',yr:'',e:0,p:0,desc:'',topics:[]};
-    html+='<div style="border:1px solid var(--border);border-radius:12px;background:#fff;padding:16px">';
+    html+='<div style="border:1px solid var(--border);border-radius:12px;background:var(--bg-card);padding:16px">';
     html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px">';
     html+='<div><div style="font-weight:700;font-size:14.5px;color:var(--ink)">'+esc(k)+'</div>';
     html+='<div style="font-size:12px;color:'+pan.color+';margin-top:1px">'+esc(desc.cn)+' · '+esc(desc.yr)+'</div></div>';
     html+='<span class="chip" style="font-size:11px;background:'+pan.color+'12;color:'+pan.color+'">'+(desc.e||0)+' 张</span>';
     html+='</div>';
-    html+='<div style="font-size:12.5px;color:#475569;line-height:1.6;margin-bottom:10px">'+esc(desc.desc)+'</div>';
+    html+='<div style="font-size:12.5px;color:var(--ink2);line-height:1.6;margin-bottom:10px">'+esc(desc.desc)+'</div>';
     html+='<label style="font-size:12px;color:var(--muted)">百度网盘分享链接<input class="input" id="h-admin-url-'+k+'" value="'+esc(pan.url)+'" placeholder="https://pan.baidu.com/s/xxxxx" style="margin-top:4px"></label>';
     html+='</div>';
   });
@@ -11849,8 +11864,8 @@ function hDoSearch(){
         r.pScores.slice(0,10).forEach(function(x){
           var hit=q?x.s>0:true;
           var badge=x.p.type==='目录'?'':(x.p.type==='扫描版'?'':'');
-          html+='<div style="display:flex;align-items:flex-start;gap:6px;padding:4px 8px;border-radius:6px;background:'+(hit&&q?'rgba(22,163,174,.08)':'rgba(250,250,250,1)')+'">';
-          html+='<span>'+badge+'</span><span style="flex:1;font-size:13px;'+(hit&&q?'color:#0e7490;font-weight:500':'')+'">'+esc(x.p.type)+' · '+esc(x.p.fname)+(q&&hit?' <span class="chip ok" style="font-size:11px">匹配</span>':'')+'</span>';
+          html+='<div style="display:flex;align-items:flex-start;gap:6px;padding:4px 8px;border-radius:6px;background:'+(hit&&q?'rgba(6,182,212,.12)':'var(--bg-elev)')+'">';
+          html+='<span>'+badge+'</span><span style="flex:1;font-size:13px;'+(hit&&q?'color:#67e8f9;font-weight:500':'')+'">'+esc(x.p.type)+' · '+esc(x.p.fname)+(q&&hit?' <span class="chip ok" style="font-size:11px">匹配</span>':'')+'</span>';
           html+='</div>';
         });
         html+='<div style="font-size:11.5px;color:var(--muted);margin-top:2px">完整 PDF 列表已包含在上方百度网盘整包内。</div>';
@@ -11901,7 +11916,7 @@ function hHighlight(text, toks){
     if(!tt) return;
     try{
       var re=new RegExp('('+tt+')','ig');
-      s=s.replace(re,'<mark style="background:#fef08a;padding:0 2px;border-radius:3px">$1</mark>');
+      s=s.replace(re,'<mark style="background:rgba(250,204,21,.4);color:#facc15;padding:0 2px;border-radius:3px">$1</mark>');
     }catch(e){}
   });
   return s;
@@ -11920,19 +11935,19 @@ function hEmptyWelcomeHTML(){
   html+='<h2 style="margin:0 0 6px;font-size:24px">卫生健康数据智能库</h2>';
   html+='<p style="margin:0;opacity:.94;line-height:1.7;font-size:14.5px">覆盖 <b>'+cats.length+'</b> 大分类 · <b>'+(meta.total_excels||0)+'</b> 张 Excel 表格 · <b>'+(meta.total_pdfs||0)+'</b> 本 PDF 说明文档 · 时间跨度 <b>'+yMin+'—'+yMax+'</b><br>请在上方输入关键词，系统仅返回<strong style="color:#fef08a">与检索相关</strong>的数据集；也可以直接点击下方分类卡片进入对应整包下载。</p>';
   html+='<div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">';
-  html+='<button class="btn sm" onclick="hQuick(\'床位数 病床使用率\')" style="background:#fff;color:#1e40af;border-color:#fff"> 医疗资源（床位/人力）</button>';
-  html+='<button class="btn sm" onclick="hQuick(\'诊疗人次 门诊 住院\')" style="background:#fff;color:#1e40af;border-color:#fff">医疗服务利用</button>';
-  html+='<button class="btn sm" onclick="hQuick(\'卫生总费用 医疗费用\')" style="background:#fff;color:#1e40af;border-color:#fff"> 卫生经费与费用</button>';
-  html+='<button class="btn sm" onclick="hQuick(\'孕产妇死亡率 儿童死亡率\')" style="background:#fff;color:#1e40af;border-color:#fff"> 妇幼与健康结果</button>';
-  html+='<button class="btn sm" onclick="hShowResearchSuggestions()" style="background:#fef08a;color:#92400e;border-color:#fde047;font-weight:600"> 查看研究建议与方法</button>';
+  html+='<button class="btn sm" onclick="hQuick(\'床位数 病床使用率\')" style="background:var(--bg-elev);color:#67e8f9;border-color:rgba(6,182,212,.5)"> 医疗资源（床位/人力）</button>';
+  html+='<button class="btn sm" onclick="hQuick(\'诊疗人次 门诊 住院\')" style="background:var(--bg-elev);color:#67e8f9;border-color:rgba(6,182,212,.5)">医疗服务利用</button>';
+  html+='<button class="btn sm" onclick="hQuick(\'卫生总费用 医疗费用\')" style="background:var(--bg-elev);color:#67e8f9;border-color:rgba(6,182,212,.5)"> 卫生经费与费用</button>';
+  html+='<button class="btn sm" onclick="hQuick(\'孕产妇死亡率 儿童死亡率\')" style="background:var(--bg-elev);color:#67e8f9;border-color:rgba(6,182,212,.5)"> 妇幼与健康结果</button>';
+  html+='<button class="btn sm" onclick="hShowResearchSuggestions()" style="background:rgba(245,158,11,.18);color:#fbbf24;border-color:rgba(245,158,11,.5);font-weight:600"> 查看研究建议与方法</button>';
   html+='</div></div>';
   // 4 类数据卡片（真实统计 + 描述 + 下载）
-  html+='<h3 style="margin:0 0 14px;font-size:17px;color:#1e293b">四类年鉴数据 · 直接下载整包</h3>';
+  html+='<h3 style="margin:0 0 14px;font-size:17px;color:var(--ink)">四类年鉴数据 · 直接下载整包</h3>';
   html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">';
   cats.forEach(function(k){
     var d=H_CAT_DESC[k]||{cn:'',yr:'',e:0,p:0,desc:'',topics:[]};
     var pan=H_CAT_PANS[k]||{url:'#',color:'#64748b'};
-    html+='<div style="border:1px solid var(--border);border-radius:14px;background:#fff;overflow:hidden;display:flex;flex-direction:column">';
+    html+='<div style="border:1px solid var(--border);border-radius:14px;background:var(--bg-card);overflow:hidden;display:flex;flex-direction:column">';
     html+='<div style="padding:14px 18px;background:linear-gradient(135deg,'+pan.color+'15,'+pan.color+'05);border-bottom:1px solid var(--border)">';
     html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">';
     html+='<div><div style="font-weight:700;font-size:15.5px;color:var(--ink)">'+esc(k)+'</div>';
@@ -11944,24 +11959,24 @@ function hEmptyWelcomeHTML(){
     if(d.e>0) html+='<span class="chip" style="background:'+pan.color+'12;color:'+pan.color+';border-color:'+pan.color+'40;font-size:12px">'+d.e+' 张 Excel</span>';
     if(d.p>0) html+='<span class="chip" style="background:#64748b12;color:#64748b;border-color:#64748b40;font-size:12px">'+d.p+' 本 PDF</span>';
     html+='</div>';
-    html+='<div style="font-size:13px;color:#475569;line-height:1.65;flex:1">'+esc(d.desc)+'</div>';
+    html+='<div style="font-size:13px;color:var(--ink2);line-height:1.65;flex:1">'+esc(d.desc)+'</div>';
     html+='<div style="display:flex;flex-wrap:wrap;gap:4px">';
     (d.topics||[]).forEach(function(t){html+='<span class="chip grey" style="font-size:11.5px;padding:2px 8px">'+esc(t)+'</span>';});
     html+='</div>';
     html+='</div>';
-    html+='<div style="padding:12px 18px;border-top:1px solid var(--border);background:#fafafa;display:flex;justify-content:flex-end">';
+    html+='<div style="padding:12px 18px;border-top:1px solid var(--line);background:var(--bg-elev);display:flex;justify-content:flex-end">';
     html+='<a class="btn primary sm" href="'+esc(pan.url)+'" target="_blank" rel="noopener" style="background:'+pan.color+';border-color:'+pan.color+'">百度网盘下载 →</a>';
     html+='</div></div>';
   });
   html+='</div>';
   // 功能区
   html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:20px">';
-  html+='<div style="padding:16px 18px;background:rgba(167,139,250,.08);border:1px solid #c4b5fd;border-radius:12px">';
-  html+='<div style="font-weight:600;margin-bottom:6px;font-size:15px;color:#5b21b6"> 研究建议智能体</div>';
-  html+='<div style="font-size:13px;color:#6d28d9;line-height:1.7">输入关键词后点击【 研究建议】，系统根据匹配到的数据主题自动输出：① 推荐研究设计（Gini/DID/面板/断点回归等）② 方法学参考文献 ③ 变量搭配指南 ④ 可研究问题示例。</div></div>';
-  html+='<div style="padding:16px 18px;background:rgba(14,165,233,.06);border:1px solid #7dd3fc;border-radius:12px">';
-  html+='<div style="font-weight:600;margin-bottom:6px;font-size:15px;color:#075985"> 关键词智能检索</div>';
-  html+='<div style="font-size:13px;color:#0369a1;line-height:1.7">在顶部输入框输入关键词（支持空格分隔多关键词 AND），系统从 7518 张表中返回匹配项，按相关度排序。如未命中，可点击上方快速检索标签试试。</div></div>';
+  html+='<div style="padding:16px 18px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.4);border-radius:12px">';
+  html+='<div style="font-weight:600;margin-bottom:6px;font-size:15px;color:#c4b5fd"> 研究建议智能体</div>';
+  html+='<div style="font-size:13px;color:#ddd6fe;line-height:1.7">输入关键词后点击【 研究建议】，系统根据匹配到的数据主题自动输出：① 推荐研究设计（Gini/DID/面板/断点回归等）② 方法学参考文献 ③ 变量搭配指南 ④ 可研究问题示例。</div></div>';
+  html+='<div style="padding:16px 18px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.4);border-radius:12px">';
+  html+='<div style="font-weight:600;margin-bottom:6px;font-size:15px;color:#67e8f9"> 关键词智能检索</div>';
+  html+='<div style="font-size:13px;color:#a5f3fc;line-height:1.7">在顶部输入框输入关键词（支持空格分隔多关键词 AND），系统从 7518 张表中返回匹配项，按相关度排序。如未命中，可点击上方快速检索标签试试。</div></div>';
   html+='</div></div>';
   return html;
 }
@@ -12089,9 +12104,9 @@ function hFindLiteratureReferences(profile, q){
 }
 function hSuggestionDialogHTML(contentHTML){
   return '<div style="position:fixed;inset:0;background:rgba(15,23,42,.65);z-index:99999;display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto" onclick="if(event.target===this)this.remove()">'+
-         '<div style="width:100%;max-width:920px;background:#fff;border-radius:14px;box-shadow:0 30px 60px rgba(0,0,0,.3)">'+
+         '<div style="width:100%;max-width:920px;background:var(--bg-card);border-radius:14px;box-shadow:0 30px 60px rgba(0,0,0,.3)">'+
          '<div style="padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">'+
-         '<h3 style="margin:0;font-size:18px;color:#1e293b"> 研究建议智能体 · 基于当前检索主题与方法学文献</h3>'+
+         '<h3 style="margin:0;font-size:18px;color:var(--ink)"> 研究建议智能体 · 基于当前检索主题与方法学文献</h3>'+
          '<button class="btn xs" onclick="this.closest(\'[style*=fixed]\').remove()">✕ 关闭</button></div>'+
          '<div style="padding:22px 24px;max-height:75vh;overflow-y:auto;line-height:1.8">'+contentHTML+'</div></div></div>';
 }
@@ -12119,17 +12134,17 @@ function hShowResearchSuggestions(){
   var yRange=(!yr&&yMin!=='-')?(yMin===yMax?yMin:(yMin+' 至 '+yMax)):(yr||'-');
   var html='';
   // Sec 1 数据画像
-  html+='<div style="background:linear-gradient(135deg,#eff6ff,#eef2ff);border-radius:12px;padding:16px 18px;margin-bottom:16px">';
-  html+='<div style="font-weight:600;font-size:15.5px;color:#1e3a8a;margin-bottom:8px">一、当前检索的数据画像</div>';
-  html+='<div style="font-size:14px;color:#1e293b;line-height:1.9">';
+  html+='<div style="background:linear-gradient(135deg,rgba(6,182,212,.1),rgba(124,58,237,.08));border:1px solid rgba(6,182,212,.3);border-radius:12px;padding:16px 18px;margin-bottom:16px">';
+  html+='<div style="font-weight:600;font-size:15.5px;color:#67e8f9;margin-bottom:8px">一、当前检索的数据画像</div>';
+  html+='<div style="font-size:14px;color:var(--ink2);line-height:1.9">';
   if(!q && !yr && !document.getElementById('h-cat').value){
-    html+='未设置关键词或筛选 → 以下为整个卫生健康智能库的<strong>整体数据结构</strong>建议。若输入 <em style="background:#fef08a">具体关键词</em>（如：床位数、孕产妇死亡率、卫生总费用），建议将更具针对性。<hr style="margin:10px 0;border:none;border-top:1px dashed #93c5fd">';
+    html+='未设置关键词或筛选 → 以下为整个卫生健康智能库的<strong>整体数据结构</strong>建议。若输入 <em style="background:rgba(245,158,11,.25);color:#fbbf24;padding:0 4px;border-radius:3px">具体关键词</em>（如：床位数、孕产妇死亡率、卫生总费用），建议将更具针对性。<hr style="margin:10px 0;border:none;border-top:1px dashed rgba(6,182,212,.4)">';
   }
-  html+='<b>关键词：</b>'+(q?('<span style="background:#fef08a;padding:1px 6px;border-radius:3px">'+esc(q)+'</span>'):'<em style="color:#64748b">（未设置）</em>')+'<br>';
-  html+='<b>数据分类：</b>'+(catList.length?catList.map(function(c){return '<span class="chip teal">'+esc(c)+'</span>';}).join(' '):'<em style="color:#64748b">全部</em>')+' &nbsp;&nbsp; <b>时间跨度：</b><span class="chip ok">'+yRange+'年</span><br>';
+  html+='<b>关键词：</b>'+(q?('<span style="background:rgba(245,158,11,.25);color:#fbbf24;padding:1px 6px;border-radius:3px">'+esc(q)+'</span>'):'<em style="color:var(--muted)">（未设置）</em>')+'<br>';
+  html+='<b>数据分类：</b>'+(catList.length?catList.map(function(c){return '<span class="chip teal">'+esc(c)+'</span>';}).join(' '):'<em style="color:var(--muted)">全部</em>')+' &nbsp;&nbsp; <b>时间跨度：</b><span class="chip ok">'+yRange+'年</span><br>';
   html+='<b>覆盖年份组：</b>'+groups2.length+' 组 &nbsp; <b>预计表格数：</b>'+groups2.reduce(function(s,g){return s+((g.excels||[]).filter(function(e){var tb=(e.title||'').toLowerCase();return !q||toks.every(function(t){return tb.indexOf(t)>=0;});}).length);},0)+' 张 &nbsp; <b>PDF：</b>'+groups2.reduce(function(s,g){return s+(g.pdf_count||0);},0)+' 本<br>';
   if(topTitles.length){
-    html+='<b>代表性核心表格标题：</b><div style="margin-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;font-size:13px;color:#334155">';
+    html+='<b>代表性核心表格标题：</b><div style="margin-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;font-size:13px;color:var(--ink2)">';
     topTitles.forEach(function(t){html+='<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">• '+esc(t)+'</div>';});
     html+='</div>';
   }
@@ -12139,29 +12154,29 @@ function hShowResearchSuggestions(){
   var topProfiles = ranked.filter(function(r){return r.s>0;}).slice(0,3);
   if(!topProfiles.length) topProfiles = ranked.slice(0,2);
   html+='<div style="margin-bottom:16px">';
-  html+='<div style="font-weight:600;font-size:15.5px;color:#5b21b6;margin-bottom:10px"> 二、推荐研究设计（'+topProfiles.length+' 个匹配主题）</div>';
+  html+='<div style="font-weight:600;font-size:15.5px;color:#c4b5fd;margin-bottom:10px"> 二、推荐研究设计（'+topProfiles.length+' 个匹配主题）</div>';
   topProfiles.forEach(function(r,ri){
     var p=r.p;
-    html+='<div style="border:1px solid #e0e7ff;border-radius:12px;padding:14px 16px;margin-bottom:10px;background:#fff">';
+    html+='<div style="border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;background:var(--bg-card)">';
     html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">';
     html+='<span style="background:linear-gradient(135deg,#8b5cf6,#4f46e5);color:#fff;padding:4px 10px;border-radius:20px;font-size:12.5px;font-weight:600">'+p.topic+'</span>';
     if(r.s>0) html+='<span class="chip grey">匹配分 '+r.s+'</span>';
     html+='</div>';
-    html+='<ol style="margin:0 0 8px 22px;padding:0;color:#1e293b;font-size:14px;line-height:1.9">';
+    html+='<ol style="margin:0 0 8px 22px;padding:0;color:var(--ink2);font-size:14px;line-height:1.9">';
     p.designs.forEach(function(d){
-      html+='<li><b>'+esc(d.n)+'</b>：<span style="color:#475569">'+esc(d.m)+'</span></li>';
+      html+='<li><b>'+esc(d.n)+'</b>：<span style="color:var(--muted)">'+esc(d.m)+'</span></li>';
     });
     html+='</ol>';
-    html+='<div style="background:#f8fafc;padding:8px 12px;border-radius:8px;font-size:13px;line-height:1.8;border-left:3px solid #6366f1"><b> 变量搭配建议：</b><br>';
-    html+='<b style="color:#047857">Y（被解释变量）：</b>'+esc(p.vars.y)+'<br>';
-    html+='<b style="color:#1d4ed8">X（核心解释）：</b>'+esc(p.vars.x)+'<br>';
-    html+='<b style="color:#78350f">Ctrl（控制变量）：</b>'+esc(p.vars.ctrl)+'</div>';
+    html+='<div style="background:var(--bg-elev);padding:8px 12px;border-radius:8px;font-size:13px;line-height:1.8;border-left:3px solid #8b5cf6"><b> 变量搭配建议：</b><br>';
+    html+='<b style="color:#6ee7b7">Y（被解释变量）：</b>'+esc(p.vars.y)+'<br>';
+    html+='<b style="color:#67e8f9">X（核心解释）：</b>'+esc(p.vars.x)+'<br>';
+    html+='<b style="color:#fbbf24">Ctrl（控制变量）：</b>'+esc(p.vars.ctrl)+'</div>';
     html+='</div>';
   });
   html+='</div>';
   // Sec 3 方法学参考文献
   html+='<div style="margin-bottom:16px">';
-  html+='<div style="font-weight:600;font-size:15.5px;color:#0e7490;margin-bottom:10px"> 三、相关方法学 / 主题参考文献（从平台文献库检索）</div>';
+  html+='<div style="font-weight:600;font-size:15.5px;color:#67e8f9;margin-bottom:10px"> 三、相关方法学 / 主题参考文献（从平台文献库检索）</div>';
   var refs=[];
   topProfiles.forEach(function(r){refs=refs.concat(hFindLiteratureReferences(r, q));});
   // 去重
@@ -12169,18 +12184,18 @@ function hShowResearchSuggestions(){
   if(!refs.length){
     html+='<div class="empty-tip">当前主题未在文献库中检索到高匹配条目。建议先在【文献/数据集检索】Tab搜索相关方法论文献。</div>';
   } else {
-    html+='<div style="font-size:13.5px;color:#0f172a;line-height:1.9">';
+    html+='<div style="font-size:13.5px;color:var(--ink2);line-height:1.9">';
     refs.forEach(function(r,i){
       var p=r.p; var link=p.url||(p.doi?'https://doi.org/'+p.doi:(p.pmid?'https://pubmed.ncbi.nlm.nih.gov/'+p.pmid+'/':'#'));
-      html+='<div style="border:1px solid #a5f3fc;border-radius:8px;padding:8px 12px;margin-bottom:6px;background:#ecfeff">';
-      html+='<div style="font-weight:500"><a href="'+esc(link)+'" target="_blank" rel="noopener" style="color:#0e7490;text-decoration:none">['+(i+1)+'] '+esc(p.title||'(无标题)')+'</a></div>';
+      html+='<div style="border:1px solid rgba(6,182,212,.35);border-radius:8px;padding:8px 12px;margin-bottom:6px;background:rgba(6,182,212,.06)">';
+      html+='<div style="font-weight:500"><a href="'+esc(link)+'" target="_blank" rel="noopener" style="color:#67e8f9;text-decoration:none">['+(i+1)+'] '+esc(p.title||'(无标题)')+'</a></div>';
       var meta=[p.authors&&p.authors[0]?esc(p.authors[0])+' 等':''];
       if(p.journal) meta.push('<em>'+esc(p.journal)+'</em>');
       if(p.year) meta.push(p.year);
       if(p.doi) meta.push('DOI:'+esc(p.doi));
       if(p.pmid) meta.push('PMID:'+esc(p.pmid));
-      html+='<div style="color:#475569;font-size:12.5px">'+meta.join(' · ')+' <span class="chip grey">相关分 '+r.s+'</span></div>';
-      if(p.abstract) html+='<div style="color:#475569;font-size:12.5px;margin-top:4px;line-height:1.7">'+esc((p.abstract||'').slice(0,260))+'…</div>';
+      html+='<div style="color:var(--ink2);font-size:12.5px">'+meta.join(' · ')+' <span class="chip grey">相关分 '+r.s+'</span></div>';
+      if(p.abstract) html+='<div style="color:var(--muted);font-size:12.5px;margin-top:4px;line-height:1.7">'+esc((p.abstract||'').slice(0,260))+'…</div>';
       html+='</div>';
     });
     html+='</div>';
@@ -12192,8 +12207,8 @@ function hShowResearchSuggestions(){
   qs=qs.slice(0,5);
   if(qs.length){
     html+='<div>';
-    html+='<div style="font-weight:600;font-size:15.5px;color:#be185d;margin-bottom:10px"> 四、可研究问题示例（5条）</div>';
-    html+='<ol style="margin:0 0 0 22px;padding:0;color:#1e293b;font-size:14px;line-height:2">';
+    html+='<div style="font-weight:600;font-size:15.5px;color:#f9a8d4;margin-bottom:10px"> 四、可研究问题示例（5条）</div>';
+    html+='<ol style="margin:0 0 0 22px;padding:0;color:var(--ink2);font-size:14px;line-height:2">';
     qs.forEach(function(q_){html+='<li>'+esc(q_)+'</li>';});
     html+='</ol></div>';
   }
@@ -12338,9 +12353,9 @@ async function hGhLoadManifest(){
       if(firstRel){
         try{
           await hGhTestDecrypt(firstRel, pwd);
-          statusHtml+='&nbsp;&nbsp;<b style="color:#065f46">密码校验通过！（decrypt auth tag OK）</b><br>';
+          statusHtml+='&nbsp;&nbsp;<b style="color:#6ee7b7">密码校验通过！（decrypt auth tag OK）</b><br>';
         }catch(err){
-          statusHtml+='&nbsp;&nbsp;<b style="color:#991b1b">密码校验失败：'+esc(err.message)+'</b>（请检查与 step2 设置的密码一致）<br>';
+          statusHtml+='&nbsp;&nbsp;<b style="color:#fca5a5">密码校验失败：'+esc(err.message)+'</b>（请检查与 step2 设置的密码一致）<br>';
         }
       }
     } else {
@@ -13361,7 +13376,7 @@ document.getElementById('lit-modal-bg').addEventListener('click',function(e){if(
       const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
 <head><meta charset="utf-8"><title>Review</title>
 <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
-<style>body{font-family:"Calibri","Microsoft YaHei",sans-serif;line-height:1.7}h1{font-size:22px;color:#0e7490}h2{font-size:17px;color:#0c4a6e;border-bottom:1px solid #cbd5e1;padding-bottom:3px}blockquote{border-left:3px solid #93c5fd;padding:4px 10px;color:#1e3a8a;background:#eff6ff}table{border-collapse:collapse}th,td{border:1px solid #cbd5e1;padding:4px 8px}code{background:#f1f5f9;padding:1px 5px;border-radius:3px}</style>
+<style>body{font-family:"Calibri","Microsoft YaHei",sans-serif;line-height:1.7}h1{font-size:22px;color:#0e7490}h2{font-size:17px;color:#0c4a6e;border-bottom:1px solid #cbd5e1;padding-bottom:3px}blockquote{border-left:3px solid #93c5fd;padding:4px 10px;color:#1e3a8a;background:rgba(124,58,237,.12)}table{border-collapse:collapse}th,td{border:1px solid #cbd5e1;padding:4px 8px}code{background:var(--line);padding:1px 5px;border-radius:3px}</style>
 </head><body>${mdToSimpleHTML(md)}</body></html>`;
       download('系统综述_'+(state.topicSummary||'review').slice(0,24).replace(/[\/\\\s*?"'<>|]/g,'_')+'.doc',
         'application/msword', '\ufeff'+html);
