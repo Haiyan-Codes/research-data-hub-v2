@@ -4502,44 +4502,31 @@ select{cursor:pointer}
   <!-- 图片新闻轮播 -->
   <div class="news-carousel" id="news-carousel" style="position:relative;border-radius:14px;overflow:hidden;height:240px;margin-bottom:20px;margin-top:24px;box-shadow:0 4px 24px rgba(0,0,0,.3)">
     <div class="news-slides" id="news-slides" style="display:flex;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1)">
-      <!-- Slide 1 -->
-      <div class="news-slide" data-idx="0" style="flex:0 0 100%;height:100%;position:relative;cursor:pointer" onclick="go('search')">
-        <img src="assets/news-brain-research.jpg" alt="NIMH 心理健康研究数据共享计划" style="width:100%;height:100%;object-fit:cover;display:block">
+      <!-- Slide 1：公开数据集 -->
+      <div class="news-slide" data-idx="0" style="flex:0 0 100%;height:100%;position:relative">
+        <img src="assets/news-open-data.jpg" alt="公开数据集" style="width:100%;height:100%;object-fit:cover;display:block">
         <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,15,19,.85) 0%,rgba(15,15,19,.5) 45%,rgba(15,15,19,.1) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px 32px">
-          <span style="display:inline-block;background:rgba(124,58,237,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">NIH · 数据政策</span>
-          <h3 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;max-width:70%;line-height:1.3">NIMH 发布 2026 年心理健康研究数据共享计划</h3>
-          <p style="font-size:13px;color:rgba(255,255,255,.8);margin:0;max-width:60%">涵盖多站点纵向脑成像、社区人群调查与电子病历整合数据的开放获取路线图</p>
-          <span style="font-size:11.5px;color:rgba(255,255,255,.5);margin-top:8px">2026-08-15</span>
+          <span style="display:inline-block;background:rgba(6,182,212,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">公开数据集</span>
+          <h3 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;max-width:70%;line-height:1.3">54+ 精选心理健康开放数据集</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,.8);margin:0;max-width:60%">覆盖 WHO Atlas、GBD 全球疾病负担、WMH 世界精神健康调查、UK Biobank 等国际权威数据源，含脑科学、调查队列、政策监测等分类，支持关键词检索与一键跳转原始页面。</p>
         </div>
       </div>
-      <!-- Slide 2 -->
-      <div class="news-slide" data-idx="1" style="flex:0 0 100%;height:100%;position:relative;cursor:pointer" onclick="go('datasets')">
-        <img src="assets/news-global-data.jpg" alt="中国卫生统计年鉴 2026" style="width:100%;height:100%;object-fit:cover;display:block">
+      <!-- Slide 2：私有数据集 -->
+      <div class="news-slide" data-idx="1" style="flex:0 0 100%;height:100%;position:relative">
+        <img src="assets/news-global-data.jpg" alt="私有数据集" style="width:100%;height:100%;object-fit:cover;display:block">
         <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,15,19,.85) 0%,rgba(15,15,19,.5) 45%,rgba(15,15,19,.1) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px 32px">
-          <span style="display:inline-block;background:rgba(16,185,129,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">CDC · 数据开放</span>
-          <h3 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;max-width:70%;line-height:1.3">中国卫生统计年鉴 2026 版公开精神卫生指标</h3>
-          <p style="font-size:13px;color:rgba(255,255,255,.8);margin:0;max-width:60%">省级层面患病率、门诊人次、病床使用率等核心指标可在线下载 CSV</p>
-          <span style="font-size:11.5px;color:rgba(255,255,255,.5);margin-top:8px">2026-08-05</span>
+          <span style="display:inline-block;background:rgba(16,185,129,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">私有数据集</span>
+          <h3 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;max-width:70%;line-height:1.3">7518 张中国卫生健康统计年鉴数据表</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,.8);margin:0;max-width:60%">整合教育经费、卫生计生、卫生健康 4 大类年鉴（2003—2023），Excel 表格 + PDF 说明文档百度网盘整包下载，支持关键词智能检索与研究建议自动生成。</p>
         </div>
       </div>
-      <!-- Slide 3 -->
-      <div class="news-slide" data-idx="2" style="flex:0 0 100%;height:100%;position:relative;cursor:pointer" onclick="go('agent')">
-        <img src="assets/news-ai-review.jpg" alt="研究智能体 STORM 上线" style="width:100%;height:100%;object-fit:cover;display:block">
+      <!-- Slide 3：研究智能体 -->
+      <div class="news-slide" data-idx="2" style="flex:0 0 100%;height:100%;position:relative">
+        <img src="assets/news-ai-review.jpg" alt="研究智能体" style="width:100%;height:100%;object-fit:cover;display:block">
         <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,15,19,.85) 0%,rgba(15,15,19,.5) 45%,rgba(15,15,19,.1) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px 32px">
-          <span style="display:inline-block;background:rgba(139,92,246,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">AI · 新功能</span>
-          <h3 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;max-width:70%;line-height:1.3">研究智能体 STORM 上线，一键生成 8 章系统综述</h3>
-          <p style="font-size:13px;color:rgba(255,255,255,.8);margin:0;max-width:60%">多轮对话 → 真实文献检索 → 自动生成中文系统综述，基于 Qwen2.5-32B 驱动</p>
-          <span style="font-size:11.5px;color:rgba(255,255,255,.5);margin-top:8px">2026-09-01</span>
-        </div>
-      </div>
-      <!-- Slide 4 -->
-      <div class="news-slide" data-idx="3" style="flex:0 0 100%;height:100%;position:relative;cursor:pointer" onclick="go('datasets')">
-        <img src="assets/news-open-data.jpg" alt="re3data 新增开放数据集" style="width:100%;height:100%;object-fit:cover;display:block">
-        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,15,19,.85) 0%,rgba(15,15,19,.5) 45%,rgba(15,15,19,.1) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px 32px">
-          <span style="display:inline-block;background:rgba(6,182,212,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">re3data · 数据集</span>
-          <h3 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;max-width:70%;line-height:1.3">心理健康领域新增 23 个可开放获取数据集</h3>
-          <p style="font-size:13px;color:rgba(255,255,255,.8);margin:0;max-width:60%">覆盖老年认知、儿童行为、社区干预等方向，re3data 搜索 mental health 可定位</p>
-          <span style="font-size:11.5px;color:rgba(255,255,255,.5);margin-top:8px">2026-07-22</span>
+          <span style="display:inline-block;background:rgba(139,92,246,.9);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:999px;width:fit-content;margin-bottom:8px">研究智能体</span>
+          <h3 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 6px;max-width:70%;line-height:1.3">STORM 多轮对话式系统综述生成</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,.8);margin:0;max-width:60%">输入研究主题，智能体自动检索真实文献、多轮对话澄清问题，基于 Qwen2.5-32B 生成 8 章中文系统综述，含方法学分析、知识图谱与参考文献，支持在线精修。</p>
         </div>
       </div>
     </div>
