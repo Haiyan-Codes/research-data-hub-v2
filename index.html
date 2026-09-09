@@ -4435,9 +4435,9 @@ section.page.active{display:block;opacity:1}
   <div class="brand"><div class="brand-mark">RH</div><span>Research&nbsp;Data&nbsp;Hub <span style="color:var(--muted);font-weight:400;font-size:12.5px;margin-left:4px">科研数据平台</span></span></div>
   <div class="nav-tabs" id="nav-tabs">
     <button data-p="home" class="active"> 首页</button>
-    <button data-p="search" class="">文献/数据集检索</button>
-    <button data-p="agent" class="">研究助手</button>
-    <button data-p="datasets">数据集</button>
+    <button data-p="search" class="">文献检索</button>
+    <button data-p="agent" class="">研究智能体</button>
+    <button data-p="datasets">数据集收录与检索</button>
     <button data-p="library">⭐ 我的收藏</button>
     <button data-p="about">ℹ 关于</button>
   </div>
@@ -4450,15 +4450,15 @@ section.page.active{display:block;opacity:1}
 <section id="p-home" class="page active">
   <div class="hero">
     <h1>心理健康相关科研平台</h1>
-    <p class="sub">文献检索 · 研究助手 · 公开与私有数据集，一站式服务心理健康科研。</p>
+    <p class="sub">文献检索 · 研究智能体 · 数据集收录与检索，一站式服务心理健康科研。</p>
     <div class="hero-meta">
-      <span> 文献数据源：<b>PubMed · Crossref · Semantic Scholar</b></span>
+      <span> 文献数据源：<b>PubMed · Crossref · Semantic Scholar</b></span><span> 数据集：<b>Zenodo · WHO · GBD</b></span>
       <span> 最近检索：<b id="home-lastupdate">暂无</b></span>
     </div>
     <div class="actions">
-      <button class="btn primary" onclick="go('search')">文献 / 数据集检索</button>
-      <button class="btn teal" onclick="go('agent')">研究助手</button>
-      <button class="btn" onclick="go('datasets')">数据集（公开 + 私有）</button>
+      <button class="btn primary" onclick="go('search')">文献检索</button>
+      <button class="btn teal" onclick="go('agent')">研究智能体</button>
+      <button class="btn" onclick="go('datasets')">数据集收录与检索</button>
     </div>
   </div>
 
@@ -4491,12 +4491,11 @@ section.page.active{display:block;opacity:1}
 
 <!-- ============ PAGE 2: SEARCH ============ -->
 <section id="p-search" class="page">
-  <div class="page-title"><h2>文献 / 数据集 检索</h2><div class="meta">PubMed · Crossref · Semantic Scholar · Zenodo</div></div>
+  <div class="page-title"><h2>文献检索</h2><div class="meta">PubMed · Crossref · Semantic Scholar</div></div>
 
   <div class="toolbar">
     <input class="input wide" id="q" placeholder="输入关键词，例如：depression cognitive decline cohort study / mental health survey / 心理健康 纵向研究">
     <select id="q-year"><option value="">所有年份</option><option value="2026">近 1 年</option><option value="2023">近 3 年</option><option value="2019">近 5 年</option><option value="2014">近 10 年</option></select>
-    <select id="q-type"><option value="all">文献 + 数据集</option><option value="paper">仅文献</option><option value="dataset">仅数据集</option></select>
     <select id="q-sort"><option value="rel">按相关性</option><option value="date">按时间降序</option><option value="cite">按引用数</option></select>
     <button class="btn primary" onclick="doSearch()"> 一键检索真实数据</button>
   </div>
@@ -4506,7 +4505,6 @@ section.page.active{display:block;opacity:1}
     <span class="chip grey" id="s-pubmed">PubMed (文献)</span>
     <span class="chip grey" id="s-crossref">Crossref (文献)</span>
     <span class="chip grey" id="s-s2">S2 (文献)</span>
-    <span class="chip grey" id="s-zenodo">Zenodo (数据集)</span>
     <span id="s-result-count" style="margin-left:auto;color:var(--ink2);font-size:13px"></span>
     <button class="btn sm" onclick="saveAllResults()" id="btn-saveall" disabled="">⭐ 收藏本页结果</button>
     <button class="btn sm" onclick="exportSavedToCsv()" id="btn-export" disabled="">导出收藏 CSV</button>
@@ -4613,7 +4611,7 @@ else:
 
 <!-- ============ PAGE: AGENT ============ -->
 <section id="p-agent" class="page">
-  <div class="page-title"><h2>研究助手</h2><div class="meta">经典模式：关键词驱动爬取分析；🤖 STORM 模式：多轮对话 → 真实文献检索 → 自动写出 8 章综述</div></div>
+  <div class="page-title"><h2>研究智能体</h2><div class="meta">经典模式：关键词驱动爬取分析；🤖 STORM 模式：多轮对话 → 真实文献检索 → 自动写出 8 章综述</div></div>
 
   <!-- STORM / 经典 二级 Tab -->
   <div class="st-subtabs" id="st-subtabs">
@@ -4869,17 +4867,36 @@ else:
   <div id="lib-list"></div>
 </section>
 
-<!-- ============ PAGE DATASETS: 数据集（公开 + 私有） ============ -->
+<!-- ============ PAGE DATASETS: 数据集收录与检索 ============ -->
 <section id="p-datasets" class="page">
-  <div class="page-title"><h2>数据集</h2><div class="meta">公开数据集 · 私有数据集</div></div>
-  <div id="ds-tabs" style="display:flex;gap:6px;margin-bottom:16px">
-    <button class="btn sm primary ds-tab-btn active" onclick="dsSwitchTab('public')">公开数据集</button>
-    <button class="btn sm ds-tab-btn" onclick="dsSwitchTab('private')">私有数据集</button>
+  <div class="page-title"><h2>数据集收录与检索</h2><div class="meta">Zenodo 数据集检索 · 公开数据集 · 私有数据集</div></div>
+
+  <!-- 模块1：Zenodo 数据集检索框 -->
+  <div style="border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:24px;background:var(--card-bg)">
+    <h3 style="margin:0 0 8px"> 数据集检索（Zenodo 开放获取）</h3>
+    <div class="toolbar">
+      <input class="input wide" id="ds-q" placeholder="输入关键词，例如：depression survey / mental health cohort / 心理健康">
+      <select id="ds-year"><option value="">所有年份</option><option value="2026">近 1 年</option><option value="2023">近 3 年</option><option value="2019">近 5 年</option><option value="2014">近 10 年</option></select>
+      <button class="btn primary" onclick="dsSearch()"> 检索数据集</button>
+    </div>
+    <div id="ds-search-status" class="empty-tip" style="margin-top:8px">
+       输入关键词后点击「检索数据集」，从 Zenodo 开放获取平台搜索心理健康相关数据集。
+    </div>
+    <div id="ds-search-results" class="result-list" style="display:none;margin-top:8px"></div>
+    <div id="ds-search-pager" class="pager" style="display:none;margin-top:8px"></div>
   </div>
-  <!-- 公开数据集子tab：JS 在 init 时把首页的 dset-tabs/dset-grid/dset-pager 搬到这里 -->
-  <div id="ds-tab-public"></div>
-  <!-- 私有数据集子tab：JS 在 init 时把原 p-health 的内容搬到这里（作为第一模块） -->
-  <div id="ds-tab-private" style="display:none"></div>
+
+  <!-- 模块2：公开数据集（JS 在 init 时把首页的 dset-tabs/dset-grid/dset-pager 搬到这里） -->
+  <div id="ds-public-section">
+    <h3 style="margin:0 0 12px"> 公开数据集</h3>
+    <div id="ds-tab-public"></div>
+  </div>
+
+  <!-- 模块3：私有数据集（JS 在 init 时把原 p-health 的内容搬到这里） -->
+  <div id="ds-private-section" style="margin-top:32px">
+    <h3 style="margin:0 0 12px"> 私有数据集</h3>
+    <div id="ds-tab-private"></div>
+  </div>
 </section>
 
 <!-- ============ PAGE HEALTH: 卫生健康数据智能库 ============ -->
@@ -4935,9 +4952,9 @@ else:
     <h3>Research Data Hub · 科研数据平台</h3>
     <p>为心理健康及相关研究领域的科研人员设计：一站式检索三大公开学术 API（PubMed / Crossref / Semantic Scholar），获取文献与数据集信息。</p>
 
-    <h3 style="margin-top:24px">研究助手</h3>
+    <h3 style="margin-top:24px">研究智能体</h3>
     <ul>
-      <li><b>关键词驱动检索</b>：PubMed / Crossref / Semantic Scholar 三源文献爬取 + Zenodo 数据集，按 DOI/PMID/标题去重。</li>
+      <li><b>关键词驱动检索</b>：PubMed / Crossref / Semantic Scholar 三源文献爬取，按 DOI/PMID/标题去重。</li>
       <li><b>结构化中文研究摘要</b>：从标题、摘要自动提取研究对象、方法学、样本量、核心发现四要素。</li>
       <li><b>文献计量分析</b>：年份分布、高产作者、核心期刊、高频关键词、高被引 Top 10 可视化。</li>
       <li><b>研究洞察</b>：主题聚类（基于关键词相似度）、引用脉络时间线、研究空白识别、推荐下一步研究方向。</li>
@@ -4945,19 +4962,19 @@ else:
       <li><b>可下载报告</b>：一键生成 Markdown 综合报告，包含全部文献与数据集。</li>
     </ul>
 
-    <h3 style="margin-top:24px">数据集</h3>
+    <h3 style="margin-top:24px">数据集收录与检索</h3>
     <ul>
+      <li><b>Zenodo 数据集检索</b>：从 CERN Zenodo 开放获取平台检索心理健康相关数据集，按 DOI/record id 去重。</li>
       <li><b>公开数据集</b>：WHO / GBD / OWID 等国际心理健康公开数据集，按分类浏览，可查看详细元数据。</li>
       <li><b>私有数据集</b>：含卫生健康数据智能库（4 大类年鉴），百度网盘整包下载，支持五级链接回退。</li>
     </ul>
 
-    <h3 style="margin-top:24px">文献与数据检索</h3>
+    <h3 style="margin-top:24px">文献检索</h3>
     <ul>
       <li><b>PubMed E-utilities (NCBI)</b>：文献元数据，返回 PMID、标题、作者、期刊、年份。<a href="https://www.ncbi.nlm.nih.gov/books/NBK25499/" target="_blank">官方文档</a></li>
       <li><b>Crossref API</b>：DOI 注册中心，返回 DOI、被引数、全文链接。<a href="https://api.crossref.org/" target="_blank">官方文档</a></li>
       <li><b>Semantic Scholar API</b>：学术元数据，返回引用计数、TLDR。<a href="https://api.semanticscholar.org/api-docs/" target="_blank">官方文档</a></li>
-      <li><b>Zenodo API (CERN)</b>：开放存储数据集，按 record id / DOI 可溯源到原始上传者、文件、许可证。<a href="https://developers.zenodo.org/" target="_blank">官方文档</a></li>
-      <li>合并策略：按 DOI / PMID / Zenodo record id / 精确标题去重；去重前后条数均显示。</li>
+      <li>合并策略：按 DOI / PMID / 精确标题去重；去重前后条数均显示。</li>
     </ul>
 
     <h3 style="margin-top:24px">隐私说明</h3>
@@ -5050,7 +5067,7 @@ document.getElementById('nav-tabs').addEventListener('click',function(e){
   if(e.target.dataset.p) go(e.target.dataset.p);
 });
 
-/* ========= DATASETS PAGE: 公开 + 私有 子tab 合并 ========= */
+/* ========= DATASETS PAGE: 3 个垂直模块（检索框→公开数据集→私有数据集） ========= */
 function initDatasetsTab(){
   if(window._dsInited) return;
   window._dsInited = true;
@@ -5083,25 +5100,77 @@ function initDatasetsTab(){
     // 删除空的 p-health section 标签（避免 go('health') 找到空壳）
     if(healthSec.parentNode) healthSec.parentNode.removeChild(healthSec);
   }
-
-  // 3. 默认显示「公开数据集」子tab
-  dsSwitchTab('public');
+  // 三个模块垂直排列，全部可见，无需子tab 切换
 }
 
-function dsSwitchTab(t){
-  var pubEl = document.getElementById('ds-tab-public');
-  var privEl = document.getElementById('ds-tab-private');
-  if(pubEl) pubEl.style.display = (t==='public') ? '' : 'none';
-  if(privEl) privEl.style.display = (t==='private') ? '' : 'none';
-  // 切换按钮高亮
-  document.querySelectorAll('.ds-tab-btn').forEach(function(b){
-    var isPublic = (b.textContent.indexOf('公开') >= 0);
-    var isActive = (t==='public' && isPublic) || (t==='private' && !isPublic);
-    b.classList.toggle('primary', isActive);
+/* ========= DATASETS: Zenodo 数据集独立检索 ========= */
+var DS_RESULTS=[], DS_PAGE=0, DS_PERPAGE=8;
+async function dsSearch(){
+  var q=document.getElementById('ds-q').value.trim();
+  if(!q){ alert('请先输入关键词');return; }
+  var yMin=document.getElementById('ds-year').value;
+  var elSt=document.getElementById('ds-search-status');
+  var elRe=document.getElementById('ds-search-results');
+  var elPg=document.getElementById('ds-search-pager');
+  DS_RESULTS=[]; DS_PAGE=0;
+  elRe.style.display='none';elPg.style.display='none';
+  elSt.className='empty-tip'; elSt.innerHTML=' 正在从 Zenodo 检索数据集…<br><small style="color:var(--muted)">Zenodo Open Access</small>';
+
+  try{
+    var z=await fetchZenodo(q,yMin);
+    DS_RESULTS=z;
+    if(DS_RESULTS.length===0){
+      elSt.className='empty-tip'; elSt.innerHTML=' 未检索到数据集。请尝试更换关键词。<br><small style="color:var(--muted)">提示：使用英文关键词通常命中更多结果。</small>';
+    }else{
+      elSt.style.display='none'; elRe.style.display='flex';
+      dsRenderResults();
+    }
+  }catch(e){
+    elSt.className='empty-tip'; elSt.innerHTML=' 检索出错：'+e.message;
+    console.error('Zenodo dsSearch',e);
+  }
+}
+
+function dsRenderResults(){
+  var elRe=document.getElementById('ds-search-results');
+  var elPg=document.getElementById('ds-search-pager');
+  elRe.innerHTML='';
+  var start=DS_PAGE*DS_PERPAGE;
+  var slice=DS_RESULTS.slice(start,start+DS_PERPAGE);
+  slice.forEach(function(r){
+    var card=document.createElement('div');
+    card.className='result-card';
+    var authors=(r.authors||'').toString();
+    var tags='';
+    if(r.year) tags+='<span class="tag">'+r.year+'年</span> ';
+    if(r.type) tags+='<span class="tag">'+r.type+'</span> ';
+    tags+='<span class="tag" style="background:#e8f5e9">数据集</span>';
+    if(r.rid) tags+='<span class="tag">Zenodo:'+r.rid+'</span>';
+    card.innerHTML='<div class="rc-title"><a href="'+(r.url||'#')+'" target="_blank">'+(r.title||'无标题')+'</a></div>'
+      +'<div class="rc-authors">'+authors+'</div>'
+      +'<div class="rc-journal">'+(r.journal||'Zenodo')+'</div>'
+      +(r.doi?'<div class="rc-doi">doi: '+r.doi+'</div>':'')
+      +'<div class="rc-tags">'+tags+'</div>'
+      +'<div class="rc-actions">'
+      +'<button class="btn sm" onclick="saveResult('+JSON.stringify(JSON.stringify(r))+')">⭐ 收藏</button>'
+      +'<a class="btn sm" href="'+(r.url||'#')+'" target="_blank">↗ 原始页面</a>'
+      +'</div>';
+    elRe.appendChild(card);
   });
-  // 进入私有数据集子tab 时，初始化 health 子模块（hSwitchTab 等需要）
-  if(t==='private' && typeof hSwitchTab === 'function' && !window._hInitedInDatasets){
-    // health 内容已搬入，无需额外初始化；hSwitchTab('search') 会在点击时自动调用
+
+  // 分页器
+  var total=DS_RESULTS.length, pages=Math.ceil(total/DS_PERPAGE);
+  if(pages>1){
+    elPg.style.display='flex'; elPg.innerHTML='';
+    for(var i=0;i<pages;i++){
+      var b=document.createElement('button');
+      b.className='btn sm'+(i===DS_PAGE?' primary':'');
+      b.textContent=(i+1);
+      b.onclick=function(idx){return function(){DS_PAGE=idx;dsRenderResults();document.getElementById('ds-search-results').scrollIntoView({behavior:'smooth'})}}(i);
+      elPg.appendChild(b);
+    }
+  }else{
+    elPg.style.display='none';
   }
 }
 
@@ -5121,39 +5190,30 @@ async function doSearch(){
   var q=document.getElementById('q').value.trim();
   if(!q){ alert('请先输入关键词');return; }
   var yMin=document.getElementById('q-year').value;
-  var qtype=document.getElementById('q-type').value;
   var sort=document.getElementById('q-sort').value;
   var elSt=document.getElementById('search-status');
   var elRe=document.getElementById('search-results');
   var elPg=document.getElementById('search-pager');
   RESULTS=[]; RPAGE=0;
   elRe.style.display='none';elPg.style.display='none';
-  elSt.className='empty-tip'; elSt.innerHTML=' 正在从真实数据源检索…<br><small style="color:var(--muted)">PubMed · Crossref · Semantic Scholar · Zenodo</small>';
-  ['s-pubmed','s-crossref','s-s2','s-zenodo'].forEach(function(id){document.getElementById(id).className='chip grey'});
+  elSt.className='empty-tip'; elSt.innerHTML=' 正在从真实数据源检索…<br><small style="color:var(--muted)">PubMed · Crossref · Semantic Scholar</small>';
+  ['s-pubmed','s-crossref','s-s2'].forEach(function(id){document.getElementById(id).className='chip grey'});
 
   var ret=0;
-  if(qtype==='all'||qtype==='paper'){
-    try{
-      var pub=await fetchPubmed(q,yMin);
-      RESULTS=RESULTS.concat(pub);document.getElementById('s-pubmed').className='chip ok';ret+=pub.length;
-    }catch(e){document.getElementById('s-pubmed').className='chip bad';document.getElementById('s-pubmed').title=e.message;console.error('PubMed',e)}
-    try{
-      var cr=await fetchCrossref(q,yMin);
-      RESULTS=RESULTS.concat(cr);document.getElementById('s-crossref').className='chip ok';ret+=cr.length;
-    }catch(e){document.getElementById('s-crossref').className='chip bad';document.getElementById('s-crossref').title=e.message;console.error('Crossref',e)}
-    try{
-      var s2=await fetchS2(q,yMin);
-      RESULTS=RESULTS.concat(s2);document.getElementById('s-s2').className='chip ok';ret+=s2.length;
-    }catch(e){document.getElementById('s-s2').className='chip bad';document.getElementById('s-s2').title=e.message;console.error('S2',e)}
-  }
-  if(qtype==='all'||qtype==='dataset'){
-    try{
-      var z=await fetchZenodo(q,yMin);
-      RESULTS=RESULTS.concat(z);document.getElementById('s-zenodo').className='chip ok';ret+=z.length;
-    }catch(e){document.getElementById('s-zenodo').className='chip bad';document.getElementById('s-zenodo').title=e.message;console.error('Zenodo',e)}
-  }
+  try{
+    var pub=await fetchPubmed(q,yMin);
+    RESULTS=RESULTS.concat(pub);document.getElementById('s-pubmed').className='chip ok';ret+=pub.length;
+  }catch(e){document.getElementById('s-pubmed').className='chip bad';document.getElementById('s-pubmed').title=e.message;console.error('PubMed',e)}
+  try{
+    var cr=await fetchCrossref(q,yMin);
+    RESULTS=RESULTS.concat(cr);document.getElementById('s-crossref').className='chip ok';ret+=cr.length;
+  }catch(e){document.getElementById('s-crossref').className='chip bad';document.getElementById('s-crossref').title=e.message;console.error('Crossref',e)}
+  try{
+    var s2=await fetchS2(q,yMin);
+    RESULTS=RESULTS.concat(s2);document.getElementById('s-s2').className='chip ok';ret+=s2.length;
+  }catch(e){document.getElementById('s-s2').className='chip bad';document.getElementById('s-s2').title=e.message;console.error('S2',e)}
 
-  // Dedupe by DOI / PMID / exact title / DOI (for datasets, use record id)
+  // Dedupe by DOI / PMID / exact title
   var seenD=new Set(),seenP=new Set(),seenT=new Set(),seenR=new Set(), uniq=[];
   RESULTS.forEach(function(r){
     var t=(r.title||'').trim().toLowerCase();
@@ -5178,7 +5238,7 @@ async function doSearch(){
   document.getElementById('btn-export').disabled=libGet().length===0;
 
   if(RESULTS.length===0){
-    elSt.className='empty-tip'; elSt.innerHTML='未检索到结果。请尝试更换关键词，或调整年份 / 类型筛选。<br><small style="color:var(--muted)">提示：使用英文关键词通常在国际数据源中命中更多结果。</small>';
+    elSt.className='empty-tip'; elSt.innerHTML='未检索到结果。请尝试更换关键词，或调整年份筛选。<br><small style="color:var(--muted)">提示：使用英文关键词通常在国际数据源中命中更多结果。</small>';
   }else{
     elSt.style.display='none'; elRe.style.display='flex';
     renderResults();
