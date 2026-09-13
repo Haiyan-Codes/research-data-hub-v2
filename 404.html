@@ -5305,12 +5305,19 @@ async function doSearch(){
 }
 
 async function fetchZenodo(q, yMin){
-  // Real Zenodo search API - open access, CORS supported, no auth required
+  // Zenodo search API - use CORS proxy relays because zenodo.org is often unreachable from China
   var params='q='+encodeURIComponent(q+' AND (mental OR depression OR anxiety OR psychiatry OR cognitive OR neuroscience OR mental health OR psychology OR survey OR cohort OR behavioral OR brain OR neuro)')+'&type=dataset&size=20&sort=bestmatch';
   if(yMin) params+='&all_versions=false';
-  var u='https://zenodo.org/api/records?'+params;
+  var rawUrl='https://zenodo.org/api/records?'+params;
+  // 代理列表：依次尝试，任一成功即返回
+  var proxies=[
+    function(url){ return 'https://corsproxy.io/?url='+encodeURIComponent(url); },
+    function(url){ return 'https://api.allorigins.win/raw?url='+encodeURIComponent(url); },
+    function(url){ return url; } // 直连兜底
+  ];
   var lastErr=null;
-  for(var attempt=0; attempt<2; attempt++){
+  for(var pi=0; pi<proxies.length; pi++){
+    var u=proxies[pi](rawUrl);
     try{
       var r=await fetch(u,{cache:'no-store'});
       if(!r.ok) throw new Error('Zenodo HTTP '+r.status);
@@ -5338,14 +5345,10 @@ async function fetchZenodo(q, yMin){
       return out;
     }catch(e){
       lastErr=e;
-      if(attempt===0 && /Failed to fetch|NetworkError|TypeError|503|502|500|429/i.test(e.message)){
-        await new Promise(rs=>setTimeout(rs, 1500));
-        continue;
-      }
-      throw e;
+      // 尝试下一个代理
     }
   }
-  throw lastErr;
+  throw lastErr||new Error('Zenodo 所有代理均失败');
 }
 
 async function fetchPubmed(q, yMin){
