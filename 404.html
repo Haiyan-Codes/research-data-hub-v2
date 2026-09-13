@@ -5172,7 +5172,7 @@ async function dsSearch(){
   elSt.className='empty-tip'; elSt.innerHTML=' 正在从 Zenodo 检索数据集…<br><small style="color:var(--muted)">Zenodo Open Access</small>';
 
   try{
-    var z=await withTimeout(fetchZenodo(q,yMin),20000,'Zenodo');
+    var z=await withTimeout(fetchZenodo(q,yMin),15000,'Zenodo');
     DS_RESULTS=z;
     if(DS_RESULTS.length===0){
       elSt.className='empty-tip'; elSt.innerHTML=' 未检索到数据集。请尝试更换关键词。<br><small style="color:var(--muted)">提示：使用英文关键词通常命中更多结果。</small>';
@@ -5305,50 +5305,35 @@ async function doSearch(){
 }
 
 async function fetchZenodo(q, yMin){
-  // Zenodo search API - use CORS proxy relays because zenodo.org is often unreachable from China
-  var params='q='+encodeURIComponent(q+' AND (mental OR depression OR anxiety OR psychiatry OR cognitive OR neuroscience OR mental health OR psychology OR survey OR cohort OR behavioral OR brain OR neuro)')+'&type=dataset&size=20&sort=bestmatch';
-  if(yMin) params+='&all_versions=false';
-  var rawUrl='https://zenodo.org/api/records?'+params;
-  // 代理列表：依次尝试，任一成功即返回
-  var proxies=[
-    function(url){ return 'https://corsproxy.io/?url='+encodeURIComponent(url); },
-    function(url){ return 'https://api.allorigins.win/raw?url='+encodeURIComponent(url); },
-    function(url){ return url; } // 直连兜底
-  ];
-  var lastErr=null;
-  for(var pi=0; pi<proxies.length; pi++){
-    var u=proxies[pi](rawUrl);
-    try{
-      var r=await fetch(u,{cache:'no-store'});
-      if(!r.ok) throw new Error('Zenodo HTTP '+r.status);
-      var j=await r.json();
-      var items=j.hits&&j.hits.hits?j.hits.hits:[];
-      var out=[];
-      items.forEach(function(it){
-        var md=it.metadata||{};
-        var dates=md.publication_date||(it.created||'').slice(0,10);
-        var yr=dates?parseInt(dates.slice(0,4)):null;
-        if(yMin && yr && yr<parseInt(yMin)) return;
-        var kw=(md.keywords||[]).slice(0,6).join(' · ');
-        var desc=(md.description||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,800);
-        var authors=(md.creators||[]).slice(0,4).map(function(c){return c.name}).join(', ')+((md.creators||[]).length>4?' 等':'');
-        out.push({
-          kind:'dataset', source:'Zenodo', relevance:4, rid:it.id, doi:md.doi||'', pmid:'',
-          title:md.title||'(无标题)',
-          abstract: desc+(kw?'\n关键词：'+kw:''),
-          authors, journal:'Zenodo Dataset', year:yr, citations:0,
-          url:it.links&&it.links.html?it.links.html:'https://zenodo.org/record/'+it.id,
-          access:md.access_right||'open',
-          size:it.files?'文件数：'+it.files.length:''
-        });
-      });
-      return out;
-    }catch(e){
-      lastErr=e;
-      // 尝试下一个代理
-    }
-  }
-  throw lastErr||new Error('Zenodo 所有代理均失败');
+  // 通过 Cloudflare Worker 代理访问 Zenodo API（解决中国直连超时）
+  var workerUrl='https://storm.mentalhealthresearch.top';
+  var params='q='+encodeURIComponent(q+' AND (mental OR depression OR anxiety OR psychiatry OR cognitive OR neuroscience OR mental health OR psychology OR survey OR cohort OR behavioral OR brain OR neuro)')+'&type=dataset&size=20&sort=bestmatch&all_versions=false';
+  var u=workerUrl+'/api/zenodo?'+params;
+  var r=await fetch(u,{cache:'no-store'});
+  if(!r.ok) throw new Error('Zenodo代理 HTTP '+r.status);
+  var j=await r.json();
+  if(!j||!j.ok||!j.data) throw new Error('Zenodo代理返回异常');
+  var items=j.data.hits&&j.data.hits.hits?j.data.hits.hits:[];
+  var out=[];
+  items.forEach(function(it){
+    var md=it.metadata||{};
+    var dates=md.publication_date||(it.created||'').slice(0,10);
+    var yr=dates?parseInt(dates.slice(0,4)):null;
+    if(yMin && yr && yr<parseInt(yMin)) return;
+    var kw=(md.keywords||[]).slice(0,6).join(' · ');
+    var desc=(md.description||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,800);
+    var authors=(md.creators||[]).slice(0,4).map(function(c){return c.name}).join(', ')+((md.creators||[]).length>4?' 等':'');
+    out.push({
+      kind:'dataset', source:'Zenodo', relevance:4, rid:it.id, doi:md.doi||'', pmid:'',
+      title:md.title||'(无标题)',
+      abstract: desc+(kw?'\n关键词：'+kw:''),
+      authors, journal:'Zenodo Dataset', year:yr, citations:0,
+      url:it.links&&it.links.html?it.links.html:'https://zenodo.org/record/'+it.id,
+      access:md.access_right||'open',
+      size:it.files?'文件数：'+it.files.length:''
+    });
+  });
+  return out;
 }
 
 async function fetchPubmed(q, yMin){
